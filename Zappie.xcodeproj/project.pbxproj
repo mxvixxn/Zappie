@@ -7,15 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00D2DC6429BE19C77FE92463 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8418B539C2E368A6F34609 /* Theme.swift */; };
 		1CCE1F662D452E01BB3EBF3F /* PowerMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E15D9C9E43622193B7CC57 /* PowerMonitorTests.swift */; };
+		330F72D29FDC5AD82182C20B /* PowerPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA44B4EDBDE6FE62D45A336 /* PowerPresentation.swift */; };
 		3A7E60A1EF8C416EF89B2E01 /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCA001A87A1CEC39E01381D /* Fixtures.swift */; };
+		484D16FA5A8F51A098B403AD /* PowerFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 709F5F17F7403E1E0FED9916 /* PowerFlowView.swift */; };
 		4E1E93E82EB7D6A230204255 /* PowerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC19B214AD3BEAE48CF4F51 /* PowerState.swift */; };
+		528C9CBCE6DF94386B6CC6F9 /* PowerPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98F50BF6B13AE1D4DD443F8 /* PowerPresentationTests.swift */; };
 		621E3B3144A8E404CA81922C /* PowerSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F08A0289524457FEC729F3D /* PowerSnapshot.swift */; };
 		7F0983B292E396396E4E4405 /* PowerReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57096C1A0A7D2E47186B3D6 /* PowerReaderTests.swift */; };
+		8A2DC301ADAEFCF0AFCCFCEE /* MenuBarLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D37628C3B4896787F5DCD27 /* MenuBarLabel.swift */; };
+		9613E6C53EF77AA4DA84F8BD /* DropdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAD9AFAA5699DB8098969E11 /* DropdownView.swift */; };
 		9BADC53928C66DEBBFBA09E6 /* PowerStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3EB8A7FE005B79EFD947AF9 /* PowerStateTests.swift */; };
 		DF4B020F6D35D235A900B09B /* PowerReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13BE3D6743EDAE837C213FA1 /* PowerReader.swift */; };
 		E2ED9D02EFD118519212FA03 /* PowerMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C3CEC65392B9A0488556A /* PowerMonitor.swift */; };
 		E7951F9C0DA3BBC42B358B0D /* ZappieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249616148354C772AB6A3241 /* ZappieApp.swift */; };
+		F1E721D1E71CDED586746C3E /* RenderSnapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF335F87073EB7F647303B3 /* RenderSnapshots.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,10 +42,17 @@
 		0F08A0289524457FEC729F3D /* PowerSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerSnapshot.swift; sourceTree = "<group>"; };
 		13BE3D6743EDAE837C213FA1 /* PowerReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerReader.swift; sourceTree = "<group>"; };
 		249616148354C772AB6A3241 /* ZappieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZappieApp.swift; sourceTree = "<group>"; };
+		2E8418B539C2E368A6F34609 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		364A31146216196A6CAF1B82 /* ZappieTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZappieTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		709F5F17F7403E1E0FED9916 /* PowerFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerFlowView.swift; sourceTree = "<group>"; };
+		8FA44B4EDBDE6FE62D45A336 /* PowerPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerPresentation.swift; sourceTree = "<group>"; };
+		9D37628C3B4896787F5DCD27 /* MenuBarLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLabel.swift; sourceTree = "<group>"; };
+		BAD9AFAA5699DB8098969E11 /* DropdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropdownView.swift; sourceTree = "<group>"; };
 		BCCA001A87A1CEC39E01381D /* Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fixtures.swift; sourceTree = "<group>"; };
+		C98F50BF6B13AE1D4DD443F8 /* PowerPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerPresentationTests.swift; sourceTree = "<group>"; };
 		D57096C1A0A7D2E47186B3D6 /* PowerReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerReaderTests.swift; sourceTree = "<group>"; };
 		E3EB8A7FE005B79EFD947AF9 /* PowerStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerStateTests.swift; sourceTree = "<group>"; };
+		ECF335F87073EB7F647303B3 /* RenderSnapshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderSnapshots.swift; sourceTree = "<group>"; };
 		FB3C3CEC65392B9A0488556A /* PowerMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerMonitor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -63,11 +77,24 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		6BFBE1119DD1CE2649669ADF /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				BAD9AFAA5699DB8098969E11 /* DropdownView.swift */,
+				9D37628C3B4896787F5DCD27 /* MenuBarLabel.swift */,
+				709F5F17F7403E1E0FED9916 /* PowerFlowView.swift */,
+				8FA44B4EDBDE6FE62D45A336 /* PowerPresentation.swift */,
+				2E8418B539C2E368A6F34609 /* Theme.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
 		73F75249484600B5A5FA8208 /* Zappie */ = {
 			isa = PBXGroup;
 			children = (
 				249616148354C772AB6A3241 /* ZappieApp.swift */,
 				4673A474E057B93BE5904789 /* Power */,
+				6BFBE1119DD1CE2649669ADF /* UI */,
 			);
 			path = Zappie;
 			sourceTree = "<group>";
@@ -86,8 +113,10 @@
 			children = (
 				BCCA001A87A1CEC39E01381D /* Fixtures.swift */,
 				05E15D9C9E43622193B7CC57 /* PowerMonitorTests.swift */,
+				C98F50BF6B13AE1D4DD443F8 /* PowerPresentationTests.swift */,
 				D57096C1A0A7D2E47186B3D6 /* PowerReaderTests.swift */,
 				E3EB8A7FE005B79EFD947AF9 /* PowerStateTests.swift */,
+				ECF335F87073EB7F647303B3 /* RenderSnapshots.swift */,
 			);
 			path = ZappieTests;
 			sourceTree = "<group>";
@@ -176,8 +205,10 @@
 			files = (
 				3A7E60A1EF8C416EF89B2E01 /* Fixtures.swift in Sources */,
 				1CCE1F662D452E01BB3EBF3F /* PowerMonitorTests.swift in Sources */,
+				528C9CBCE6DF94386B6CC6F9 /* PowerPresentationTests.swift in Sources */,
 				7F0983B292E396396E4E4405 /* PowerReaderTests.swift in Sources */,
 				9BADC53928C66DEBBFBA09E6 /* PowerStateTests.swift in Sources */,
+				F1E721D1E71CDED586746C3E /* RenderSnapshots.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,10 +216,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9613E6C53EF77AA4DA84F8BD /* DropdownView.swift in Sources */,
+				8A2DC301ADAEFCF0AFCCFCEE /* MenuBarLabel.swift in Sources */,
+				484D16FA5A8F51A098B403AD /* PowerFlowView.swift in Sources */,
 				E2ED9D02EFD118519212FA03 /* PowerMonitor.swift in Sources */,
+				330F72D29FDC5AD82182C20B /* PowerPresentation.swift in Sources */,
 				DF4B020F6D35D235A900B09B /* PowerReader.swift in Sources */,
 				621E3B3144A8E404CA81922C /* PowerSnapshot.swift in Sources */,
 				4E1E93E82EB7D6A230204255 /* PowerState.swift in Sources */,
+				00D2DC6429BE19C77FE92463 /* Theme.swift in Sources */,
 				E7951F9C0DA3BBC42B358B0D /* ZappieApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
