@@ -70,6 +70,8 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 연결됨 && batteryW < −0.5                           → .assisted (어댑터 부족, 배터리 보조) ※시안에 없음, 배지만 "보조 방전"
 ```
 임계값 0.5 W는 깜빡임 방지용 초깃값. 상태 전환에 2초 히스테리시스 적용.
+- 단, `.battery`로 들어가고 나오는 전환(분리/연결)은 히스테리시스 없이 즉시 반영한다 (완료 기준 1초).
+- 연결 상태가 바뀐 시각보다 `UpdateTime`이 오래된 스냅샷은 이전 전원의 값이므로 와트를 무시하고 `.hold`로 본다.
 
 ---
 

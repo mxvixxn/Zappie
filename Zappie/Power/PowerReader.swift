@@ -43,7 +43,8 @@ enum PowerReader {
             fullChargeCapacitymAh: int(batteryData?["FullChargeCapacity"]),
             timeToFullMin: minutes(battery["AvgTimeToFull"]),
             timeToEmptyMin: minutes(battery["AvgTimeToEmpty"]),
-            adapter: adapter(battery["AdapterDetails"] as? [String: Any])
+            adapter: adapter(battery["AdapterDetails"] as? [String: Any]),
+            updateTime: signed(battery["UpdateTime"]).map { Date(timeIntervalSince1970: TimeInterval($0)) }
         )
     }
 

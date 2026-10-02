@@ -73,6 +73,11 @@ struct PowerReaderTests {
         #expect(s.adapter == nil)
     }
 
+    @Test func readsUpdateTimeAsDate() throws {
+        let s = try #require(PowerReader.parse(battery: Fixtures.pluggedHold, pack: nil))
+        #expect(s.updateTime == Date(timeIntervalSince1970: 1790950824))
+    }
+
     @Test func unsupportedWithoutPowerTelemetry() {
         var battery = Fixtures.pluggedHold
         battery["PowerTelemetryData"] = nil
