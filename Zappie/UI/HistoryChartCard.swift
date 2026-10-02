@@ -5,6 +5,8 @@ import SwiftUI
 struct HistoryChartCard: View {
     let history: PowerHistory
     var now: Date = .now
+    var chartHeight: CGFloat = 170
+    var showsSummary = false
     @State private var range: HistoryRange = .hour
 
     var body: some View {
@@ -27,10 +29,24 @@ struct HistoryChartCard: View {
                 Text("기록을 모으는 중…")
                     .font(.system(size: 13))
                     .foregroundStyle(Theme.secondaryText)
-                    .frame(maxWidth: .infinity, minHeight: 170)
+                    .frame(maxWidth: .infinity, minHeight: chartHeight)
             } else {
                 HistoryChart(samples: samples, range: range, now: now)
-                    .frame(height: 170)
+                    .frame(height: chartHeight)
+            }
+            if showsSummary, let summary = HistorySummary(samples) {
+                HStack(spacing: 10) {
+                    ForEach(summary.items, id: \.label) { item in
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(item.label).font(.system(size: 11)).foregroundStyle(Theme.secondaryText)
+                            Text(item.value).font(.system(size: 15, weight: .semibold))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .background(Theme.background, in: RoundedRectangle(cornerRadius: 8))
+                    }
+                }
             }
         }
         .padding(18)

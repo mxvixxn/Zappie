@@ -3,13 +3,16 @@ import SwiftUI
 
 struct MenuBarLabel: View {
     let monitor: PowerMonitor
+    @AppStorage(AppSettings.labelStyleKey) private var style = MenuBarLabelStyle.watts
 
     var body: some View {
         if let snapshot = monitor.snapshot, let state = monitor.state {
             let item = PowerPresentation(snapshot: snapshot, state: state).menuBar
             HStack(spacing: 4) {
                 Image(nsImage: Self.coloredSymbol(item.icon, tint: item.tint))
-                Text(item.text).monospacedDigit()
+                if style.showsText {
+                    Text(item.text).monospacedDigit()
+                }
             }
         } else {
             Image(systemName: "bolt.fill")

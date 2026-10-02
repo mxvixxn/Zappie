@@ -152,20 +152,7 @@ struct OverviewView: View {
 
     private func batteryCard(_ tiles: [OverviewPresentation.Tile]) -> some View {
         Card("배터리") {
-            HStack(spacing: 10) {
-                ForEach(tiles, id: \.label) { tile in
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(tile.label).font(.system(size: 11)).foregroundStyle(Theme.secondaryText)
-                        Text(tile.value).font(.system(size: 15, weight: .semibold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .background(Theme.background, in: RoundedRectangle(cornerRadius: 8))
-                }
-            }
+            BatteryTiles(tiles: tiles)
         }
     }
 

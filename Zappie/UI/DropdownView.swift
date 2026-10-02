@@ -3,6 +3,7 @@ import SwiftUI
 struct DropdownView: View {
     let monitor: PowerMonitor
     @Environment(\.openWindow) private var openWindow
+    @AppStorage(AppSettings.sectionKey) private var section: MainSection = .overview
 
     var body: some View {
         VStack(spacing: 12) {
@@ -98,6 +99,7 @@ struct DropdownView: View {
 
             Menu {
                 Button("설정…") {
+                    section = .settings
                     openWindow(id: "main")
                     NSApp.activate()
                 }

@@ -13,7 +13,7 @@ enum MainSection: String, CaseIterable, Identifiable {
 struct MainWindow: View {
     let monitor: PowerMonitor
     var scrolls = true
-    @State private var section: MainSection = .overview
+    @AppStorage(AppSettings.sectionKey) private var section: MainSection = .overview
 
     var body: some View {
         HStack(spacing: 0) {
@@ -22,7 +22,10 @@ struct MainWindow: View {
             Group {
                 switch section {
                 case .overview: OverviewView(monitor: monitor, scrolls: scrolls)
-                default: placeholder
+                case .history: HistoryTab(monitor: monitor)
+                case .adapter: AdapterTab(monitor: monitor)
+                case .battery: BatteryTab(monitor: monitor)
+                case .settings: SettingsTab()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -57,10 +60,5 @@ struct MainWindow: View {
         .padding(.vertical, 16)
         .frame(width: 200)
         .background(Theme.sidebar)
-    }
-
-    private var placeholder: some View {
-        Text("\(section.rawValue) 화면은 준비 중입니다.")
-            .foregroundStyle(Theme.secondaryText)
     }
 }

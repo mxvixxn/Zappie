@@ -106,17 +106,12 @@ struct OverviewPresentation: Equatable {
             if abs(a) < 0.005 { return "0.00 A" }
             return (a > 0 ? "+" : "−") + String(format: "%.2f A", abs(a))
         } ?? "—"
-        let health: String = if let full = s.fullChargeCapacitymAh, let design = s.designCapacitymAh, design > 0 {
-            Format.percent(Double(full) / Double(design))
-        } else {
-            "—"
-        }
         return [
             Tile(label: "전압", value: s.batteryVoltageV.map { String(format: "%.2f V", $0) } ?? "—"),
             Tile(label: "전류", value: current),
             Tile(label: "온도", value: s.temperatureC.map { String(format: "%.1f °C", $0) } ?? "—"),
             Tile(label: "사이클", value: s.cycleCount.map(String.init) ?? "—"),
-            Tile(label: "최대 용량", value: health),
+            Tile(label: "최대 용량", value: Format.capacityHealth(s)),
             // The macOS charge limit setting is not readable through public API (SPEC §1).
             Tile(label: "충전 한도", value: "—"),
         ]
