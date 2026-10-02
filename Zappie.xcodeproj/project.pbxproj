@@ -17,6 +17,7 @@
 		484D16FA5A8F51A098B403AD /* PowerFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 709F5F17F7403E1E0FED9916 /* PowerFlowView.swift */; };
 		4E1E93E82EB7D6A230204255 /* PowerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC19B214AD3BEAE48CF4F51 /* PowerState.swift */; };
 		528C9CBCE6DF94386B6CC6F9 /* PowerPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98F50BF6B13AE1D4DD443F8 /* PowerPresentationTests.swift */; };
+		561F3DED5CC10DA79340B057 /* Zappie.icon in Resources */ = {isa = PBXBuildFile; fileRef = 631C5C8CC927B0417091EA74 /* Zappie.icon */; };
 		57CF806824E09917D6C76FE0 /* DetailPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F9520C806283AAE550071D /* DetailPresentation.swift */; };
 		6137AB04F882DC845B66F75A /* DetailPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C8265EFB803AA04E32E648 /* DetailPresentationTests.swift */; };
 		621E3B3144A8E404CA81922C /* PowerSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F08A0289524457FEC729F3D /* PowerSnapshot.swift */; };
@@ -63,6 +64,7 @@
 		455979CEE452E0D1B6E3E37D /* DetailTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailTabs.swift; sourceTree = "<group>"; };
 		57F9520C806283AAE550071D /* DetailPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPresentation.swift; sourceTree = "<group>"; };
 		5D36A6E69A1963BE036FCFA6 /* PowerHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerHistoryTests.swift; sourceTree = "<group>"; };
+		631C5C8CC927B0417091EA74 /* Zappie.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = Zappie.icon; sourceTree = "<group>"; };
 		66C8265EFB803AA04E32E648 /* DetailPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPresentationTests.swift; sourceTree = "<group>"; };
 		709F5F17F7403E1E0FED9916 /* PowerFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerFlowView.swift; sourceTree = "<group>"; };
 		8C5B24B5F80DB26CD5793678 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				8C5B24B5F80DB26CD5793678 /* AppSettings.swift */,
+				631C5C8CC927B0417091EA74 /* Zappie.icon */,
 				249616148354C772AB6A3241 /* ZappieApp.swift */,
 				4673A474E057B93BE5904789 /* Power */,
 				6BFBE1119DD1CE2649669ADF /* UI */,
@@ -180,6 +183,7 @@
 			buildConfigurationList = EF05A036E44648FD4BC48045 /* Build configuration list for PBXNativeTarget "Zappie" */;
 			buildPhases = (
 				844AA5318FDC436F9EB5BB8C /* Sources */,
+				E329BD6469F89E2736E0C13E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -230,6 +234,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E329BD6469F89E2736E0C13E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				561F3DED5CC10DA79340B057 /* Zappie.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		59DC14821D493C25D9659864 /* Sources */ = {
@@ -288,7 +303,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Zappie;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -375,7 +390,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Zappie;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;

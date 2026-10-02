@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/app-icon.png" width="120" alt="Zappie 앱 아이콘" />
+
 # Zappie
 
 **어댑터 → 시스템 / 배터리로 흐르는 전력을 실시간으로 보여주는 macOS 메뉴 막대 앱**
