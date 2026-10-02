@@ -12,7 +12,7 @@ macOS 메뉴 막대 앱. 어댑터 입력 → 시스템 / 배터리로 흐르는
 | 항목 | 값 |
 |---|---|
 | 언어 / UI | Swift 6, SwiftUI (+ Swift Charts) |
-| 대상 | macOS 26+, **Apple Silicon 전용** (Intel은 `PowerTelemetryData` 없음) |
+| 대상 | macOS 27+, **Apple Silicon 전용** (Intel은 `PowerTelemetryData` 없음) |
 | 메뉴 막대 | `MenuBarExtra` + `.menuBarExtraStyle(.window)` |
 | 메인 창 | `Window` scene, 드롭다운 버튼에서 `openWindow(id:)` |
 | App Sandbox | **끔** (개인용). 샌드박스에서 IORegistry 읽기 가능 여부는 미확인 |
@@ -25,26 +25,35 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 ## 1. 데이터 소스
 
 `IOServiceMatching("AppleSmartBattery")` → `IORegistryEntryCreateCFProperties`로 딕셔너리를 통째로 읽는다.
+일부 값(온도, raw 용량)은 자식 노드 `AppleSmartBatteryPack`의 `BatteryData`에만 있으므로 그 노드도 함께 읽는다.
 
-| 용도 | 키 | 단위(예상) | 비고 |
+> M0 검증 완료 (2026-10-02, Mac17,9 M5 Pro, macOS 27, 70W USB-C 어댑터). 원본 출력은 `docs/m0/`.
+
+| 용도 | 키 | 단위 | 비고 |
 |---|---|---|---|
-| 어댑터 입력 | `PowerTelemetryData.SystemPowerIn` | mW | Apple Silicon, macOS 13+ |
-| 시스템 소비 | `PowerTelemetryData.SystemLoad` | mW | 배터리 충전분 제외 |
-| 배터리 전력 | `PowerTelemetryData.BatteryPower` | mW | 충전 +, 방전 − |
-| 배터리 전압 | `Voltage` | mV | |
-| 배터리 전류 | `InstantAmperage` | mA | 부호 있음. 음수 처리 주의(UInt로 올 수 있음) |
-| 온도 | `Temperature` | 0.01 °C | |
-| 사이클 | `CycleCount` | 회 | |
-| 설계 용량 | `BatteryData.DesignCapacity` | mAh | |
-| 최대 충전 용량 | `AppleRawMaxCapacity` 또는 `BatteryData.FullChargeCapacity` | mAh | 둘 중 존재하는 것 |
-| 전원 연결 | `ExternalConnected` | Bool | |
-| 어댑터 정보 | `AdapterDetails` (`Watts`, `AdapterVoltage`, `Current`, `Manufacturer` …) | W / mV / mA | 키 구성 기기별로 확인 |
-| 배터리 % | `CurrentCapacity` | % (Apple Silicon 추정) | raw mAh는 `AppleRawCurrentCapacity` |
+| 어댑터 입력 | `PowerTelemetryData.SystemPowerIn` | mW | ✅ 확인. `SystemVoltageIn`(mV) × `SystemCurrentIn`(mA)와 일치 |
+| 시스템 소비 | `PowerTelemetryData.SystemLoad` | mW | ✅ 확인 |
+| 배터리 전력 | `PowerTelemetryData.BatteryPower` | mW | ✅ 충전 +, 방전 −. 방전 시 −16,860 = `SystemLoad`와 같음. (`BatteryData.BatteryPower`는 −13,822로 V×I와 일치 — 셀 단자 기준) |
+| 어댑터 손실 | `PowerTelemetryData.AdapterEfficiencyLoss` | mW | M0에서 새로 발견. 손실 계산에 직접 사용 가능 |
+| 배터리 전압 | `Voltage` | mV | ✅ 확인 |
+| 배터리 전류 | `InstantAmperage` | mA | ✅ 방전 −1,124 |
+| 온도 | **Pack** `BatteryData.Temperature` | 0.01 °C | ⚠️ 최상위 `Temperature` 없음. Pack 노드에만 있음 (`VirtualTemperature`도 동일 값) |
+| 사이클 | `CycleCount` | 회 | ✅ 확인 |
+| 설계 용량 | `BatteryData.DesignCapacity` | mAh | ✅ 확인 |
+| 최대 충전 용량 | `BatteryData.FullChargeCapacity` | mAh | ✅ 확인. `AppleRawMaxCapacity`는 최상위에 없고 Pack에만 있음 |
+| 전원 연결 | `ExternalConnected` | Bool | ✅ 확인 |
+| 어댑터 정보 | `AdapterDetails` (`Watts`, `AdapterVoltage`, `Current`, `Manufacturer`, `Name`, `Description`) | W / mV / mA | ✅ 70W 어댑터인데 `Watts`=68. 프로토콜은 `Description`("pd charger") |
+| 배터리 % | `CurrentCapacity` | % | ✅ 확인. raw mAh는 `BatteryData.RemainingCapacity` (Pack에는 `AppleRawCurrentCapacity`) |
 | 남은 시간 | `AvgTimeToFull` / `AvgTimeToEmpty` | 분 | 65535 = 계산 중/없음 처리 |
+| 충전 중 여부 | `IsCharging`, `ChargerData.NotChargingReason` | Bool / 비트마스크 | 한도 유지 중 `NotChargingReason`=16777216 (0이 아님) |
+
+**음수 값**: `BatteryPower`, `InstantAmperage` 등 음수는 **UInt64 비트 패턴**으로 온다(예: 18446744073709534756 = −16,860). `NSNumber.int64Value`로 재해석한다.
+
+**갱신 주기**: IORegistry 값은 1초마다 바뀌지 않는다. `UpdateTime` 관찰 결과 유휴 시 최대 약 60초, 부하 변화 시 1~7초 간격. 전원을 분리하면 `ExternalConnected`는 즉시 바뀌지만 전력 값은 다음 갱신까지 이전 값이 남는다. → 상태 판정은 `ExternalConnected`를 우선하고, 전력 값의 신선도는 `UpdateTime`으로 판단한다.
 
 **계산값**
 - 배터리 순전력(대체값) = `Voltage × InstantAmperage / 1_000_000` (W). `BatteryPower`가 없거나 0일 때 사용.
-- 기타·손실 = 입력 − 시스템 − 배터리(충전 시). 음수면 0으로 클램프, 배터리 모드에선 "—".
+- 기타·손실 = 입력 − 시스템 − 배터리(충전 시). 음수면 0으로 클램프, 배터리 모드에선 "—". (`AdapterEfficiencyLoss`와 비교해 어느 쪽을 쓸지 M1에서 결정)
 - 정격 대비 사용률 = 입력 W / `AdapterDetails.Watts`.
 - 최대 용량 % = 최대 충전 용량 / 설계 용량.
 

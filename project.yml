@@ -2,7 +2,7 @@ name: Zappie
 options:
   bundleIdPrefix: com.mxvixxn
   deploymentTarget:
-    macOS: "26.0"
+    macOS: "27.0"
   createIntermediateGroups: true
 settings:
   base:

@@ -1,0 +1,11 @@
++-o AppleSmartBatteryPack  <class AppleSmartBatteryPack, id 0x100000e86, registered, matched, active, busy 0 (3 ms), retain 9>
+    {
+      "ID" = 0
+      "BankCount" = 3
+      "KioskMode" = {}
+      "CarrierMode" = {"CarrierModeLowVoltage"=0,"CarrierModeHighVoltage"=0,"CarrierModeStatus"=0}
+      "Serial" = "REDACTED"
+      "BatteryData" = {"CurrentCapacity"=80,"PackReserve"=152,"Qstart"=0,"TrueRemainingCapacity"=0,"BatteryPower"=0,"DailyMinSoc"=79,"BatteryCellDisconnectCount"=0,"PackCurrentAccumulator"=833113,"Amperage"=0,"PassedCharge"=12,"Flags"=16777217,"MiscStatus"=132,"AppleRawCurrentCapacity"=4736,"FccComp1"=6004,"AbsoluteCapacity"=0,"iMaxAndSocSmoothTable"=<0000000000000000000000000000000000000000000000000000000000000000>,"FccComp2"=6004,"ChemID"=29795,"PackCurrentAccumulatorCount"=283005,"AppleRawBatteryVoltage"=12415,"IPDBatteryDemand"=14718,"Dod0AtQualifiedQmax"=0,"Serial"="REDACTED","ResScale"=0,"FilteredCurrent"=0,"NominalChargeCapacity"=6156,"RSS"=0,"FullyCharged"=0,"FaultType"=1,"DataFlashWriteCount"=3332,"DailyMaxSoc"=80,"DateOfFirstUse"=0,"MaxCapacity"=100,"InstantAmperage"=0,"BatteryHealthMetric"=0,"GasGaugeFirmwareVersion"=2,"DesignCapacity"=6249,"Temperature"=2850,"BatteryPfCommsFailure"=0,"VacVoltageLimit"=4435,"BatteryState"=<000000000000000000c3e4000284030102>,"LifetimeData"={"Raw"=<01386aab00034d9b0000000000000000013bb8460000c7e44012000000000000002c000f11550c7e3400261b1a37dae51fe5d6b1dae5d6b100f4000167380002>,"UpdateTime"=1790951034,"CycleCountLastQmax"=51,"TemperatureSamples"=91960,"TotalOperatingTime"=5747,"MaximumDischargeCurrent"=18446744073709542117,"MinimumPackVoltage"=9755,"MaximumPackVoltage"=13312,"MaximumChargeCurrent"=6711,"AverageTemperature"=244,"MinimumTemperature"=15,"RDISCnt"=0,"MaximumTemperature"=44},"ISS"=0,"ChargeAccum"=0,"Voltage"=12415,"MfgData"=<000000000b000100271d00000433353134033030410341544c00000000000000>,"Soc1Voltage"=0,"SimRate"=0,"ManufactureDate"=55182581838899,"QmaxDisqualificationReason"=0,"CycleCount"=66,"IdealCRate"=0,"PermanentFailureStatus"=0,"ITMiscStatus"=0,"StateOfCharge"=79,"GaugeFlagRaw"=192,"VirtualTemperature"=2850,"AppleRawMaxCapacity"=6004,"VmaxNcc"=4435}
+    }
+    
+
