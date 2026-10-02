@@ -1,0 +1,41 @@
+name: Zappie
+options:
+  bundleIdPrefix: com.mxvixxn
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: "ACTN9LPR35"
+    CODE_SIGN_STYLE: Automatic
+    GENERATE_INFOPLIST_FILE: YES
+targets:
+  Zappie:
+    type: application
+    platform: macOS
+    sources:
+      - path: Zappie
+    settings:
+      base:
+        # Apple Silicon only: PowerTelemetryData does not exist on Intel.
+        ARCHS: arm64
+        # Personal build; IORegistry access under App Sandbox is unverified.
+        ENABLE_APP_SANDBOX: NO
+        ENABLE_HARDENED_RUNTIME: YES
+        # Menu bar app: no Dock icon.
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+  ZappieTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: ZappieTests
+    dependencies:
+      - target: Zappie
+    settings:
+      base:
+        ARCHS: arm64
+        GENERATE_INFOPLIST_FILE: YES
