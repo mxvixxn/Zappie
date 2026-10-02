@@ -33,4 +33,28 @@ struct RenderSnapshots {
             try png.write(to: dir.appendingPathComponent("dropdown-\(name).png"))
         }
     }
+
+    @Test(.enabled(if: outputDir != nil)) func renderMainWindow() throws {
+        let dir = URL(fileURLWithPath: try #require(Self.outputDir))
+        let adapter = AdapterInfo(watts: 68, voltageV: 20, currentA: 3.39, name: "70W USB-C Power Adapter")
+        var snapshot = Self.cases[0].1
+        snapshot.adapter = adapter
+        snapshot.adapterLossW = 0.233
+        snapshot.batteryVoltageV = 12.71
+        snapshot.batteryCurrentA = 2.47
+        snapshot.temperatureC = 33.4
+        snapshot.cycleCount = 66
+        snapshot.designCapacitymAh = 6249
+        snapshot.fullChargeCapacitymAh = 6004
+        snapshot.updateTime = .now
+        let monitor = PowerMonitor(read: { snapshot })
+        monitor.refresh()
+        let renderer = ImageRenderer(content: MainWindow(monitor: monitor, scrolls: false).frame(width: 1200, height: 908))
+        renderer.scale = 1
+        let image = try #require(renderer.nsImage)
+        let tiff = try #require(image.tiffRepresentation)
+        let rep = try #require(NSBitmapImageRep(data: tiff))
+        let png = try #require(rep.representation(using: .png, properties: [:]))
+        try png.write(to: dir.appendingPathComponent("main-overview.png"))
+    }
 }

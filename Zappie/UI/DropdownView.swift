@@ -47,12 +47,7 @@ struct DropdownView: View {
                 Text(p.source).font(.system(size: 12)).foregroundStyle(Theme.secondaryText)
             }
             Spacer()
-            Text(p.badge)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Theme.badgeText(p.badgeTint))
-                .padding(.horizontal, 9)
-                .padding(.vertical, 3)
-                .background(Theme.color(p.badgeTint).opacity(0.16), in: Capsule())
+            Badge(text: p.badge, tint: p.badgeTint)
             Text(p.percent).font(.system(size: 22, weight: .semibold))
         }
         .padding([.horizontal, .top], 2)
