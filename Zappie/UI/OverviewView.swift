@@ -43,7 +43,7 @@ struct OverviewView: View {
             }
             .fixedSize(horizontal: false, vertical: true)
 
-            historyCard
+            HistoryChartCard(history: monitor.history)
 
             HStack(alignment: .top, spacing: gap) {
                 adapterCard(o.adapter)
@@ -115,16 +115,6 @@ struct OverviewView: View {
                 .font(.system(size: 12))
             }
         }
-    }
-
-    private var historyCard: some View {
-        Card("전력 기록") {
-            Text("기록을 모으는 중…")
-                .font(.system(size: 13))
-                .foregroundStyle(Theme.secondaryText)
-                .frame(maxWidth: .infinity, minHeight: 150)
-        }
-        .fixedSize(horizontal: false, vertical: true)
     }
 
     private func adapterCard(_ a: OverviewPresentation.Adapter?) -> some View {

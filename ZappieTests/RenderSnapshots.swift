@@ -47,8 +47,17 @@ struct RenderSnapshots {
         snapshot.designCapacitymAh = 6249
         snapshot.fullChargeCapacitymAh = 6004
         snapshot.updateTime = .now
-        let monitor = PowerMonitor(read: { snapshot })
-        monitor.refresh()
+        // 50 minutes of synthetic history ending now.
+        let end = Date.now
+        var clock = end.addingTimeInterval(-3_000)
+        let monitor = PowerMonitor(read: { snapshot }, now: { clock })
+        for second in 0..<3_000 {
+            let t = Double(second)
+            snapshot.adapterInW = 44 + 2 * sin(t / 300)
+            snapshot.systemLoadW = 12 + 6 * max(0, sin(t / 200))
+            clock = end.addingTimeInterval(-3_000 + t)
+            monitor.refresh()
+        }
         let renderer = ImageRenderer(content: MainWindow(monitor: monitor, scrolls: false).frame(width: 1200, height: 908))
         renderer.scale = 1
         let image = try #require(renderer.nsImage)

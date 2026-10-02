@@ -54,6 +54,13 @@ struct PowerMonitorTests {
         #expect(rig.monitor.state == .charging)
     }
 
+    @Test func refreshRecordsHistory() {
+        let rig = Rig()
+        rig.step(0, PowerSnapshot(isExternalConnected: true, adapterInW: 20, systemLoadW: 8))
+        rig.step(1, PowerSnapshot(isExternalConnected: true, adapterInW: 20, systemLoadW: 8))
+        #expect(rig.monitor.history.samples(.hour).map(\.inputW) == [20])
+    }
+
     @Test func holdToChargingWaitsForHysteresis() {
         let rig = Rig()
         rig.step(0, PowerSnapshot(isExternalConnected: true, batteryW: 0))

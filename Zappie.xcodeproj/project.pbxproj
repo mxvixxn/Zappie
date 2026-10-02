@@ -12,6 +12,7 @@
 		1CCE1F662D452E01BB3EBF3F /* PowerMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E15D9C9E43622193B7CC57 /* PowerMonitorTests.swift */; };
 		330F72D29FDC5AD82182C20B /* PowerPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA44B4EDBDE6FE62D45A336 /* PowerPresentation.swift */; };
 		3A7E60A1EF8C416EF89B2E01 /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCA001A87A1CEC39E01381D /* Fixtures.swift */; };
+		3A94945760F9EEB2DEDE8603 /* HistoryChartCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AF91567342D599D82F3B98 /* HistoryChartCard.swift */; };
 		484D16FA5A8F51A098B403AD /* PowerFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 709F5F17F7403E1E0FED9916 /* PowerFlowView.swift */; };
 		4E1E93E82EB7D6A230204255 /* PowerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC19B214AD3BEAE48CF4F51 /* PowerState.swift */; };
 		528C9CBCE6DF94386B6CC6F9 /* PowerPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98F50BF6B13AE1D4DD443F8 /* PowerPresentationTests.swift */; };
@@ -19,7 +20,9 @@
 		7F0983B292E396396E4E4405 /* PowerReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57096C1A0A7D2E47186B3D6 /* PowerReaderTests.swift */; };
 		8A2DC301ADAEFCF0AFCCFCEE /* MenuBarLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D37628C3B4896787F5DCD27 /* MenuBarLabel.swift */; };
 		9613E6C53EF77AA4DA84F8BD /* DropdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAD9AFAA5699DB8098969E11 /* DropdownView.swift */; };
+		974A4B394BE575B85113B61C /* PowerHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D36A6E69A1963BE036FCFA6 /* PowerHistoryTests.swift */; };
 		9BADC53928C66DEBBFBA09E6 /* PowerStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3EB8A7FE005B79EFD947AF9 /* PowerStateTests.swift */; };
+		9FBD0BEC5E0C1C55B224FB3C /* PowerHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969A9F90202742BE828E145 /* PowerHistory.swift */; };
 		A858C84891B5132F645219D2 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646210A36754EDFC85A2BD2 /* OverviewView.swift */; };
 		AEEB27E6096F64328C9C4EB3 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F25DC705E2A122CF11F2BB /* MainWindow.swift */; };
 		BC7647B8A5765AB03B8314A3 /* OverviewPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF1CCB988B78D05E5CD0F97 /* OverviewPresentationTests.swift */; };
@@ -48,9 +51,12 @@
 		15A3A2BA8DFFA077075D2D8D /* OverviewPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewPresentation.swift; sourceTree = "<group>"; };
 		1646210A36754EDFC85A2BD2 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
 		249616148354C772AB6A3241 /* ZappieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZappieApp.swift; sourceTree = "<group>"; };
+		24AF91567342D599D82F3B98 /* HistoryChartCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryChartCard.swift; sourceTree = "<group>"; };
+		2969A9F90202742BE828E145 /* PowerHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerHistory.swift; sourceTree = "<group>"; };
 		2E8418B539C2E368A6F34609 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		364A31146216196A6CAF1B82 /* ZappieTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZappieTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EF1CCB988B78D05E5CD0F97 /* OverviewPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewPresentationTests.swift; sourceTree = "<group>"; };
+		5D36A6E69A1963BE036FCFA6 /* PowerHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerHistoryTests.swift; sourceTree = "<group>"; };
 		709F5F17F7403E1E0FED9916 /* PowerFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerFlowView.swift; sourceTree = "<group>"; };
 		8FA44B4EDBDE6FE62D45A336 /* PowerPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerPresentation.swift; sourceTree = "<group>"; };
 		9D37628C3B4896787F5DCD27 /* MenuBarLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLabel.swift; sourceTree = "<group>"; };
@@ -68,6 +74,7 @@
 		4673A474E057B93BE5904789 /* Power */ = {
 			isa = PBXGroup;
 			children = (
+				2969A9F90202742BE828E145 /* PowerHistory.swift */,
 				FB3C3CEC65392B9A0488556A /* PowerMonitor.swift */,
 				13BE3D6743EDAE837C213FA1 /* PowerReader.swift */,
 				0F08A0289524457FEC729F3D /* PowerSnapshot.swift */,
@@ -89,6 +96,7 @@
 			isa = PBXGroup;
 			children = (
 				BAD9AFAA5699DB8098969E11 /* DropdownView.swift */,
+				24AF91567342D599D82F3B98 /* HistoryChartCard.swift */,
 				B2F25DC705E2A122CF11F2BB /* MainWindow.swift */,
 				9D37628C3B4896787F5DCD27 /* MenuBarLabel.swift */,
 				15A3A2BA8DFFA077075D2D8D /* OverviewPresentation.swift */,
@@ -124,6 +132,7 @@
 			children = (
 				BCCA001A87A1CEC39E01381D /* Fixtures.swift */,
 				3EF1CCB988B78D05E5CD0F97 /* OverviewPresentationTests.swift */,
+				5D36A6E69A1963BE036FCFA6 /* PowerHistoryTests.swift */,
 				05E15D9C9E43622193B7CC57 /* PowerMonitorTests.swift */,
 				C98F50BF6B13AE1D4DD443F8 /* PowerPresentationTests.swift */,
 				D57096C1A0A7D2E47186B3D6 /* PowerReaderTests.swift */,
@@ -217,6 +226,7 @@
 			files = (
 				3A7E60A1EF8C416EF89B2E01 /* Fixtures.swift in Sources */,
 				BC7647B8A5765AB03B8314A3 /* OverviewPresentationTests.swift in Sources */,
+				974A4B394BE575B85113B61C /* PowerHistoryTests.swift in Sources */,
 				1CCE1F662D452E01BB3EBF3F /* PowerMonitorTests.swift in Sources */,
 				528C9CBCE6DF94386B6CC6F9 /* PowerPresentationTests.swift in Sources */,
 				7F0983B292E396396E4E4405 /* PowerReaderTests.swift in Sources */,
@@ -230,11 +240,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				9613E6C53EF77AA4DA84F8BD /* DropdownView.swift in Sources */,
+				3A94945760F9EEB2DEDE8603 /* HistoryChartCard.swift in Sources */,
 				AEEB27E6096F64328C9C4EB3 /* MainWindow.swift in Sources */,
 				8A2DC301ADAEFCF0AFCCFCEE /* MenuBarLabel.swift in Sources */,
 				15E3A39E9684B99CF0B5829E /* OverviewPresentation.swift in Sources */,
 				A858C84891B5132F645219D2 /* OverviewView.swift in Sources */,
 				484D16FA5A8F51A098B403AD /* PowerFlowView.swift in Sources */,
+				9FBD0BEC5E0C1C55B224FB3C /* PowerHistory.swift in Sources */,
 				E2ED9D02EFD118519212FA03 /* PowerMonitor.swift in Sources */,
 				330F72D29FDC5AD82182C20B /* PowerPresentation.swift in Sources */,
 				DF4B020F6D35D235A900B09B /* PowerReader.swift in Sources */,

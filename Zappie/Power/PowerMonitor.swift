@@ -9,6 +9,7 @@ final class PowerMonitor {
     private(set) var snapshot: PowerSnapshot?
     private(set) var state: PowerState?
     private(set) var isSupported = true
+    private(set) var history = PowerHistory()
 
     var pollInterval: Duration = .seconds(1)
 
@@ -39,6 +40,7 @@ final class PowerMonitor {
         }
         snapshot = reading
         state = debouncer.update(PowerState.classify(reading, connectionChangedAt: connectionChangedAt), at: time)
+        history.record(reading, at: time)
     }
 
     func start() {

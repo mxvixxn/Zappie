@@ -16,6 +16,7 @@ enum Theme {
     static let sidebar = Color(hex: 0x232326)
     static let sidebarText = Color(hex: 0xD1D1D6)
     static let divider = Color(hex: 0x2E2E31)
+    static let systemLine = Color(hex: 0xD1D1D6)
 
     static func color(_ tint: Tint) -> Color {
         switch tint {
