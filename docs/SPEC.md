@@ -1,0 +1,145 @@
+# Zappie — 구현 명세 (Claude Code 작업용)
+
+macOS 메뉴 막대 앱. 어댑터 입력 → 시스템 / 배터리로 흐르는 전력을 실시간으로 보여준다.
+디자인 시안: claude.ai 캔버스 "Power Flow 메뉴 막대 앱" (드롭다운 3상태, 메인 창, 메뉴 막대 아이템). 아래에 필요한 수치를 모두 옮겨 두었다.
+
+> ⚠️ 이 문서의 IOKit 키 이름·단위는 공개 오픈소스 예제를 근거로 정리한 것이며 Apple 공식 문서가 없다. **M0 단계에서 실제 기기 출력으로 반드시 검증**하고, 다르면 이 문서를 고친 뒤 진행할 것.
+
+---
+
+## 0. 환경
+
+| 항목 | 값 |
+|---|---|
+| 언어 / UI | Swift 6, SwiftUI (+ Swift Charts) |
+| 대상 | macOS 26+, **Apple Silicon 전용** (Intel은 `PowerTelemetryData` 없음) |
+| 메뉴 막대 | `MenuBarExtra` + `.menuBarExtraStyle(.window)` |
+| 메인 창 | `Window` scene, 드롭다운 버튼에서 `openWindow(id:)` |
+| App Sandbox | **끔** (개인용). 샌드박스에서 IORegistry 읽기 가능 여부는 미확인 |
+| 배포 | 개인 빌드. App Store 대상 아님 |
+
+Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOMainPortDefault` 사용.
+
+---
+
+## 1. 데이터 소스
+
+`IOServiceMatching("AppleSmartBattery")` → `IORegistryEntryCreateCFProperties`로 딕셔너리를 통째로 읽는다.
+
+| 용도 | 키 | 단위(예상) | 비고 |
+|---|---|---|---|
+| 어댑터 입력 | `PowerTelemetryData.SystemPowerIn` | mW | Apple Silicon, macOS 13+ |
+| 시스템 소비 | `PowerTelemetryData.SystemLoad` | mW | 배터리 충전분 제외 |
+| 배터리 전력 | `PowerTelemetryData.BatteryPower` | mW | 충전 +, 방전 − |
+| 배터리 전압 | `Voltage` | mV | |
+| 배터리 전류 | `InstantAmperage` | mA | 부호 있음. 음수 처리 주의(UInt로 올 수 있음) |
+| 온도 | `Temperature` | 0.01 °C | |
+| 사이클 | `CycleCount` | 회 | |
+| 설계 용량 | `BatteryData.DesignCapacity` | mAh | |
+| 최대 충전 용량 | `AppleRawMaxCapacity` 또는 `BatteryData.FullChargeCapacity` | mAh | 둘 중 존재하는 것 |
+| 전원 연결 | `ExternalConnected` | Bool | |
+| 어댑터 정보 | `AdapterDetails` (`Watts`, `AdapterVoltage`, `Current`, `Manufacturer` …) | W / mV / mA | 키 구성 기기별로 확인 |
+| 배터리 % | `CurrentCapacity` | % (Apple Silicon 추정) | raw mAh는 `AppleRawCurrentCapacity` |
+| 남은 시간 | `AvgTimeToFull` / `AvgTimeToEmpty` | 분 | 65535 = 계산 중/없음 처리 |
+
+**계산값**
+- 배터리 순전력(대체값) = `Voltage × InstantAmperage / 1_000_000` (W). `BatteryPower`가 없거나 0일 때 사용.
+- 기타·손실 = 입력 − 시스템 − 배터리(충전 시). 음수면 0으로 클램프, 배터리 모드에선 "—".
+- 정격 대비 사용률 = 입력 W / `AdapterDetails.Watts`.
+- 최대 용량 % = 최대 충전 용량 / 설계 용량.
+
+**충전 한도(80%)**: 공개 API로 macOS 충전 한도 설정값을 읽는 방법은 확인하지 못했다. v1에서는 표시하지 않거나 "—"로 둔다.
+
+---
+
+## 2. 상태 판정
+
+```
+연결 안 됨 (ExternalConnected == false)            → .battery
+연결됨 && batteryW > +0.5                           → .charging
+연결됨 && |batteryW| <= 0.5                         → .hold   (어댑터가 시스템에 직접 공급)
+연결됨 && batteryW < −0.5                           → .assisted (어댑터 부족, 배터리 보조) ※시안에 없음, 배지만 "보조 방전"
+```
+임계값 0.5 W는 깜빡임 방지용 초깃값. 상태 전환에 2초 히스테리시스 적용.
+
+---
+
+## 3. 아키텍처
+
+```
+PowerReader      IOKit 읽기 → PowerSnapshot (순수 값 타입, Sendable)
+PowerMonitor     @Observable @MainActor. 1초 폴링 + 전원 이벤트 구독, 상태 판정, 히스토리 기록
+PowerHistory     링 버퍼: 1시간=1초 해상도, 6시간=10초 평균, 24시간=60초 평균 (메모리만, v1)
+Views            MenuBarLabel / DropdownView / MainWindow(Overview, History, Adapter, Battery, Settings)
+```
+
+- 전원 연결/분리 이벤트: `IOPSNotificationCreateRunLoopSource`로 즉시 갱신 (폴링과 병행).
+- `PowerReader`는 딕셔너리 → 스냅샷 파싱을 별도 함수로 분리해서 **고정 딕셔너리로 단위 테스트** 가능하게.
+
+---
+
+## 4. 디자인 토큰
+
+| 토큰 | 값 |
+|---|---|
+| 배경 | `#1E1E20` |
+| 카드 | `#2A2A2D` |
+| 테두리 | `#3A3A3D` |
+| 본문 텍스트 | `#F5F5F7` |
+| 보조 텍스트 | `#A8A8AE` |
+| 어댑터/시스템 강조 | `#4DA3FF` |
+| 배터리 강조 | `#FFA63D` |
+| 비활성 선 | `#48484A` (점선) |
+| 손실 | `#8E8E93` |
+| 폰트 | 시스템 폰트, 숫자는 `.monospacedDigit()` |
+| 모서리 | 패널 14 / 카드 12 / 타일 8~10 |
+
+배지: 충전 중·배터리 = 주황 배경 16% + `#FFB45E` 글자 / 한도 유지 = 파랑 배경 16% + `#7CBBFF` 글자.
+다크 모드 기준 시안. 라이트 모드는 v2.
+
+---
+
+## 5. 화면
+
+### 5-1. 메뉴 막대 라벨 (설정에서 선택)
+- 충전 중: ⚡(주황) `+31.4W` — 배터리로 들어가는 전력
+- 한도 유지: 플러그(파랑) `12.3W` — 어댑터 입력
+- 배터리: 배터리(주황) `−11.8W` — 방전 전력
+- 아이콘만 모드
+
+### 5-2. 드롭다운 (폭 340, 높이 약 500)
+1. 헤더: "전원" + 소스 문구(예: "전원 어댑터 · 충전 중") / 상태 배지 + 배터리 % (22pt)
+2. 전력 흐름 카드: `[어댑터] —W→ ● —W→ [시스템]`, 분기점 아래 `↕ W` 후 `[배터리]`
+   - 충전: 모든 선 실선, 세로 화살표 ↓ 주황
+   - 한도 유지: 세로선 점선 회색, 라벨 "0.0 W"
+   - 배터리: 어댑터 노드 투명도 0.45, 어댑터 선 점선, 분기점·시스템 선 주황, 세로 화살표 ↑
+3. 숫자 3칸: 입력 / 시스템 / 배터리
+4. 한 줄: 남은 시간 라벨 + 값
+5. 하단: "앱에서 자세히 보기"(강조색 버튼, 메인 창 열기) + 설정 아이콘 버튼(44×44)
+
+### 5-3. 메인 창 (1200×960 기준, 리사이즈 가능)
+- 사이드바 200: 개요 / 기록 / 어댑터 / 배터리 / 설정
+- 개요(3열 그리드, 간격 18):
+  - 전력 흐름(2열) | 입력 전력 구성(1열: 스택 막대 + 3행 W·% + 남은 시간)
+  - 전력 기록(3열): Swift Charts 라인 2개(어댑터 입력 파랑, 시스템 흰회색), 1시간/6시간/24시간 세그먼트
+  - 어댑터(1열): 정격 W, 프로토콜, 사용률 막대, 협상 전압×전류 | 배터리(2열): 전압·전류·온도·사이클·최대 용량·충전 한도 6타일
+- 기록/어댑터/배터리/설정 탭은 v1에서 간단 버전(설정: 갱신 주기, 메뉴 막대 라벨 형식, 로그인 시 실행)
+
+---
+
+## 6. 작업 순서
+
+- **M0 검증**: `ioreg -rn AppleSmartBattery` 출력 저장 → 위 표의 키·단위 확인 → 이 문서 수정
+- **M1** `PowerReader` + 파싱 단위 테스트 (M0 출력으로 fixture 작성)
+- **M2** `PowerMonitor` 상태 판정 + 히스테리시스 + 이벤트 구독
+- **M3** 메뉴 막대 라벨 + 드롭다운
+- **M4** 메인 창 개요
+- **M5** 히스토리 + 차트
+- **M6** 설정, 로그인 시 실행(`SMAppService.mainApp`)
+
+## 7. 완료 기준
+
+- 전원 분리/연결 시 1초 이내에 드롭다운 아이콘·선 방향이 바뀐다
+- 충전 중일 때 입력 ≈ 시스템 + 배터리 + 손실(±1 W)
+- 앱 자체 CPU 사용률이 평상시 1% 미만 (활성 상태 보기로 확인)
+- 키가 없는 기기(데스크톱 Mac 등)에서 크래시 없이 "지원하지 않는 기기" 표시
