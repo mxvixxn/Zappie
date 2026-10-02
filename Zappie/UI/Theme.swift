@@ -7,12 +7,12 @@ enum Theme {
     static let border = Color(hex: 0x3A3A3D)
     static let text = Color(hex: 0xF5F5F7)
     static let secondaryText = Color(hex: 0xA8A8AE)
-    static let adapter = Color(hex: 0x4DA3FF)
-    static let battery = Color(hex: 0xFFA63D)
+    static let adapter = Color(hex: 0x967CEC)   // lavender
+    static let battery = Color(hex: 0x0FAA7B)   // emerald
     static let inactive = Color(hex: 0x48484A)
     static let loss = Color(hex: 0x8E8E93)
 
-    static let buttonText = Color(hex: 0x0B1220)
+    static let buttonText = Color(hex: 0x140F2A)
     static let sidebar = Color(hex: 0x232326)
     static let sidebarText = Color(hex: 0xD1D1D6)
     static let divider = Color(hex: 0x2E2E31)
@@ -29,8 +29,8 @@ enum Theme {
     /// Badge foreground: a lighter shade of the accent for contrast on the 16% fill.
     static func badgeText(_ tint: Tint) -> Color {
         switch tint {
-        case .adapter: Color(hex: 0x7CBBFF)
-        case .battery: Color(hex: 0xFFB45E)
+        case .adapter: Color(hex: 0xC4B5FD)
+        case .battery: Color(hex: 0x6EE7B7)
         case .inactive: secondaryText
         }
     }

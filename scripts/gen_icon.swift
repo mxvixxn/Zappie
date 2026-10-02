@@ -2,7 +2,7 @@
 // Generate the Zappie app icon layers for Icon Composer, plus a flat preview.
 //
 // Concept: a lightning bolt split along its own zigzag into two pieces —
-// adapter blue on top, battery orange below — the adapter → battery flow the app shows.
+// adapter lavender on top, battery emerald below — the adapter → battery flow the app shows.
 // Layers stay flat (no baked gloss) so macOS can apply Liquid Glass to the `.icon`.
 //
 // Run from the repo root:  swift scripts/gen_icon.swift
@@ -13,8 +13,8 @@ let iconDir = "Zappie/Zappie.icon"
 let previewPath = "docs/app-icon.png"
 
 // Design tokens (docs/SPEC.md §4)
-let adapterBlue = NSColor(srgbRed: 0x4D / 255, green: 0xA3 / 255, blue: 0xFF / 255, alpha: 1)
-let batteryOrange = NSColor(srgbRed: 0xFF / 255, green: 0xA6 / 255, blue: 0x3D / 255, alpha: 1)
+let adapterLavender = NSColor(srgbRed: 0x96 / 255, green: 0x7C / 255, blue: 0xEC / 255, alpha: 1)
+let batteryEmerald = NSColor(srgbRed: 0x0F / 255, green: 0xAA / 255, blue: 0x7B / 255, alpha: 1)
 let backgroundTop = NSColor(srgbRed: 44 / 255, green: 44 / 255, blue: 50 / 255, alpha: 1)
 let backgroundBottom = NSColor(srgbRed: 16 / 255, green: 16 / 255, blue: 19 / 255, alpha: 1)
 
@@ -108,8 +108,8 @@ func piece(_ reference: CGPoint, _ color: NSColor) -> NSBitmapImageRep {
 
 // Icon Composer layers
 save(render(drawBackground), "\(iconDir)/Assets/background.png")
-let upper = piece(upperReference, adapterBlue)
-let lower = piece(lowerReference, batteryOrange)
+let upper = piece(upperReference, adapterLavender)
+let lower = piece(lowerReference, batteryEmerald)
 save(upper, "\(iconDir)/Assets/bolt-adapter.png")
 save(lower, "\(iconDir)/Assets/bolt-battery.png")
 
