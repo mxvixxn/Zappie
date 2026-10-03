@@ -34,7 +34,7 @@ struct HistoryChartCard: View {
                     .foregroundStyle(Theme.secondaryText)
                     .frame(maxWidth: .infinity, minHeight: chartHeight)
             } else {
-                HistoryChart(samples: samples, range: range, now: now, showsUSB: hasUSB)
+                HistoryChart(samples: HistoryRange.forChart(samples), range: range, now: now, showsUSB: hasUSB)
                     .frame(height: chartHeight)
             }
             if showsSummary, let summary = HistorySummary(samples) {

@@ -148,3 +148,20 @@ extension HistoryRange {
         return ((peak / 20).rounded(.down) + 1) * 20
     }
 }
+
+extension HistoryRange {
+    /// Averages consecutive samples so the chart draws at most `limit` points.
+    /// Stored history keeps full resolution; this is only for drawing.
+    static func forChart(_ samples: [PowerSample], limit: Int = 360) -> [PowerSample] {
+        guard samples.count > limit, limit > 0 else { return samples }
+        let chunk = (samples.count + limit - 1) / limit
+        return stride(from: 0, to: samples.count, by: chunk).map { start in
+            let slice = samples[start..<min(start + chunk, samples.count)]
+            let n = Double(slice.count)
+            return PowerSample(date: slice.first!.date,
+                               inputW: slice.reduce(0) { $0 + $1.inputW } / n,
+                               systemW: slice.reduce(0) { $0 + $1.systemW } / n,
+                               usbW: slice.reduce(0) { $0 + $1.usbW } / n)
+        }
+    }
+}

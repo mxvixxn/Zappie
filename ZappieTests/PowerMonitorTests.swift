@@ -81,6 +81,33 @@ struct PowerMonitorTests {
         #expect(rig.logged.map(\.value) == [0x4])
     }
 
+    /// Redrawing the menu bar every second (live SMC watts) cost ~2% CPU. Small wobbles are
+    /// batched; real changes still show at once.
+    @Test func menuBarIgnoresSmallWobbleForFiveSeconds() {
+        let rig = Rig()
+        rig.step(0, PowerSnapshot(isExternalConnected: true, adapterInW: 22.2, systemLoadW: 22, batteryW: 0))
+        #expect(rig.monitor.menuBarItem?.text == "22.2W")
+        rig.step(1, PowerSnapshot(isExternalConnected: true, adapterInW: 22.4, systemLoadW: 22, batteryW: 0))
+        #expect(rig.monitor.menuBarItem?.text == "22.2W")
+        rig.step(4, PowerSnapshot(isExternalConnected: true, adapterInW: 22.4, systemLoadW: 22, batteryW: 0))
+        #expect(rig.monitor.menuBarItem?.text == "22.4W")
+    }
+
+    @Test func menuBarShowsBigChangesAtOnce() {
+        let rig = Rig()
+        rig.step(0, PowerSnapshot(isExternalConnected: true, adapterInW: 22.2, systemLoadW: 22, batteryW: 0))
+        rig.step(1, PowerSnapshot(isExternalConnected: true, adapterInW: 30.0, systemLoadW: 30, batteryW: 0))
+        #expect(rig.monitor.menuBarItem?.text == "30.0W")
+    }
+
+    @Test func menuBarFollowsStateChangesAtOnce() {
+        let rig = Rig()
+        rig.step(0, PowerSnapshot(isExternalConnected: true, adapterInW: 22.2, systemLoadW: 22, batteryW: 0))
+        rig.step(1, PowerSnapshot(isExternalConnected: false, adapterInW: 0, systemLoadW: 22.3, batteryW: -22.3))
+        #expect(rig.monitor.menuBarItem?.icon == .battery)
+        #expect(rig.monitor.menuBarItem?.text == "−22.3W")
+    }
+
     @Test func holdToChargingWaitsForHysteresis() {
         let rig = Rig()
         rig.step(0, PowerSnapshot(isExternalConnected: true, batteryW: 0))

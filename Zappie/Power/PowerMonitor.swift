@@ -12,6 +12,14 @@ final class PowerMonitor {
     private(set) var state: PowerState?
     private(set) var isSupported = true
     private(set) var history = PowerHistory()
+    /// What the menu bar shows. Small wobbles are held back (see `updateMenuBar`) because every
+    /// menu bar redraw costs CPU, and live SMC watts change every second.
+    private(set) var menuBarItem: PowerPresentation.MenuBar?
+    @ObservationIgnored private var menuBarWatts: Double?
+    @ObservationIgnored private var menuBarShownAt: Date?
+    static let menuBarMinChangeW = 0.5
+    static let menuBarMaxAge: TimeInterval = 5
+
     /// When each port's data-connected USB device first appeared.
     private(set) var usbConnectedSince: [Int: Date] = [:]
 
@@ -42,6 +50,7 @@ final class PowerMonitor {
             isSupported = false
             snapshot = nil
             state = nil
+            menuBarItem = nil
             return
         }
         isSupported = true
@@ -57,6 +66,9 @@ final class PowerMonitor {
         snapshot = reading
         state = debouncer.update(PowerState.classify(reading, connectionChangedAt: connectionChangedAt), at: time)
         history.record(reading, at: time)
+        if let state {
+            updateMenuBar(PowerPresentation(snapshot: reading, state: state).menuBar, reading, at: time)
+        }
         reasonTracker.newSightings(in: reading, at: time).forEach(logReason)
 
         var since = usbConnectedSince.filter { reading.usbDevices[$0.key] != nil }
@@ -66,6 +78,19 @@ final class PowerMonitor {
         if since != usbConnectedSince {
             usbConnectedSince = since
         }
+    }
+
+    private func updateMenuBar(_ item: PowerPresentation.MenuBar, _ s: PowerSnapshot, at time: Date) {
+        let watts = item.icon == .plug ? s.adapterInW : s.batteryW
+        guard item != menuBarItem else { return }
+        if let shown = menuBarItem, shown.icon == item.icon, shown.tint == item.tint,
+           let old = menuBarWatts, let new = watts, abs(new - old) < Self.menuBarMinChangeW,
+           let at = menuBarShownAt, time.timeIntervalSince(at) < Self.menuBarMaxAge {
+            return
+        }
+        menuBarItem = item
+        menuBarWatts = watts
+        menuBarShownAt = time
     }
 
     func start() {

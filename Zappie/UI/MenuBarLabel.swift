@@ -6,8 +6,7 @@ struct MenuBarLabel: View {
     @AppStorage(AppSettings.labelStyleKey) private var style = MenuBarLabelStyle.watts
 
     var body: some View {
-        if let snapshot = monitor.snapshot, let state = monitor.state {
-            let item = PowerPresentation(snapshot: snapshot, state: state).menuBar
+        if let item = monitor.menuBarItem {
             HStack(spacing: 4) {
                 Image(nsImage: Self.coloredSymbol(item.icon, tint: item.tint))
                 if style.showsText {
@@ -19,8 +18,19 @@ struct MenuBarLabel: View {
         }
     }
 
+    private static var imageCache: [String: NSImage] = [:]
+
     /// Menu bar images are templates (monochrome) unless built as a non-template NSImage.
+    /// Cached so an unchanged icon is not rebuilt on every refresh.
     private static func coloredSymbol(_ icon: PowerPresentation.MenuBar.Icon, tint: Tint) -> NSImage {
+        let key = "\(icon)-\(tint)"
+        if let cached = imageCache[key] { return cached }
+        let image = makeSymbol(icon, tint: tint)
+        imageCache[key] = image
+        return image
+    }
+
+    private static func makeSymbol(_ icon: PowerPresentation.MenuBar.Icon, tint: Tint) -> NSImage {
         let name = switch icon {
         case .bolt: "bolt.fill"
         case .plug: "powerplug.fill"

@@ -93,3 +93,30 @@ struct HistoryAxisTests {
         #expect(HistoryRange.yAxisMax(for: [PowerSample(date: t0, inputW: 14.9, systemW: 20)]) == 40)
     }
 }
+
+/// The chart is ~1000 pt wide; drawing 3,600 points every second (now that SMC watts change
+/// each second) cost ~2% CPU with the main window open. Draw at most `limit` averaged points.
+struct ChartDownsampleTests {
+    let t0 = Date(timeIntervalSince1970: 1_790_949_960)
+
+    func samples(_ n: Int) -> [PowerSample] {
+        (0..<n).map { PowerSample(date: t0 + Double($0), inputW: Double($0), systemW: 1, usbW: 0) }
+    }
+
+    @Test func shortSeriesUntouched() {
+        #expect(HistoryRange.forChart(samples(100), limit: 360) == samples(100))
+    }
+
+    @Test func longSeriesAveragedToLimit() {
+        let out = HistoryRange.forChart(samples(3600), limit: 360)
+        #expect(out.count == 360)
+        #expect(out.first == PowerSample(date: t0, inputW: 4.5, systemW: 1, usbW: 0))
+        #expect(out.last?.inputW == 3594.5)
+    }
+
+    @Test func peaksSurviveAsAverageNotDropped() {
+        var s = samples(3600)
+        s[5].inputW = 1000
+        #expect(HistoryRange.forChart(s, limit: 360)[0].inputW > 4.5)
+    }
+}
