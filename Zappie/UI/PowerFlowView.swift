@@ -33,17 +33,11 @@ struct PowerFlowView: View {
                 FlowSegment(text: flow.adapterText, color: adapterColor, dashed: !flow.adapterActive)
                 junction(10)
                 FlowSegment(text: flow.systemText, color: Theme.color(flow.systemLineTint), dashed: false)
-                FlowNode(symbol: "laptopcomputer", label: "시스템", tint: Theme.text, size: .compact)
+                FlowNode(symbol: "laptopcomputer", label: flow.usbText == nil ? "시스템" : "Mac", tint: Theme.text,
+                         size: .compact)
             }
-            HStack(spacing: 10) {
-                Color.clear.frame(width: 80, height: 1)
-                VerticalConnector(direction: flow.vertical, length: 26)
-                    .frame(width: 12)
-                Text(flow.batteryText)
-                    .font(.system(size: 12, weight: .semibold))
-                    .frame(width: 80, alignment: .leading)
-            }
-            FlowNode(symbol: "battery.100", label: "배터리", tint: Theme.battery, size: .compact)
+            branches(size: .compact, connector: 26, caption: flow.batteryText, captionSize: 12,
+                     batteryValue: nil)
         }
     }
 
@@ -58,18 +52,44 @@ struct PowerFlowView: View {
                 junction(12)
                 FlowSegment(text: nil, color: Theme.color(flow.systemLineTint), dashed: false)
                     .padding(.horizontal, 2)
-                FlowNode(symbol: "laptopcomputer", label: "시스템 소비", value: flow.systemText,
-                         tint: Theme.text, size: .large)
+                FlowNode(symbol: "laptopcomputer",
+                         label: flow.usbText == nil ? "시스템 소비" : flow.systemNodeLabel,
+                         value: flow.systemNodeText, tint: Theme.text, size: .large)
             }
-            HStack(spacing: 12) {
-                Color.clear.frame(width: 120, height: 1)
-                VerticalConnector(direction: flow.vertical, length: 30)
+            branches(size: .large, connector: 30, caption: caption, captionSize: 13, batteryValue: batteryValue)
+        }
+    }
+
+    /// Battery under the junction; USB devices (when charging any) under the system node.
+    /// Side columns match the node width so the battery column centers on the junction.
+    private func branches(size: FlowNode.Size, connector: CGFloat, caption: String, captionSize: CGFloat,
+                          batteryValue: String?) -> some View {
+        HStack(alignment: .top, spacing: 0) {
+            Color.clear.frame(width: size.width, height: 1)
+            VStack(spacing: 2) {
+                VerticalConnector(direction: flow.vertical, length: connector)
                     .frame(width: 12)
-                Text(caption)
-                    .font(.system(size: 13, weight: .semibold))
-                    .frame(width: 120, alignment: .leading)
+                    .overlay(alignment: .leading) {
+                        Text(caption)
+                            .font(.system(size: captionSize, weight: .semibold))
+                            .fixedSize()
+                            .offset(x: 22)
+                    }
+                FlowNode(symbol: "battery.100", label: "배터리", value: batteryValue, tint: Theme.battery, size: size)
             }
-            FlowNode(symbol: "battery.100", label: "배터리", value: batteryValue, tint: Theme.battery, size: .large)
+            .frame(maxWidth: .infinity)
+            Group {
+                if let usb = flow.usbText {
+                    VStack(spacing: 2) {
+                        VerticalConnector(direction: .down, length: connector, color: Theme.usb)
+                        FlowNode(symbol: "cable.connector", label: "USB 기기", value: usb, tint: Theme.usb,
+                                 size: size)
+                    }
+                } else {
+                    Color.clear.frame(height: 1)
+                }
+            }
+            .frame(width: size.width)
         }
     }
 
@@ -80,7 +100,7 @@ struct PowerFlowView: View {
     }
 }
 
-private struct FlowNode: View {
+struct FlowNode: View {
     enum Size {
         case compact, large
 
@@ -111,7 +131,7 @@ private struct FlowNode: View {
                 .foregroundStyle(Theme.secondaryText)
             if let value {
                 Text(value)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: size == .compact ? 12 : 18, weight: .semibold))
             }
         }
         .padding(.vertical, size.padding)
@@ -149,9 +169,10 @@ private struct FlowSegment: View {
 private struct VerticalConnector: View {
     let direction: PowerPresentation.Flow.Vertical
     let length: CGFloat
+    var color: Color?
 
     var body: some View {
-        let color = direction == .idle ? Theme.inactive : Theme.battery
+        let color = color ?? (direction == .idle ? Theme.inactive : Theme.battery)
         VStack(spacing: 0) {
             if direction == .up { chevron("chevron.up", color) }
             Line(axis: .vertical)

@@ -18,6 +18,9 @@ struct HistoryChartCard: View {
                 HStack(spacing: 14) {
                     legend("어댑터 입력", Theme.adapter)
                     legend("시스템 소비", Theme.systemLine)
+                    if hasUSB {
+                        legend("USB 기기 출력", Theme.usb)
+                    }
                 }
                 .padding(.leading, 4)
                 Spacer()
@@ -31,7 +34,7 @@ struct HistoryChartCard: View {
                     .foregroundStyle(Theme.secondaryText)
                     .frame(maxWidth: .infinity, minHeight: chartHeight)
             } else {
-                HistoryChart(samples: samples, range: range, now: now)
+                HistoryChart(samples: samples, range: range, now: now, showsUSB: hasUSB)
                     .frame(height: chartHeight)
             }
             if showsSummary, let summary = HistorySummary(samples) {
@@ -53,6 +56,8 @@ struct HistoryChartCard: View {
         .background(Theme.card, in: RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.border))
     }
+
+    private var hasUSB: Bool { visibleSamples.contains { $0.usbW > 0 } }
 
     private var visibleSamples: [PowerSample] {
         let start = now.addingTimeInterval(-range.duration)
@@ -96,11 +101,13 @@ private struct HistoryChart: View {
     let samples: [PowerSample]
     let range: HistoryRange
     let now: Date
+    let showsUSB: Bool
     @State private var hovered: Date?
 
     private enum Series: String, Plottable {
         case input = "어댑터 입력"
         case system = "시스템 소비"
+        case usb = "USB 기기 출력"
     }
 
     var body: some View {
@@ -113,6 +120,10 @@ private struct HistoryChart: View {
                     .foregroundStyle(Theme.adapter)
                 LineMark(x: .value("시간", s.date), y: .value("전력", s.systemW), series: .value("항목", Series.system))
                     .foregroundStyle(Theme.systemLine)
+                if showsUSB {
+                    LineMark(x: .value("시간", s.date), y: .value("전력", s.usbW), series: .value("항목", Series.usb))
+                        .foregroundStyle(Theme.usb)
+                }
             }
             .lineStyle(StrokeStyle(lineWidth: 2))
 
@@ -181,6 +192,9 @@ private struct HistoryChart: View {
                 .foregroundStyle(Theme.secondaryText)
             row("어댑터 입력", s.inputW, Theme.adapter)
             row("시스템 소비", s.systemW, Theme.systemLine)
+            if showsUSB {
+                row("USB 기기 출력", s.usbW, Theme.usb)
+            }
         }
         .font(.system(size: 11))
         .monospacedDigit()

@@ -4,6 +4,7 @@ struct PowerSample: Sendable, Equatable {
     var date: Date
     var inputW: Double
     var systemW: Double
+    var usbW: Double = 0
 }
 
 /// SPEC §3: 1 hour at 1 s, 6 hours at 10 s averages, 24 hours at 60 s averages. Memory only (v1).
@@ -43,7 +44,8 @@ struct PowerHistory: Sendable {
         let sample = PowerSample(
             date: date,
             inputW: snapshot.isExternalConnected ? snapshot.adapterInW ?? 0 : 0,
-            systemW: snapshot.systemLoadW ?? 0
+            systemW: snapshot.systemLoadW ?? 0,
+            usbW: snapshot.usbOutW
         )
         for range in HistoryRange.allCases {
             tiers[range]?.add(sample)
@@ -78,6 +80,7 @@ struct BucketAverager: Sendable {
     private var count = 0
     private var inputSum = 0.0
     private var systemSum = 0.0
+    private var usbSum = 0.0
 
     init(interval: TimeInterval) {
         self.interval = interval
@@ -87,15 +90,18 @@ struct BucketAverager: Sendable {
         let start = Date(timeIntervalSince1970: (sample.date.timeIntervalSince1970 / interval).rounded(.down) * interval)
         var closed: PowerSample?
         if let bucketStart, start != bucketStart, count > 0 {
-            closed = PowerSample(date: bucketStart, inputW: inputSum / Double(count), systemW: systemSum / Double(count))
+            let n = Double(count)
+            closed = PowerSample(date: bucketStart, inputW: inputSum / n, systemW: systemSum / n, usbW: usbSum / n)
             count = 0
             inputSum = 0
             systemSum = 0
+            usbSum = 0
         }
         bucketStart = start
         count += 1
         inputSum += sample.inputW
         systemSum += sample.systemW
+        usbSum += sample.usbW
         return closed
     }
 }

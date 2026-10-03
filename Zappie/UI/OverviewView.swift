@@ -45,6 +45,10 @@ struct OverviewView: View {
 
             HistoryChartCard(history: monitor.history)
 
+            if !o.ports.isEmpty {
+                usbCard(o.ports, total: p.usbText ?? "")
+            }
+
             HStack(alignment: .top, spacing: gap) {
                 adapterCard(o.adapter)
                     .frame(width: column)
@@ -153,6 +157,33 @@ struct OverviewView: View {
     private func batteryCard(_ tiles: [OverviewPresentation.Tile]) -> some View {
         Card("배터리") {
             BatteryTiles(tiles: tiles)
+        }
+    }
+
+    private func usbCard(_ ports: [OverviewPresentation.Port], total: String) -> some View {
+        Card("USB 기기 출력", trailing: total) {
+            HStack(spacing: 10) {
+                ForEach(ports, id: \.name) { port in
+                    HStack(spacing: 10) {
+                        Image(systemName: "cable.connector")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Theme.usb)
+                            .frame(width: 30, height: 30)
+                            .background(Theme.usb.opacity(0.16), in: Circle())
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(port.name).font(.system(size: 11)).foregroundStyle(Theme.secondaryText)
+                            Text(port.watts).font(.system(size: 15, weight: .semibold))
+                            Text(port.detail).font(.system(size: 11)).foregroundStyle(Theme.secondaryText)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: 260)
+                    .background(Theme.background, in: RoundedRectangle(cornerRadius: 8))
+                }
+                Spacer(minLength: 0)
+            }
         }
     }
 

@@ -24,6 +24,10 @@ enum Fixtures {
                 "DesignCapacity": 6249,
                 "FullChargeCapacity": 6004,
             ] as [String: Any],
+            "PowerOutDetails": [
+                ["PortIndex": 1, "Watts": 4448, "AdapterVoltage": 5201, "Current": 855, "PDPowermW": 15000],
+                ["PortIndex": 3, "Watts": 1276, "AdapterVoltage": 5203, "Current": 245, "PDPowermW": 15000],
+            ] as [[String: Any]],
             "AdapterDetails": [
                 "Watts": 68,
                 "AdapterVoltage": 20000,

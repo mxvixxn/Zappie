@@ -19,8 +19,22 @@ struct PowerSnapshot: Sendable, Equatable {
     var timeToEmptyMin: Int? = nil
 
     var adapter: AdapterInfo? = nil
+    /// USB-C ports currently supplying power to other devices. Already included in `systemLoadW`.
+    var portOutputs: [PortOutput] = []
     /// When the battery driver last refreshed these values (`UpdateTime`).
     var updateTime: Date? = nil
+}
+
+extension PowerSnapshot {
+    var usbOutW: Double { portOutputs.reduce(0) { $0 + $1.watts } }
+}
+
+struct PortOutput: Sendable, Equatable {
+    /// `PowerOutDetails.PortIndex`; see `PortName` for the physical location.
+    var port: Int
+    var watts: Double
+    var voltageV: Double?
+    var currentA: Double?
 }
 
 struct AdapterInfo: Sendable, Equatable {

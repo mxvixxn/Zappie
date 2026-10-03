@@ -51,8 +51,16 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 
 **갱신 주기**: IORegistry 값은 1초마다 바뀌지 않는다. `UpdateTime` 관찰 결과 유휴 시 최대 약 60초, 부하 변화 시 1~7초 간격. 전원을 분리하면 `ExternalConnected`는 즉시 바뀌지만 전력 값은 다음 갱신까지 이전 값이 남는다. → 상태 판정은 `ExternalConnected`를 우선하고, 전력 값의 신선도는 `UpdateTime`으로 판단한다.
 
+**USB 출력 (허브 사용)** — 2026-10-03 확인, 기록은 `docs/m0/usb-out-experiment.log`
+- `PowerOutDetails`: 다른 기기에 전력을 공급 중인 포트마다 항목 하나. `PortIndex`, `Watts`(**실제 단위 mW** = `AdapterVoltage`(mV) × `Current`(mA)), `ConfiguredVoltage`, `PDPowermW`(포트 한도).
+- **USB 출력은 `SystemLoad`에 포함된다.** 5.3 W 기기를 뽑자 시스템 소비 평균 약 17 W → 11 W. 따라서 "Mac 본체" = `SystemLoad` − USB 출력 합.
+- 기기 분리 시 2초 안에 목록에서 사라짐 (다른 전력 값보다 빠름).
+- Mac17,9는 전원 포트 컨트롤러 4개(USB-C 3 + MagSafe). 어댑터가 MagSafe면 USB-C 3개 모두 출력 가능. `PortIndex` ↔ 물리적 위치 매핑은 `PortName`에 기록(미완).
+- 충전 전용 연결은 USB 기기 목록에 잡히지 않아 기기 이름은 알 수 없음. `FedDetails`(연결 기기 배터리 잔량 등)는 일부 Apple 기기만 채움.
+- 색: USB 강조 앰버 `#CC8026` (연보라·에메랄드와 3색 검증 통과, 배지 글자 `#F5C27A`).
+
 **계산값**
-- 배터리 순전력(대체값) = `Voltage × InstantAmperage / 1_000_000` (W). `BatteryPower`가 없거나 0일 때 사용.
+- 배터리 순전력(대체값) = `Voltage × InstantAmperage / 1_000_000` (W). `BatteryPower` 키가 **없을 때만** 사용. (0일 때도 대체하던 초안은 부하 급증 순간 `InstantAmperage`가 −65 mA쯤 흔들려 입력 = 시스템인데도 −0.8 W "보조 방전"으로 오표시됨. 2026-10-03)
 - 기타·손실 = 입력 − 시스템 − 배터리(충전 시). 음수면 0으로 클램프, 배터리 모드에선 "—". (`AdapterEfficiencyLoss`와 비교해 어느 쪽을 쓸지 M1에서 결정)
 - 정격 대비 사용률 = 입력 W / `AdapterDetails.Watts`.
 - 최대 용량 % = 최대 충전 용량 / 설계 용량.

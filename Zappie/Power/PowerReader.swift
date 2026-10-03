@@ -21,8 +21,10 @@ enum PowerReader {
         let voltageMV = signed(battery["Voltage"])
         let amperageMA = signed(battery["InstantAmperage"])
 
+        // Telemetry 0 means idle; InstantAmperage wobbles under load spikes, so it is only a
+        // fallback when the telemetry key is missing altogether.
         var batteryW = signed(telemetry["BatteryPower"]).map(milli)
-        if batteryW == nil || batteryW == 0, let voltageMV, let amperageMA {
+        if batteryW == nil, let voltageMV, let amperageMA {
             batteryW = Double(voltageMV) * Double(amperageMA) / 1_000_000
         }
 
@@ -44,6 +46,7 @@ enum PowerReader {
             timeToFullMin: minutes(battery["AvgTimeToFull"]),
             timeToEmptyMin: minutes(battery["AvgTimeToEmpty"]),
             adapter: adapter(battery["AdapterDetails"] as? [String: Any]),
+            portOutputs: portOutputs(battery["PowerOutDetails"] as? [[String: Any]]),
             updateTime: signed(battery["UpdateTime"]).map { Date(timeIntervalSince1970: TimeInterval($0)) }
         )
     }
@@ -60,6 +63,20 @@ enum PowerReader {
             manufacturer: details["Manufacturer"] as? String,
             protocolDescription: details["Description"] as? String
         )
+    }
+
+    /// `PowerOutDetails` has one entry per port supplying power. Its `Watts` key is in mW
+    /// (verified: `AdapterVoltage` × `Current`).
+    private static func portOutputs(_ details: [[String: Any]]?) -> [PortOutput] {
+        (details ?? []).compactMap { port in
+            guard let index = int(port["PortIndex"]), let mW = signed(port["Watts"]) else { return nil }
+            return PortOutput(
+                port: index,
+                watts: milli(mW),
+                voltageV: signed(port["AdapterVoltage"]).map(milli),
+                currentA: signed(port["Current"]).map(milli)
+            )
+        }
     }
 
     /// IOKit publishes negative values as UInt64 bit patterns; `int64Value` reinterprets them.

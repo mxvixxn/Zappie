@@ -38,6 +38,12 @@ struct OverviewPresentation: Equatable {
         var lossText: String
     }
 
+    struct Port: Equatable {
+        var name: String
+        var watts: String
+        var detail: String
+    }
+
     struct Tile: Equatable {
         var label: String
         var value: String
@@ -47,12 +53,21 @@ struct OverviewPresentation: Equatable {
     var adapter: Adapter?
     var batteryTiles: [Tile]
     var batteryCaption: String
+    var ports: [Port]
 
     init(snapshot s: PowerSnapshot, state: PowerState) {
         let connected = state != .battery
         composition = connected ? Self.composition(s) : nil
         adapter = connected ? s.adapter.map { Self.adapter($0, inputW: s.adapterInW, lossW: s.adapterLossW) } : nil
         batteryTiles = Self.tiles(s)
+        ports = s.portOutputs.map { p in
+            let detail: String = if let v = p.voltageV, let i = p.currentA {
+                String(format: "%.2f V × %.2f A", v, i)
+            } else {
+                "—"
+            }
+            return Port(name: PortName.name(for: p.port), watts: Format.watts(p.watts), detail: detail)
+        }
 
         let w = Format.signedWatts(s.batteryW)
         batteryCaption = switch state {
@@ -63,10 +78,12 @@ struct OverviewPresentation: Equatable {
     }
 
     /// Input = system + battery charge + other. Other is the remainder, clamped at zero.
+    /// USB output is part of system load, so when present system splits into Mac + USB.
     private static func composition(_ s: PowerSnapshot) -> Composition? {
         guard let input = s.adapterInW, let system = s.systemLoadW else { return nil }
         let charge = max(s.batteryW ?? 0, 0)
         let other = max(input - system - charge, 0)
+        let usb = s.usbOutW
         let denominator = max(input, system + charge + other)
 
         func row(_ label: String, _ tint: Tint?, _ w: Double) -> Composition.Row {
@@ -74,10 +91,12 @@ struct OverviewPresentation: Equatable {
             return .init(label: label, tint: tint, fraction: fraction,
                          valueText: "\(Format.watts(w)) · \(Format.percent(fraction))")
         }
+        let systemRows = usb > 0
+            ? [row("Mac 본체", .adapter, max(system - usb, 0)), row("USB 기기 출력", .usb, usb)]
+            : [row("시스템 소비", .adapter, system)]
         return Composition(
             totalText: Format.watts(input),
-            rows: [
-                row("시스템 소비", .adapter, system),
+            rows: systemRows + [
                 row("배터리 충전", .battery, charge),
                 row("기타·손실 (계산값)", nil, other),
             ]

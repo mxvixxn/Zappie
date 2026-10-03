@@ -29,8 +29,11 @@ struct DropdownView: View {
         PowerFlowView(flow: p.flow)
         HStack(spacing: 8) {
             stat("입력", p.inputText)
-            stat("시스템", p.systemText)
+            stat(p.systemLabel == "시스템" ? "시스템" : "Mac", p.systemText)
             stat("배터리", p.batteryText)
+            if let usb = p.usbText {
+                stat("USB", usb)
+            }
         }
         HStack {
             Text(p.detailLabel).foregroundStyle(Theme.secondaryText)

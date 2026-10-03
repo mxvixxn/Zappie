@@ -2,7 +2,7 @@ import Foundation
 
 /// Accent roles from the design tokens; `Theme` maps them to colors.
 enum Tint: Equatable {
-    case adapter, battery, inactive
+    case adapter, battery, usb, inactive
 }
 
 enum Format {
@@ -48,8 +48,14 @@ struct PowerPresentation: Equatable {
         var systemLineTint: Tint
         var vertical: Vertical
         var adapterText: String
+        /// Total system load on the junction → system line (includes USB output).
         var systemText: String
         var batteryText: String
+        /// Power sent to other devices; nil hides the USB node.
+        var usbText: String?
+        var systemNodeLabel: String
+        /// What the Mac itself uses (system load minus USB output).
+        var systemNodeText: String
     }
 
     struct MenuBar: Equatable {
@@ -64,8 +70,12 @@ struct PowerPresentation: Equatable {
     var badgeTint: Tint
     var percent: String
     var inputText: String
+    /// "Mac 본체" when USB output is split out, otherwise "시스템".
+    var systemLabel: String
+    /// System load minus USB output, i.e. what the Mac itself uses.
     var systemText: String
     var batteryText: String
+    var usbText: String?
     var detailLabel: String
     var detailValue: String
     var flow: Flow
@@ -75,8 +85,12 @@ struct PowerPresentation: Equatable {
         let onBattery = state == .battery
         percent = s.percent.map { "\($0)%" } ?? "—"
         inputText = onBattery ? "—" : Format.watts(s.adapterInW)
-        systemText = Format.watts(s.systemLoadW)
+        let usb = s.usbOutW
+        let hasUSB = !s.portOutputs.isEmpty && usb > 0
+        systemLabel = hasUSB ? "Mac 본체" : "시스템"
+        systemText = Format.watts(hasUSB ? s.systemLoadW.map { max($0 - usb, 0) } : s.systemLoadW)
         batteryText = Format.signedWatts(s.batteryW)
+        usbText = hasUSB ? Format.watts(usb) : nil
 
         switch state {
         case .charging:
@@ -120,8 +134,11 @@ struct PowerPresentation: Equatable {
             systemLineTint: onBattery ? .battery : .adapter,
             vertical: vertical,
             adapterText: inputText,
-            systemText: systemText,
-            batteryText: batteryText
+            systemText: Format.watts(s.systemLoadW),
+            batteryText: batteryText,
+            usbText: usbText,
+            systemNodeLabel: systemLabel,
+            systemNodeText: systemText
         )
     }
 }

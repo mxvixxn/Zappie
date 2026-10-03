@@ -31,6 +31,15 @@ struct PowerReaderTests {
         #expect(abs(w - (-13.822952)) < 0.0001)
     }
 
+    /// Telemetry 0 means idle. A momentary InstantAmperage wobble under a load spike must not
+    /// override it (seen live: −0.8 W shown as "보조 방전" while input == system load).
+    @Test func telemetryZeroIsNotReplacedByInstantCurrent() throws {
+        var battery = Fixtures.pluggedHold
+        battery["InstantAmperage"] = NSNumber(value: UInt64(bitPattern: -65))
+        let s = try #require(PowerReader.parse(battery: battery, pack: nil))
+        #expect(s.batteryW == 0)
+    }
+
     @Test func readsTemperatureFromPackNode() throws {
         let withPack = try #require(PowerReader.parse(battery: Fixtures.pluggedHold, pack: Fixtures.pack))
         #expect(withPack.temperatureC == 28.29)
@@ -76,6 +85,22 @@ struct PowerReaderTests {
     @Test func readsUpdateTimeAsDate() throws {
         let s = try #require(PowerReader.parse(battery: Fixtures.pluggedHold, pack: nil))
         #expect(s.updateTime == Date(timeIntervalSince1970: 1790950824))
+    }
+
+    /// `PowerOutDetails` lists only ports currently supplying power; `Watts` is actually mW.
+    @Test func readsUSBPortOutputs() throws {
+        let s = try #require(PowerReader.parse(battery: Fixtures.pluggedHold, pack: nil))
+        #expect(s.portOutputs == [
+            PortOutput(port: 1, watts: 4.448, voltageV: 5.201, currentA: 0.855),
+            PortOutput(port: 3, watts: 1.276, voltageV: 5.203, currentA: 0.245),
+        ])
+        #expect(abs(s.usbOutW - 5.724) < 0.0001)
+    }
+
+    @Test func noPortOutputsWhenNothingIsCharging() throws {
+        let s = try #require(PowerReader.parse(battery: Fixtures.discharging, pack: nil))
+        #expect(s.portOutputs.isEmpty)
+        #expect(s.usbOutW == 0)
     }
 
     @Test func unsupportedWithoutPowerTelemetry() {
