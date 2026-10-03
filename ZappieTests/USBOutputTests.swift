@@ -26,11 +26,11 @@ struct USBOutputTests {
 
     @Test func portRowsUseNames() {
         let rows = OverviewPresentation(snapshot: hub, state: .hold).ports
-        #expect(rows == [.init(name: PortName.name(for: 3), watts: "5.3 W", detail: "5.19 V × 1.02 A")])
+        #expect(rows == [.init(name: "오른쪽", watts: "5.3 W", detail: "5.19 V × 1.02 A")])
     }
 
     @Test func unknownPortFallsBackToNumber() {
-        #expect(PortName.name(for: 9) == "포트 9")
+        #expect(PortLayout.mac17_9.name(for: 9) == "USB-C 9")
     }
 
     @Test func historyRecordsUSBOutput() {
@@ -46,9 +46,9 @@ struct USBOutputTests {
 /// PortIndex − 1 = FedDetails slot = USB bus (top byte of locationID).
 struct PortIdentityTests {
     @Test func physicalPortNames() {
-        #expect(PortName.name(for: 1) == "왼쪽 뒤")
-        #expect(PortName.name(for: 2) == "왼쪽 앞")
-        #expect(PortName.name(for: 3) == "오른쪽")
+        #expect(PortLayout.mac17_9.name(for: 1) == "왼쪽 뒤")
+        #expect(PortLayout.mac17_9.name(for: 2) == "왼쪽 앞")
+        #expect(PortLayout.mac17_9.name(for: 3) == "오른쪽")
     }
 
     @Test func usbLocationIDMapsToPort() {

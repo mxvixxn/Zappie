@@ -55,7 +55,7 @@ struct PowerTreeTests {
     @Test func unknownPortIsAppended() {
         let s = PowerSnapshot(isExternalConnected: true, adapterInW: 20, systemLoadW: 20, batteryW: 0,
                               portOutputs: [PortOutput(port: 4, watts: 2)])
-        #expect(tree(.hold, s).ports.map(\.name) == ["왼쪽 뒤", "왼쪽 앞", "오른쪽", "포트 4"])
+        #expect(tree(.hold, s).ports.map(\.name) == ["왼쪽 뒤", "왼쪽 앞", "오른쪽", "USB-C 4"])
     }
 
     @Test func macShareShownOnlyWithUSBOutput() {

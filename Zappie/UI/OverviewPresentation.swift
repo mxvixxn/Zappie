@@ -60,7 +60,7 @@ struct OverviewPresentation: Equatable {
         let connected = state != .battery
         composition = connected ? Self.composition(s) : nil
         adapter = connected ? s.adapter.map {
-            Self.adapter($0, inputW: s.adapterInW, lossW: s.adapterLossW, port: s.powerInput?.portName)
+            Self.adapter($0, inputW: s.adapterInW, lossW: s.adapterLossW, port: s.powerInput?.portName(in: s.portLayout))
         } : nil
         batteryTiles = Self.tiles(s)
         ports = s.portOutputs.map { p in
@@ -69,7 +69,7 @@ struct OverviewPresentation: Equatable {
             } else {
                 "—"
             }
-            return Port(name: PortName.name(for: p.port), watts: Format.watts(p.watts), detail: detail,
+            return Port(name: s.portLayout.name(for: p.port), watts: Format.watts(p.watts), detail: detail,
                         device: PortOutput.describeDevice(p))
         }
 

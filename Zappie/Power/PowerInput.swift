@@ -16,10 +16,10 @@ struct PowerInput: Equatable, Sendable {
     /// Negotiated maximum, from `WinningPowerSourceOption`.
     var negotiatedW: Double?
 
-    var portName: String {
+    func portName(in layout: PortLayout) -> String {
         switch port {
         case .magSafe: "MagSafe"
-        case let .usbC(n): PortName.name(for: n)
+        case let .usbC(n): layout.name(for: n)
         }
     }
 }

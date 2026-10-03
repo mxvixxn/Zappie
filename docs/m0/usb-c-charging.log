@@ -11,3 +11,6 @@
 14:56:25 ext=Yes src=[USB-PD [*]@Port-USB-C@2/Power In/USB-PD;TypeC@Port-USB-C@2/Power In/TypeC] win=["Max Power (mW)"=68000] out=[] fed=[0:ext0/role0 1:ext1/role0 2:ext1/role0 3:ext1/role0 ] adapter=["Watts"=68 "Description"="pd charger"]
 14:57:20 ext=No src=[] win=[] out=[] fed=[0:ext0/role0 1:ext1/role0 2:ext1/role0 3:ext1/role0 ] adapter=[]
 14:57:22 ext=Yes src=[USB-PD [*]@Port-USB-C@1/Power In/USB-PD;TypeC@Port-USB-C@1/Power In/TypeC] win=["Max Power (mW)"=68000] out=[] fed=[0:ext1/role0 1:ext1/role0 2:ext1/role0 3:ext1/role0 ] adapter=["Watts"=68]
+15:03:24 ext=No src=[] win=[] out=[] fed=[0:ext1/role0 1:ext1/role0 2:ext1/role0 3:ext1/role0 ] adapter=[]
+15:03:35 ext=Yes src=[USB-PD [*]@Port-MagSafe 3@1/Power In/USB-PD] win=["Max Power (mW)"=67800] out=[] fed=[0:ext1/role0 1:ext1/role0 2:ext1/role0 3:ext1/role0 ] adapter=["Watts"=68]
+15:03:39 ext=Yes src=[USB-PD [*]@Port-MagSafe 3@1/Power In/USB-PD] win=["Max Power (mW)"=67800] out=[] fed=[0:ext1/role0 1:ext1/role0 2:ext1/role0 3:ext1/role0 ] adapter=["Watts"=68 "Description"="pd charger"]

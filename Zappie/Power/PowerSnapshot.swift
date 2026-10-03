@@ -31,6 +31,8 @@ struct PowerSnapshot: Sendable, Equatable {
     var usbDevices: [Int: String] = [:]
     /// The port the charger is plugged into, when one is.
     var powerInput: PowerInput? = nil
+    /// This Mac's USB-C ports and their names.
+    var portLayout: PortLayout = .mac17_9
     /// When the battery driver last refreshed these values (`UpdateTime`).
     var updateTime: Date? = nil
     /// False when the watts were withheld as impossible or stale (see `withHiddenWatts()`).

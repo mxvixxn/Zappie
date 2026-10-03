@@ -11,8 +11,9 @@ enum PowerReader {
         defer { IOObjectRelease(service) }
 
         guard let battery = properties(of: service),
-              let snapshot = parse(battery: battery, pack: packProperties(of: service),
+              var snapshot = parse(battery: battery, pack: packProperties(of: service),
                                    usbDeviceNames: usbDeviceNames(), powerSources: powerSourceNodes()) else { return nil }
+        snapshot.portLayout = thisMacPorts
         let useSMC = UserDefaults.standard.object(forKey: AppSettings.liveWattsKey) as? Bool ?? true
         if useSMC, let live = SMCConnection.shared?.livePower() {
             return live.applied(to: snapshot, at: .now)
@@ -106,6 +107,21 @@ enum PowerReader {
     }
 
     private static let appleVendorID = 1452
+
+    /// Read once: ports do not change while the app runs.
+    static let thisMacPorts: PortLayout = {
+        var size = 0
+        sysctlbyname("hw.model", nil, &size, nil, 0)
+        var model = [CChar](repeating: 0, count: max(size, 1))
+        sysctlbyname("hw.model", &model, &size, nil, 0)
+        let names = (1...8).map { "port-usb-c-\($0)" } + ["port-magsafe3-1", "port-magsafe-1"]
+        let present = names.filter { name in
+            let entry = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceNameMatching(name))
+            defer { if entry != IO_OBJECT_NULL { IOObjectRelease(entry) } }
+            return entry != IO_OBJECT_NULL
+        }
+        return PortLayout.make(model: String(cString: model), deviceTreeNodes: present)
+    }()
 
     /// One `IOPortFeaturePowerSource` registry entry.
     struct PowerSourceNode: Equatable {

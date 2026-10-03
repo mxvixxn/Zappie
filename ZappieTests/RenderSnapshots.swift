@@ -27,6 +27,11 @@ struct RenderSnapshots {
         ("usbc-charging", PowerSnapshot(isExternalConnected: true, adapterInW: 22.2, systemLoadW: 22, batteryW: 0,
                                         percent: 80, powerInput: PowerInput(port: .usbC(1), source: "USB-PD",
                                                                             negotiatedW: 68))),
+        ("no-magsafe", PowerSnapshot(isExternalConnected: true, adapterInW: 18.5, systemLoadW: 9.5, batteryW: 9.0,
+                                     percent: 64,
+                                     powerInput: PowerInput(port: .usbC(1), source: "USB-PD", negotiatedW: 30),
+                                     portLayout: .make(model: "MacBookAir10,1",
+                                                       deviceTreeNodes: ["port-usb-c-1", "port-usb-c-2"]))),
         ("assisted", PowerSnapshot(isExternalConnected: true, adapterInW: 30, systemLoadW: 38, batteryW: -8,
                                    percent: 55, timeToEmptyMin: 400)),
     ]

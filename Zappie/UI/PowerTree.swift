@@ -44,7 +44,7 @@ struct PowerTree: Equatable {
     init(snapshot s: PowerSnapshot, state: PowerState, connectedSince: [Int: Date] = [:], now: Date = .now) {
         adapterActive = state != .battery
         adapterText = adapterActive ? Format.watts(s.adapterInW) : "—"
-        adapterTitle = s.powerInput.map { "어댑터 · \($0.portName)" } ?? "어댑터"
+        adapterTitle = s.powerInput.map { "어댑터 · \($0.portName(in: s.portLayout))" } ?? "어댑터"
         batteryLink = switch state {
         case .charging: .charging
         case .battery, .assisted: .discharging
@@ -60,10 +60,10 @@ struct PowerTree: Equatable {
             : usbActive ? s.systemLoadW.map { "Mac 본체 \(Format.watts(max($0 - usb, 0)))" } : nil
 
         let outputs = Dictionary(s.portOutputs.map { ($0.port, $0) }, uniquingKeysWith: { a, _ in a })
-        let indices = Set(PortName.known.keys).union(outputs.keys).union(s.usbDevices.keys).sorted()
+        let indices = Set(s.portLayout.ports).union(outputs.keys).union(s.usbDevices.keys).sorted()
         let inputPort: Int? = if case let .usbC(n)? = s.powerInput?.port { n } else { nil }
         ports = indices.map { index in
-            let name = PortName.name(for: index)
+            let name = s.portLayout.name(for: index)
             if index == inputPort, let input = s.powerInput {
                 let limit = input.negotiatedW.map { " · 최대 \(Format.wholeWatts($0))" } ?? ""
                 return Port(name: name, connected: true, active: false, watts: Format.watts(s.adapterInW),
