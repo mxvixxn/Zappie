@@ -46,7 +46,7 @@ struct PowerTreeView: View {
             ZStack(alignment: .topLeading) {
                 Canvas { context, _ in drawConnectors(context, l) }
 
-                node(symbol: "powerplug", title: "어댑터", value: tree.adapterText, tint: Theme.adapter)
+                node(symbol: "powerplug", title: tree.adapterTitle, value: tree.adapterText, tint: Theme.adapter)
                     .opacity(tree.adapterActive ? 1 : 0.45)
                     .frame(width: sourceWidth, height: nodeHeight)
                     .position(x: l.adapterX, y: nodeHeight / 2)
@@ -63,8 +63,8 @@ struct PowerTreeView: View {
 
                 ForEach(Array(tree.ports.enumerated()), id: \.offset) { index, port in
                     node(symbol: port.icon.symbol, title: port.name, value: port.watts, detail: port.detail,
-                         tint: port.connected ? Theme.usb : Theme.secondaryText)
-                        .opacity(port.active ? 1 : port.connected ? 0.85 : 0.55)
+                         tint: port.isInput ? Theme.adapter : port.connected ? Theme.usb : Theme.secondaryText)
+                        .opacity(port.active || port.isInput ? 1 : port.connected ? 0.85 : 0.55)
                         .frame(width: l.portWidth, height: portHeight)
                         .position(x: l.portX(index), y: l.portsTop + portHeight / 2)
                 }
@@ -135,7 +135,8 @@ struct PowerTreeView: View {
         // Draw order: empty, then connected-but-idle, then charging, so stronger lines sit on top.
         func rank(_ p: PowerTree.Port) -> Int { p.active ? 2 : p.connected ? 1 : 0 }
         let order = tree.ports.indices.sorted { rank(tree.ports[$0]) < rank(tree.ports[$1]) }
-        for index in order {
+        // The charger's own port takes no output branch.
+        for index in order where !tree.ports[index].isInput {
             let port = tree.ports[index]
             let active = port.active
             let x = l.portX(index)

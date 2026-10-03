@@ -208,27 +208,21 @@ Views            MenuBarLabel / DropdownView / MainWindow(Overview, History, Ada
 
 ## 8. 백로그 (미뤄 둔 작업)
 
-### 8-1. USB-C 포트로 충전할 때 (보류, 2026-10-03)
+### 8-1. USB-C 포트로 충전할 때 ✅ 구현 (2026-10-03)
 
-**현재 동작**: 어댑터가 어느 포트로 들어오는지 구분하지 않는다. MagSafe가 아닌 USB-C로 충전하면 그 포트는 아래 포트 줄에 "출력 없음"으로 보인다.
+**검증** (`docs/m0/usb-c-charging.log`, 70 W 어댑터 + 썬더볼트 5 케이블):
+| 꽂은 곳 | 전원 노드 (`IOPortFeaturePowerSource`, 이름에 `[*]`) | 포트 번호 |
+|---|---|---|
+| MagSafe | `Port-MagSafe 3@1/Power In/USB-PD` 67.8 W | — |
+| 오른쪽 | `Port-USB-C@3/Power In/USB-PD` 68 W | 3 ✅ |
+| 왼쪽 앞 | `Port-USB-C@2/...` — 처음 2초는 `TypeC [*]` 15 W, 이후 `USB-PD [*]` 68 W | 2 ✅ |
+| 왼쪽 뒤 | `Port-USB-C@1/...` 68 W | 1 ✅ |
+- `Port-USB-C@N`의 N = `PowerOutDetails.PortIndex`. 입력 포트는 `PowerOutDetails`에 나오지 않는다. 꽂은 뒤 2~17초 안에 노드가 생긴다.
+- `IOPortFeaturePowerIn.Active`, `FedDetails.FedExternalConnected`는 연결과 무관하게 남아 있어 쓰지 않는다.
 
-**찾은 데이터** (MagSafe 충전 중 확인):
-- 포트마다 `IOPortFeaturePowerIn` 노드가 있다. `Description` = `Port-USB-C@1~3/Power In`, `Port-MagSafe 3@1/Power In`, `ParentBuiltInPortNumber`, `ParentBuiltInPortTypeDescription`.
-  `Active`는 연결 여부와 무관하게 모두 `No`였다 → 판별에 쓰지 않는다.
-- 전원이 들어오는 포트 아래에만 `IOPortFeaturePowerSource` 노드가 생긴다. 지금 쓰이는 공급원은 이름에 `[*]`가 붙는다 (예: `USB-PD [*]`).
-  `WinningPowerSourceOption` = 협상 결과 (20000 mV × 3390 mA = 67.8 W), `PowerSourceOptions` = 어댑터가 제공하는 PDO 목록.
-- 장치 트리에 `port-usb-c-1~3`, `port-magsafe3-1` 노드가 있다 (정적 정보만).
+**표시**: 어댑터 노드 "어댑터 · MagSafe / 왼쪽 뒤 …", 입력 포트는 🔌 "전원 입력 · 최대 68 W"(연보라, 출력선 없음), 어댑터 카드 부제목에 포트 이름.
 
-**검증할 것** (실험: 충전기를 MagSafe → USB-C 한 포트에 30초 → MagSafe):
-1. USB-C로 충전하면 그 포트의 `Power In` 아래에 `IOPortFeaturePowerSource [*]`가 생기는가
-2. `Port-USB-C@N`의 N이 `PowerOutDetails.PortIndex`와 같은가 (1 = 왼쪽 뒤, 2 = 왼쪽 앞, 3 = 오른쪽)
-3. 충전기 두 개(MagSafe + USB-C)일 때 `[*]`가 한쪽에만 붙는가
-
-**화면 계획**:
-- 어댑터 노드에 입력 포트 표시: "어댑터 · MagSafe" / "어댑터 · USB-C 오른쪽"
-- 입력으로 쓰이는 USB-C 포트는 "출력 없음" 대신 🔌 "전원 입력 · 67.8 W"(연보라), 시스템에서 내려가는 출력선은 그리지 않음
-- 충전기 두 개: `[*]` 쪽 "사용 중", 다른 쪽 "대기 전원"
-- 저전력 USB-C 충전기는 기존 "배터리 보조"·"느린 충전" 표시로 처리
+**미검증**: 충전기 두 개 동시 연결 (어댑터가 하나뿐). 지금은 `[*]` 공급원 하나만 따르므로 값은 틀리지 않지만, 쓰이지 않는 쪽 충전기의 포트는 "출력 없음"으로 보일 수 있다.
 
 ### 8-2. 그 밖의 후보
 - 다른 MacBook 지원 검증: 포트 이름은 Mac17,9(14·16형 MacBook Pro) 기준 → 모델별 포트 표 필요(MacBook Air는 왼쪽 2개뿐). SMC 키(`PDTR`, `PSTR`, `B0AV`, `B0AC`)의 의미를 M1~M4에서 확인

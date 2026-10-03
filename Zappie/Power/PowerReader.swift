@@ -12,7 +12,7 @@ enum PowerReader {
 
         guard let battery = properties(of: service),
               let snapshot = parse(battery: battery, pack: packProperties(of: service),
-                                   usbDeviceNames: usbDeviceNames()) else { return nil }
+                                   usbDeviceNames: usbDeviceNames(), powerSources: powerSourceNodes()) else { return nil }
         let useSMC = UserDefaults.standard.object(forKey: AppSettings.liveWattsKey) as? Bool ?? true
         if useSMC, let live = SMCConnection.shared?.livePower() {
             return live.applied(to: snapshot, at: .now)
@@ -22,7 +22,7 @@ enum PowerReader {
 
     /// - Parameter usbDeviceNames: Port → USB product name, from `usbDeviceNames()`.
     static func parse(battery: [String: Any], pack: [String: Any]?,
-                      usbDeviceNames: [Int: String] = [:]) -> PowerSnapshot? {
+                      usbDeviceNames: [Int: String] = [:], powerSources: [PowerSourceNode] = []) -> PowerSnapshot? {
         guard let telemetry = battery["PowerTelemetryData"] as? [String: Any] else { return nil }
         let batteryData = battery["BatteryData"] as? [String: Any]
 
@@ -62,6 +62,7 @@ enum PowerReader {
                                      devices: battery["FedDetails"] as? [[String: Any]],
                                      names: usbDeviceNames),
             usbDevices: usbDeviceNames,
+            powerInput: powerInput(from: powerSources),
             updateTime: signed(battery["UpdateTime"]).map { Date(timeIntervalSince1970: TimeInterval($0)) }
         )
         return snapshot.hasImpossibleWatts ? snapshot.withHiddenWatts() : snapshot
@@ -105,6 +106,50 @@ enum PowerReader {
     }
 
     private static let appleVendorID = 1452
+
+    /// One `IOPortFeaturePowerSource` registry entry.
+    struct PowerSourceNode: Equatable {
+        var name: String
+        var description: String
+        var maxPowermW: Int?
+    }
+
+    /// The source marked "[*]" (in use) names the input port. "Brick ID" is only an ID probe.
+    static func powerInput(from nodes: [PowerSourceNode]) -> PowerInput? {
+        guard let active = nodes.first(where: { $0.name.contains("[*]") && !$0.name.hasPrefix("Brick ID") }),
+              let portPart = active.description.split(separator: "/").first else { return nil }
+        let port: PowerInput.Port
+        if portPart.hasPrefix("Port-MagSafe") {
+            port = .magSafe
+        } else if portPart.hasPrefix("Port-USB-C@"), let n = Int(portPart.split(separator: "@").last ?? "") {
+            port = .usbC(n)
+        } else {
+            return nil
+        }
+        return PowerInput(port: port,
+                          source: active.name.replacingOccurrences(of: " [*]", with: ""),
+                          negotiatedW: active.maxPowermW.map { Double($0) / 1000 })
+    }
+
+    private static func powerSourceNodes() -> [PowerSourceNode] {
+        var iterator: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, IOServiceMatching("IOPortFeaturePowerSource"),
+                                           &iterator) == KERN_SUCCESS else { return [] }
+        defer { IOObjectRelease(iterator) }
+
+        var nodes: [PowerSourceNode] = []
+        while case let entry = IOIteratorNext(iterator), entry != IO_OBJECT_NULL {
+            defer { IOObjectRelease(entry) }
+            var nameBuffer = [CChar](repeating: 0, count: 128)
+            guard IORegistryEntryGetName(entry, &nameBuffer) == KERN_SUCCESS,
+                  let props = properties(of: entry),
+                  let description = props["Description"] as? String else { continue }
+            let winning = props["WinningPowerSourceOption"] as? [String: Any]
+            nodes.append(PowerSourceNode(name: String(cString: nameBuffer), description: description,
+                                         maxPowermW: int(winning?["Max Power (mW)"])))
+        }
+        return nodes
+    }
 
     /// USB bus (top byte of `locationID`) + 1 = `PowerOutDetails.PortIndex`.
     static func port(forUSBLocationID locationID: Int) -> Int {

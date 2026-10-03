@@ -11,12 +11,14 @@
 		1406D8EFF649BFDE1D196634 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C5B24B5F80DB26CD5793678 /* AppSettings.swift */; };
 		15E3A39E9684B99CF0B5829E /* OverviewPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A3A2BA8DFFA077075D2D8D /* OverviewPresentation.swift */; };
 		17A0B3D282C3C7668DBD4F21 /* PowerTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77CD2EB31B8F5CF61E42478B /* PowerTreeTests.swift */; };
+		1A17E4BC99877A731B1C950B /* PowerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA6F475C4D5DCD041965498 /* PowerInput.swift */; };
 		1CCE1F662D452E01BB3EBF3F /* PowerMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E15D9C9E43622193B7CC57 /* PowerMonitorTests.swift */; };
 		299A207C4CEEBA0B565BDCB1 /* PowerTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA51C57C2DA3F4D6C227D074 /* PowerTreeView.swift */; };
 		330F72D29FDC5AD82182C20B /* PowerPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA44B4EDBDE6FE62D45A336 /* PowerPresentation.swift */; };
 		3967425A1F28E5EAA886E9B4 /* PortName.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD3F43A8D096FBE359637DD /* PortName.swift */; };
 		3A7E60A1EF8C416EF89B2E01 /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCA001A87A1CEC39E01381D /* Fixtures.swift */; };
 		3A94945760F9EEB2DEDE8603 /* HistoryChartCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AF91567342D599D82F3B98 /* HistoryChartCard.swift */; };
+		3ABEE878BA0578E2D0473CCB /* PowerInputTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8906572FA035AC33710CF2EE /* PowerInputTests.swift */; };
 		4E1E93E82EB7D6A230204255 /* PowerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC19B214AD3BEAE48CF4F51 /* PowerState.swift */; };
 		528C9CBCE6DF94386B6CC6F9 /* PowerPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98F50BF6B13AE1D4DD443F8 /* PowerPresentationTests.swift */; };
 		561F3DED5CC10DA79340B057 /* Zappie.icon in Resources */ = {isa = PBXBuildFile; fileRef = 631C5C8CC927B0417091EA74 /* Zappie.icon */; };
@@ -82,6 +84,7 @@
 		66C8265EFB803AA04E32E648 /* DetailPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPresentationTests.swift; sourceTree = "<group>"; };
 		77CD2EB31B8F5CF61E42478B /* PowerTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerTreeTests.swift; sourceTree = "<group>"; };
 		799E6411509EC3011CE393DD /* SMCTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMCTests.swift; sourceTree = "<group>"; };
+		8906572FA035AC33710CF2EE /* PowerInputTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerInputTests.swift; sourceTree = "<group>"; };
 		8C5B24B5F80DB26CD5793678 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		8FA44B4EDBDE6FE62D45A336 /* PowerPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerPresentation.swift; sourceTree = "<group>"; };
 		9D37628C3B4896787F5DCD27 /* MenuBarLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLabel.swift; sourceTree = "<group>"; };
@@ -90,6 +93,7 @@
 		BAD9AFAA5699DB8098969E11 /* DropdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropdownView.swift; sourceTree = "<group>"; };
 		BCCA001A87A1CEC39E01381D /* Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fixtures.swift; sourceTree = "<group>"; };
 		C98F50BF6B13AE1D4DD443F8 /* PowerPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerPresentationTests.swift; sourceTree = "<group>"; };
+		CEA6F475C4D5DCD041965498 /* PowerInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerInput.swift; sourceTree = "<group>"; };
 		D57096C1A0A7D2E47186B3D6 /* PowerReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerReaderTests.swift; sourceTree = "<group>"; };
 		E3EB8A7FE005B79EFD947AF9 /* PowerStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerStateTests.swift; sourceTree = "<group>"; };
 		EBD3F43A8D096FBE359637DD /* PortName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortName.swift; sourceTree = "<group>"; };
@@ -105,6 +109,7 @@
 				F25AD71C9E144F740965B92A /* ChargeReason.swift */,
 				EBD3F43A8D096FBE359637DD /* PortName.swift */,
 				2969A9F90202742BE828E145 /* PowerHistory.swift */,
+				CEA6F475C4D5DCD041965498 /* PowerInput.swift */,
 				FB3C3CEC65392B9A0488556A /* PowerMonitor.swift */,
 				13BE3D6743EDAE837C213FA1 /* PowerReader.swift */,
 				0F08A0289524457FEC729F3D /* PowerSnapshot.swift */,
@@ -171,6 +176,7 @@
 				BCCA001A87A1CEC39E01381D /* Fixtures.swift */,
 				3EF1CCB988B78D05E5CD0F97 /* OverviewPresentationTests.swift */,
 				5D36A6E69A1963BE036FCFA6 /* PowerHistoryTests.swift */,
+				8906572FA035AC33710CF2EE /* PowerInputTests.swift */,
 				05E15D9C9E43622193B7CC57 /* PowerMonitorTests.swift */,
 				C98F50BF6B13AE1D4DD443F8 /* PowerPresentationTests.swift */,
 				D57096C1A0A7D2E47186B3D6 /* PowerReaderTests.swift */,
@@ -283,6 +289,7 @@
 				3A7E60A1EF8C416EF89B2E01 /* Fixtures.swift in Sources */,
 				BC7647B8A5765AB03B8314A3 /* OverviewPresentationTests.swift in Sources */,
 				974A4B394BE575B85113B61C /* PowerHistoryTests.swift in Sources */,
+				3ABEE878BA0578E2D0473CCB /* PowerInputTests.swift in Sources */,
 				1CCE1F662D452E01BB3EBF3F /* PowerMonitorTests.swift in Sources */,
 				528C9CBCE6DF94386B6CC6F9 /* PowerPresentationTests.swift in Sources */,
 				7F0983B292E396396E4E4405 /* PowerReaderTests.swift in Sources */,
@@ -311,6 +318,7 @@
 				A858C84891B5132F645219D2 /* OverviewView.swift in Sources */,
 				3967425A1F28E5EAA886E9B4 /* PortName.swift in Sources */,
 				9FBD0BEC5E0C1C55B224FB3C /* PowerHistory.swift in Sources */,
+				1A17E4BC99877A731B1C950B /* PowerInput.swift in Sources */,
 				E2ED9D02EFD118519212FA03 /* PowerMonitor.swift in Sources */,
 				330F72D29FDC5AD82182C20B /* PowerPresentation.swift in Sources */,
 				DF4B020F6D35D235A900B09B /* PowerReader.swift in Sources */,

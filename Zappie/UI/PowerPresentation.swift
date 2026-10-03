@@ -23,6 +23,11 @@ enum Format {
         watts(w).replacingOccurrences(of: " ", with: "")
     }
 
+    /// "68 W" for whole numbers, "67.8 W" otherwise.
+    static func wholeWatts(_ w: Double) -> String {
+        w.rounded() == w ? "\(Int(w)) W" : String(format: "%.1f W", w)
+    }
+
     static func compactSignedWatts(_ w: Double?) -> String {
         signedWatts(w).replacingOccurrences(of: " ", with: "")
     }

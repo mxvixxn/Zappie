@@ -19,9 +19,12 @@ struct PowerTree: Equatable {
         var watts: String
         var detail: String
         var icon: DeviceIcon = .generic
+        /// The charger is plugged into this port.
+        var isInput = false
     }
 
     var adapterActive: Bool
+    var adapterTitle: String
     var adapterText: String
     var batteryLink: BatteryLink
     var batteryText: String
@@ -31,7 +34,7 @@ struct PowerTree: Equatable {
     var macText: String?
     var usbActive: Bool
     var ports: [Port]
-    var anyPortConnected: Bool { ports.contains { $0.connected } }
+    var anyPortConnected: Bool { ports.contains { $0.connected && !$0.isInput } }
 
     /// A data device seen this recently without watts is still waiting for the battery driver's
     /// refresh; after that it is simply not drawing power.
@@ -41,6 +44,7 @@ struct PowerTree: Equatable {
     init(snapshot s: PowerSnapshot, state: PowerState, connectedSince: [Int: Date] = [:], now: Date = .now) {
         adapterActive = state != .battery
         adapterText = adapterActive ? Format.watts(s.adapterInW) : "—"
+        adapterTitle = s.powerInput.map { "어댑터 · \($0.portName)" } ?? "어댑터"
         batteryLink = switch state {
         case .charging: .charging
         case .battery, .assisted: .discharging
@@ -57,8 +61,14 @@ struct PowerTree: Equatable {
 
         let outputs = Dictionary(s.portOutputs.map { ($0.port, $0) }, uniquingKeysWith: { a, _ in a })
         let indices = Set(PortName.known.keys).union(outputs.keys).union(s.usbDevices.keys).sorted()
+        let inputPort: Int? = if case let .usbC(n)? = s.powerInput?.port { n } else { nil }
         ports = indices.map { index in
             let name = PortName.name(for: index)
+            if index == inputPort, let input = s.powerInput {
+                let limit = input.negotiatedW.map { " · 최대 \(Format.wholeWatts($0))" } ?? ""
+                return Port(name: name, connected: true, active: false, watts: Format.watts(s.adapterInW),
+                            detail: "전원 입력\(limit)", icon: .charger, isInput: true)
+            }
             if let out = outputs[index], out.watts > 0 {
                 return Port(name: name, connected: true, active: true, watts: Format.watts(out.watts),
                             detail: PortOutput.describeDevice(out) ?? "충전 중", icon: DeviceIcon(out))
@@ -77,7 +87,7 @@ struct PowerTree: Equatable {
 /// Icon for what is plugged into a port. The name comes from USB (data-connected devices only),
 /// so AirPods cases usually show up as an unnamed Apple device.
 enum DeviceIcon: Equatable {
-    case iphone, ipad, airpods, watch, macbook, desktopMac, apple, generic
+    case iphone, ipad, airpods, watch, macbook, desktopMac, apple, charger, generic
 
     init(_ p: PortOutput) {
         let name = p.deviceName?.lowercased() ?? ""
@@ -100,6 +110,7 @@ enum DeviceIcon: Equatable {
         case .macbook: "laptopcomputer"
         case .desktopMac: "desktopcomputer"
         case .apple: "apple.logo"
+        case .charger: "powerplug"
         case .generic: "cable.connector"
         }
     }

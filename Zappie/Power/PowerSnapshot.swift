@@ -29,6 +29,8 @@ struct PowerSnapshot: Sendable, Equatable {
     /// Data-connected USB devices by port (e.g. 2: "iPhone"). These appear the moment a device is
     /// plugged in, unlike `portOutputs`, which waits for the battery driver's next refresh.
     var usbDevices: [Int: String] = [:]
+    /// The port the charger is plugged into, when one is.
+    var powerInput: PowerInput? = nil
     /// When the battery driver last refreshed these values (`UpdateTime`).
     var updateTime: Date? = nil
     /// False when the watts were withheld as impossible or stale (see `withHiddenWatts()`).

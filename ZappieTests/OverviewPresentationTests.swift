@@ -46,6 +46,13 @@ struct OverviewPresentationTests {
         #expect(a.lossText == "0.2 W")
     }
 
+    @Test func adapterCardNamesInputPort() throws {
+        var s = charging
+        s.powerInput = PowerInput(port: .usbC(1), source: "USB-PD", negotiatedW: 68)
+        let a = try #require(OverviewPresentation(snapshot: s, state: .charging).adapter)
+        #expect(a.subtitle == "70W USB-C Power Adapter · 왼쪽 뒤")
+    }
+
     @Test func usageFractionIsClampedToOne() throws {
         var s = charging
         s.adapterInW = 80

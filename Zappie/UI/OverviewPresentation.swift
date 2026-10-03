@@ -59,7 +59,9 @@ struct OverviewPresentation: Equatable {
     init(snapshot s: PowerSnapshot, state: PowerState) {
         let connected = state != .battery
         composition = connected ? Self.composition(s) : nil
-        adapter = connected ? s.adapter.map { Self.adapter($0, inputW: s.adapterInW, lossW: s.adapterLossW) } : nil
+        adapter = connected ? s.adapter.map {
+            Self.adapter($0, inputW: s.adapterInW, lossW: s.adapterLossW, port: s.powerInput?.portName)
+        } : nil
         batteryTiles = Self.tiles(s)
         ports = s.portOutputs.map { p in
             let detail: String = if let v = p.voltageV, let i = p.currentA {
@@ -99,7 +101,7 @@ struct OverviewPresentation: Equatable {
         )
     }
 
-    private static func adapter(_ a: AdapterInfo, inputW: Double?, lossW: Double?) -> Adapter {
+    private static func adapter(_ a: AdapterInfo, inputW: Double?, lossW: Double?, port: String?) -> Adapter {
         let usage = min(max((inputW ?? 0) / Double(a.watts), 0), 1)
         let negotiated: String = if let v = a.voltageV, let i = a.currentA {
             String(format: "%.1f V × %.2f A", v, i)
@@ -108,7 +110,7 @@ struct OverviewPresentation: Equatable {
         }
         return Adapter(
             ratedText: "\(a.watts) W",
-            subtitle: a.name ?? a.protocolDescription ?? "",
+            subtitle: [a.name ?? a.protocolDescription, port].compactMap { $0 }.joined(separator: " · "),
             usageFraction: usage,
             usageText: Format.percent(usage),
             negotiatedText: negotiated,
