@@ -11,9 +11,7 @@ enum PowerReader {
         defer { IOObjectRelease(service) }
 
         guard let battery = properties(of: service) else { return nil }
-        let charging = !((battery["PowerOutDetails"] as? [Any])?.isEmpty ?? true)
-        return parse(battery: battery, pack: packProperties(of: service),
-                     usbDeviceNames: charging ? usbDeviceNames() : [:])
+        return parse(battery: battery, pack: packProperties(of: service), usbDeviceNames: usbDeviceNames())
     }
 
     /// - Parameter usbDeviceNames: Port → USB product name, from `usbDeviceNames()`.
@@ -53,6 +51,7 @@ enum PowerReader {
             portOutputs: portOutputs(battery["PowerOutDetails"] as? [[String: Any]],
                                      devices: battery["FedDetails"] as? [[String: Any]],
                                      names: usbDeviceNames),
+            usbDevices: usbDeviceNames,
             updateTime: signed(battery["UpdateTime"]).map { Date(timeIntervalSince1970: TimeInterval($0)) }
         )
     }

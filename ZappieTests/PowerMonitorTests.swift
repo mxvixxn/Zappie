@@ -61,6 +61,17 @@ struct PowerMonitorTests {
         #expect(rig.monitor.history.samples(.hour).map(\.inputW) == [20])
     }
 
+    @Test func tracksWhenUSBDevicesWereConnected() {
+        let rig = Rig()
+        let start = rig.now
+        rig.step(0, PowerSnapshot(isExternalConnected: true, usbDevices: [2: "iPhone"]))
+        rig.step(3, PowerSnapshot(isExternalConnected: true, usbDevices: [2: "iPhone"]))
+        #expect(rig.monitor.usbConnectedSince == [2: start])
+
+        rig.step(1, PowerSnapshot(isExternalConnected: true))
+        #expect(rig.monitor.usbConnectedSince.isEmpty)
+    }
+
     @Test func holdToChargingWaitsForHysteresis() {
         let rig = Rig()
         rig.step(0, PowerSnapshot(isExternalConnected: true, batteryW: 0))

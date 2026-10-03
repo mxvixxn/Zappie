@@ -104,3 +104,49 @@ struct DeviceIconTests {
         #expect(PowerTree(snapshot: s, state: .hold).ports.allSatisfy { $0.icon == .generic })
     }
 }
+
+/// Data-connected devices (iPhone, iPad, Macs) appear over USB the moment they are plugged in,
+/// while `PowerOutDetails` waits for the battery driver's next refresh (up to ~60 s).
+struct PendingPortTests {
+    let now = Date(timeIntervalSince1970: 1_791_000_000)
+
+    func port(since seconds: TimeInterval) -> PowerTree.Port {
+        let s = PowerSnapshot(isExternalConnected: true, adapterInW: 20, systemLoadW: 20, batteryW: 0,
+                              usbDevices: [3: "iPhone"])
+        let tree = PowerTree(snapshot: s, state: .hold, connectedSince: [3: now - seconds], now: now)
+        return tree.ports[2]
+    }
+
+    @Test func newlyPluggedDeviceShowsBeforeWattsArrive() {
+        let p = port(since: 5)
+        #expect(p.connected)
+        #expect(!p.active)
+        #expect(p.watts == "—")
+        #expect(p.detail == "iPhone · 전력 확인 중")
+        #expect(p.icon == .iphone)
+    }
+
+    @Test func treeKnowsSomethingIsPluggedIn() {
+        let s = PowerSnapshot(isExternalConnected: true, adapterInW: 20, systemLoadW: 20, batteryW: 0,
+                              usbDevices: [3: "iPhone"])
+        let tree = PowerTree(snapshot: s, state: .hold)
+        #expect(tree.anyPortConnected)
+        #expect(!tree.usbActive)
+    }
+
+    @Test func deviceThatNeverDrawsPowerIsNotCharging() {
+        #expect(port(since: 90).detail == "iPhone · 충전 안 함")
+    }
+
+    @Test func chargingPortIsAlsoConnected() {
+        let s = PowerSnapshot(isExternalConnected: true, adapterInW: 20, systemLoadW: 20, batteryW: 0,
+                              portOutputs: [PortOutput(port: 2, watts: 9)])
+        let p = PowerTree(snapshot: s, state: .hold).ports[1]
+        #expect(p.connected && p.active)
+    }
+
+    @Test func readerKeepsUSBDevicesWithoutPowerOutput() throws {
+        let s = try #require(PowerReader.parse(battery: Fixtures.discharging, pack: nil, usbDeviceNames: [2: "iPhone"]))
+        #expect(s.usbDevices == [2: "iPhone"])
+    }
+}

@@ -10,8 +10,10 @@ enum PowerState: Sendable, Equatable {
     /// Adapter connected but insufficient; battery discharging to help.
     case assisted
 
-    /// Battery watts within ±threshold count as idle, to avoid flicker.
-    static let idleThresholdW = 0.5
+    /// Battery watts within ±threshold count as idle. Telemetry reads exactly 0 when the battery
+    /// is idle, so this only absorbs rounding; flicker is handled by `StateDebouncer`.
+    /// (Was 0.5 W, which hid a real 0.3 W assist as "배터리 대기".)
+    static let idleThresholdW = 0.1
 
     /// - Parameter connectionChangedAt: When `isExternalConnected` last flipped. Telemetry older
     ///   than that still describes the previous power source, so its watts are ignored.

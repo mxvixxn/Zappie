@@ -21,6 +21,9 @@ struct PowerSnapshot: Sendable, Equatable {
     var adapter: AdapterInfo? = nil
     /// USB-C ports currently supplying power to other devices. Already included in `systemLoadW`.
     var portOutputs: [PortOutput] = []
+    /// Data-connected USB devices by port (e.g. 2: "iPhone"). These appear the moment a device is
+    /// plugged in, unlike `portOutputs`, which waits for the battery driver's next refresh.
+    var usbDevices: [Int: String] = [:]
     /// When the battery driver last refreshed these values (`UpdateTime`).
     var updateTime: Date? = nil
 }

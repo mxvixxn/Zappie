@@ -60,7 +60,9 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
   `PortIndex − 1` = `FedDetails` 칸 번호 = USB 버스(`locationID` 최상위 바이트). `PortControllerInfo` 순서는 이와 달라 쓰지 않는다.
 - `FedDetails[PortIndex−1].FedStateOfCharge` = 연결 기기 배터리 % (아이폰 84%일 때 83 — 1%p 이내). `FedVendorID` 1452 = Apple. 완충된 에어팟처럼 전력을 받지 않는 기기는 `PowerOutDetails`에 없다.
 - 데이터 연결되는 기기는 `IOUSBHostDevice`의 `USB Product Name`(예: "iPhone")으로 이름을 붙인다.
-- 새로 꽂은 포트의 출력은 길게는 약 50초 뒤에 나타난다 (9 W 협상 시).
+- 새로 꽂은 포트의 출력은 길게는 약 60초 뒤에 나타난다. `PowerOutDetails`·`FedDetails`는 배터리 드라이버 갱신(`UpdateTime`) 때만 바뀌기 때문.
+  `pmset -g batt/ps/rawbatt/accps`, `system_profiler SPPowerDataType`로는 갱신을 앞당길 수 없음을 확인 (수동 새로고침 버튼 불채택).
+- 즉시 인식: 데이터 연결 기기는 `IOUSBHostDevice` 연결/해제 알림으로 바로 포트에 "기기 · 전력 확인 중"을 표시하고, 75초 안에 W가 오지 않으면 "충전 안 함". 배터리 드라이버 general-interest 알림으로 새 값은 폴링을 기다리지 않고 반영.
 - 충전 전용 연결은 USB 기기 목록에 잡히지 않아 기기 이름은 알 수 없음. `FedDetails`(연결 기기 배터리 잔량 등)는 일부 Apple 기기만 채움.
 - 색: USB 강조 코발트 `#2563C9` (배지 글자 `#93C5FD`). 연보라와는 색각 이상에서 색조가 겹치므로 **명도 차로 구분**(CVD ΔE 11.1, 일반 16.8). 배경 대비 2.5:1이라 USB 표시는 항상 글자 라벨을 동반한다. (앰버 `#CC8026`에서 변경, 2026-10-03)
 
@@ -78,11 +80,11 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 
 ```
 연결 안 됨 (ExternalConnected == false)            → .battery
-연결됨 && batteryW > +0.5                           → .charging
-연결됨 && |batteryW| <= 0.5                         → .hold   (어댑터가 시스템에 직접 공급)
-연결됨 && batteryW < −0.5                           → .assisted (어댑터 부족, 배터리 보조) ※시안에 없음, 배지만 "보조 방전"
+연결됨 && batteryW > +0.1                           → .charging
+연결됨 && |batteryW| <= 0.1                         → .hold   (어댑터가 시스템에 직접 공급)
+연결됨 && batteryW < −0.1                           → .assisted (어댑터 부족, 배터리 보조) ※시안에 없음, 배지만 "보조 방전"
 ```
-임계값 0.5 W는 깜빡임 방지용 초깃값. 상태 전환에 2초 히스테리시스 적용.
+임계값은 0.5 W로 시작했으나 0.1 W로 낮춤 (2026-10-03): 텔레메트리는 대기 시 정확히 0이고, 실제 0.3 W 보조(입력 43.8 + 배터리 0.3 = 시스템 44.1)가 "배터리 대기"로 표시됐다. 깜빡임은 2초 히스테리시스가 막는다.
 - 단, `.battery`로 들어가고 나오는 전환(분리/연결)은 히스테리시스 없이 즉시 반영한다 (완료 기준 1초).
 - 연결 상태가 바뀐 시각보다 `UpdateTime`이 오래된 스냅샷은 이전 전원의 값이므로 와트를 무시하고 `.hold`로 본다.
 

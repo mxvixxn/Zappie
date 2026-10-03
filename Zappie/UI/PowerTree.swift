@@ -12,6 +12,9 @@ struct PowerTree: Equatable {
 
     struct Port: Equatable {
         var name: String
+        /// Something is plugged in (charging, or a data device still waiting for its watts).
+        var connected: Bool = false
+        /// Power is flowing to it.
         var active: Bool
         var watts: String
         var detail: String
@@ -28,8 +31,14 @@ struct PowerTree: Equatable {
     var macText: String?
     var usbActive: Bool
     var ports: [Port]
+    var anyPortConnected: Bool { ports.contains { $0.connected } }
 
-    init(snapshot s: PowerSnapshot, state: PowerState) {
+    /// A data device seen this recently without watts is still waiting for the battery driver's
+    /// refresh; after that it is simply not drawing power.
+    static let pendingWindow: TimeInterval = 75
+
+    /// - Parameter connectedSince: When each port's USB device first appeared (`PowerMonitor`).
+    init(snapshot s: PowerSnapshot, state: PowerState, connectedSince: [Int: Date] = [:], now: Date = .now) {
         adapterActive = state != .battery
         adapterText = adapterActive ? Format.watts(s.adapterInW) : "—"
         batteryLink = switch state {
@@ -46,13 +55,20 @@ struct PowerTree: Equatable {
         macText = usbActive ? s.systemLoadW.map { "Mac 본체 \(Format.watts(max($0 - usb, 0)))" } : nil
 
         let outputs = Dictionary(s.portOutputs.map { ($0.port, $0) }, uniquingKeysWith: { a, _ in a })
-        let indices = Set(PortName.known.keys).union(outputs.keys).sorted()
+        let indices = Set(PortName.known.keys).union(outputs.keys).union(s.usbDevices.keys).sorted()
         ports = indices.map { index in
-            guard let out = outputs[index], out.watts > 0 else {
-                return Port(name: PortName.name(for: index), active: false, watts: "—", detail: "출력 없음")
+            let name = PortName.name(for: index)
+            if let out = outputs[index], out.watts > 0 {
+                return Port(name: name, connected: true, active: true, watts: Format.watts(out.watts),
+                            detail: PortOutput.describeDevice(out) ?? "충전 중", icon: DeviceIcon(out))
             }
-            return Port(name: PortName.name(for: index), active: true, watts: Format.watts(out.watts),
-                        detail: PortOutput.describeDevice(out) ?? "충전 중", icon: DeviceIcon(out))
+            if let device = s.usbDevices[index] {
+                let waiting = connectedSince[index].map { now.timeIntervalSince($0) < Self.pendingWindow } ?? true
+                return Port(name: name, connected: true, active: false, watts: "—",
+                            detail: "\(device) · \(waiting ? "전력 확인 중" : "충전 안 함")",
+                            icon: DeviceIcon(PortOutput(port: index, watts: 0, deviceName: device)))
+            }
+            return Port(name: name, active: false, watts: "—", detail: "출력 없음")
         }
     }
 }

@@ -18,13 +18,21 @@ struct PowerStateClassifyTests {
     }
 
     @Test func connectedNearZeroIsHold() {
-        #expect(PowerState.classify(snapshot(connected: true, batteryW: 0.3)) == .hold)
-        #expect(PowerState.classify(snapshot(connected: true, batteryW: -0.5)) == .hold)
+        #expect(PowerState.classify(snapshot(connected: true, batteryW: 0)) == .hold)
+        #expect(PowerState.classify(snapshot(connected: true, batteryW: 0.05)) == .hold)
+        #expect(PowerState.classify(snapshot(connected: true, batteryW: -0.1)) == .hold)
         #expect(PowerState.classify(snapshot(connected: true, batteryW: nil)) == .hold)
     }
 
     @Test func connectedAndDischargingIsAssisted() {
         #expect(PowerState.classify(snapshot(connected: true, batteryW: -5)) == .assisted)
+    }
+
+    /// Seen live: adapter 43.8 W + battery 0.3 W = system 44.1 W, yet shown as "배터리 대기".
+    /// Telemetry is exact (0 when idle), so small real flows count; the 2 s debounce handles flicker.
+    @Test func smallRealDischargeIsAssisted() {
+        #expect(PowerState.classify(snapshot(connected: true, batteryW: -0.3)) == .assisted)
+        #expect(PowerState.classify(snapshot(connected: true, batteryW: 0.3)) == .charging)
     }
 
     /// Right after plugging in, IORegistry still publishes the discharge numbers.

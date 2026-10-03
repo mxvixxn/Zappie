@@ -21,6 +21,8 @@ struct RenderSnapshots {
                                   PortOutput(port: 2, watts: 9.0, voltageV: 9, currentA: 1, deviceName: "iPhone",
                                              deviceBatteryPercent: 88, deviceIsApple: true),
                               ])),
+        ("pending", PowerSnapshot(isExternalConnected: true, adapterInW: 44.1, systemLoadW: 44.4, batteryW: -0.3,
+                                  percent: 80, usbDevices: [2: "iPhone"])),
         ("assisted", PowerSnapshot(isExternalConnected: true, adapterInW: 30, systemLoadW: 38, batteryW: -8,
                                    percent: 55, timeToEmptyMin: 400)),
     ]

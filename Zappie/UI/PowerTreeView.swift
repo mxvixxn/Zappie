@@ -63,8 +63,8 @@ struct PowerTreeView: View {
 
                 ForEach(Array(tree.ports.enumerated()), id: \.offset) { index, port in
                     node(symbol: port.icon.symbol, title: port.name, value: port.watts, detail: port.detail,
-                         tint: port.active ? Theme.usb : Theme.secondaryText)
-                        .opacity(port.active ? 1 : 0.55)
+                         tint: port.connected ? Theme.usb : Theme.secondaryText)
+                        .opacity(port.active ? 1 : port.connected ? 0.85 : 0.55)
                         .frame(width: l.portWidth, height: portHeight)
                         .position(x: l.portX(index), y: l.portsTop + portHeight / 2)
                 }
@@ -131,14 +131,17 @@ struct PowerTreeView: View {
 
         // System → ports. Idle branches first so active ones draw on top of the shared bus.
         stroke(context, [.init(x: l.centerX, y: l.systemBottom), .init(x: l.centerX, y: l.portsBus)],
-               tree.usbActive ? Theme.usb : inactive, dashed: !tree.usbActive)
-        let order = tree.ports.indices.sorted { !tree.ports[$0].active && tree.ports[$1].active }
+               tree.anyPortConnected ? Theme.usb : inactive, dashed: !tree.usbActive)
+        // Draw order: empty, then connected-but-idle, then charging, so stronger lines sit on top.
+        func rank(_ p: PowerTree.Port) -> Int { p.active ? 2 : p.connected ? 1 : 0 }
+        let order = tree.ports.indices.sorted { rank(tree.ports[$0]) < rank(tree.ports[$1]) }
         for index in order {
-            let active = tree.ports[index].active
+            let port = tree.ports[index]
+            let active = port.active
             let x = l.portX(index)
             stroke(context, [.init(x: l.centerX, y: l.portsBus), .init(x: x, y: l.portsBus),
                              .init(x: x, y: l.portsTop)],
-                   active ? Theme.usb : inactive, dashed: !active)
+                   port.connected ? Theme.usb : inactive, dashed: !active)
             if active {
                 chevron(context, at: .init(x: x, y: l.portsTop - 2), down: true, Theme.usb)
             }
