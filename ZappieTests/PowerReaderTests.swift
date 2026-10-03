@@ -91,7 +91,8 @@ struct PowerReaderTests {
     @Test func readsUSBPortOutputs() throws {
         let s = try #require(PowerReader.parse(battery: Fixtures.pluggedHold, pack: nil))
         #expect(s.portOutputs == [
-            PortOutput(port: 1, watts: 4.448, voltageV: 5.201, currentA: 0.855),
+            PortOutput(port: 1, watts: 4.448, voltageV: 5.201, currentA: 0.855,
+                       deviceBatteryPercent: 83, deviceIsApple: true),
             PortOutput(port: 3, watts: 1.276, voltageV: 5.203, currentA: 0.245),
         ])
         #expect(abs(s.usbOutW - 5.724) < 0.0001)

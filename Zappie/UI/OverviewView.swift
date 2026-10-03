@@ -174,6 +174,9 @@ struct OverviewView: View {
                             Text(port.name).font(.system(size: 11)).foregroundStyle(Theme.secondaryText)
                             Text(port.watts).font(.system(size: 15, weight: .semibold))
                             Text(port.detail).font(.system(size: 11)).foregroundStyle(Theme.secondaryText)
+                            if let device = port.device {
+                                Text(device).font(.system(size: 11, weight: .semibold))
+                            }
                         }
                         Spacer(minLength: 0)
                     }

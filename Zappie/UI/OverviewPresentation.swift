@@ -42,6 +42,8 @@ struct OverviewPresentation: Equatable {
         var name: String
         var watts: String
         var detail: String
+        /// e.g. "iPhone · 83%"; nil when nothing is known about the device.
+        var device: String?
     }
 
     struct Tile: Equatable {
@@ -66,7 +68,8 @@ struct OverviewPresentation: Equatable {
             } else {
                 "—"
             }
-            return Port(name: PortName.name(for: p.port), watts: Format.watts(p.watts), detail: detail)
+            return Port(name: PortName.name(for: p.port), watts: Format.watts(p.watts), detail: detail,
+                        device: Self.device(p))
         }
 
         let w = Format.signedWatts(s.batteryW)
@@ -74,6 +77,16 @@ struct OverviewPresentation: Equatable {
         case .charging: "\(w) 충전"
         case .battery, .assisted: "\(w) 방전"
         case .hold: w
+        }
+    }
+
+    private static func device(_ p: PortOutput) -> String? {
+        let name = p.deviceName ?? (p.deviceIsApple ? "Apple 기기" : nil)
+        switch (name, p.deviceBatteryPercent) {
+        case let (name?, percent?): return "\(name) · \(percent)%"
+        case let (name?, nil): return name
+        case let (nil, percent?): return "기기 · \(percent)%"
+        case (nil, nil): return nil
         }
     }
 

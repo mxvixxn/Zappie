@@ -53,6 +53,7 @@ struct PowerPresentation: Equatable {
         var batteryText: String
         /// Power sent to other devices; nil hides the USB node.
         var usbText: String?
+        var usbLabel: String
         var systemNodeLabel: String
         /// What the Mac itself uses (system load minus USB output).
         var systemNodeText: String
@@ -137,8 +138,14 @@ struct PowerPresentation: Equatable {
             systemText: Format.watts(s.systemLoadW),
             batteryText: batteryText,
             usbText: usbText,
+            usbLabel: Self.usbLabel(s.portOutputs),
             systemNodeLabel: systemLabel,
             systemNodeText: systemText
         )
+    }
+
+    private static func usbLabel(_ ports: [PortOutput]) -> String {
+        if ports.count > 1 { return "USB 기기 \(ports.count)대" }
+        return ports.first?.deviceName ?? "USB 기기"
     }
 }

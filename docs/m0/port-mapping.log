@@ -1,1 +1,11 @@
 11:46:35 output ports=[3]
+--- run 2 (iPhone moved across ports)
+13:18:11 out=[3] fet=[0,130,0,140] Location ID: 0x02100000
+--- run 3 (iPhone moved across ports)
+13:28:40 out=[] fet=[0,0,130,140]  usb=
+13:28:42 out=[] fet=[0,0,0,140]  usb=
+13:28:46 out=[1] fet=[0,0,0,140] fed0(soc=83,ext=0)  usb=0x00100000
+13:29:38 out=[] fet=[130,0,0,140]  usb=
+13:29:44 out=[] fet=[130,0,0,140]  usb=0x01100000
+13:30:40 out=[2] fet=[130,0,0,140] fed1(soc=85,ext=0)  usb=0x01100000
+13:32:40 out=[2] fet=[130,0,0,140] fed1(soc=86,ext=0)  usb=0x01100000

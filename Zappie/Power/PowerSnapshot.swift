@@ -33,8 +33,13 @@ struct PortOutput: Sendable, Equatable {
     /// `PowerOutDetails.PortIndex`; see `PortName` for the physical location.
     var port: Int
     var watts: Double
-    var voltageV: Double?
-    var currentA: Double?
+    var voltageV: Double? = nil
+    var currentA: Double? = nil
+    /// USB product name, when the device also connects for data (e.g. "iPhone").
+    var deviceName: String? = nil
+    /// The device's own battery level, reported by some Apple devices via `FedDetails`.
+    var deviceBatteryPercent: Int? = nil
+    var deviceIsApple = false
 }
 
 struct AdapterInfo: Sendable, Equatable {

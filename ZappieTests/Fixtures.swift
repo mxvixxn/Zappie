@@ -28,6 +28,13 @@ enum Fixtures {
                 ["PortIndex": 1, "Watts": 4448, "AdapterVoltage": 5201, "Current": 855, "PDPowermW": 15000],
                 ["PortIndex": 3, "Watts": 1276, "AdapterVoltage": 5203, "Current": 245, "PDPowermW": 15000],
             ] as [[String: Any]],
+            // One slot per USB-C port (slot = PortIndex − 1). Only some Apple devices fill it.
+            "FedDetails": [
+                ["FedVendorID": 1452, "FedStateOfCharge": 83, "FedExternalConnected": 0],
+                ["FedVendorID": 0, "FedStateOfCharge": 0, "FedExternalConnected": 1],
+                ["FedVendorID": 0, "FedStateOfCharge": 0, "FedExternalConnected": 0],
+                ["FedVendorID": 0, "FedStateOfCharge": 0, "FedExternalConnected": 1],
+            ] as [[String: Any]],
             "AdapterDetails": [
                 "Watts": 68,
                 "AdapterVoltage": 20000,

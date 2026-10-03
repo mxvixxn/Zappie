@@ -55,7 +55,12 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 - `PowerOutDetails`: 다른 기기에 전력을 공급 중인 포트마다 항목 하나. `PortIndex`, `Watts`(**실제 단위 mW** = `AdapterVoltage`(mV) × `Current`(mA)), `ConfiguredVoltage`, `PDPowermW`(포트 한도).
 - **USB 출력은 `SystemLoad`에 포함된다.** 5.3 W 기기를 뽑자 시스템 소비 평균 약 17 W → 11 W. 따라서 "Mac 본체" = `SystemLoad` − USB 출력 합.
 - 기기 분리 시 2초 안에 목록에서 사라짐 (다른 전력 값보다 빠름).
-- Mac17,9는 전원 포트 컨트롤러 4개(USB-C 3 + MagSafe). 어댑터가 MagSafe면 USB-C 3개 모두 출력 가능. `PortIndex` ↔ 물리적 위치 매핑은 `PortName`에 기록(미완).
+- Mac17,9는 전원 포트 컨트롤러 4개(USB-C 3 + MagSafe). 어댑터가 MagSafe면 USB-C 3개 모두 출력 가능.
+- 포트 매핑 (아이폰을 옮겨 꽂아 확인, `docs/m0/port-mapping.log`): `PortIndex` 1 = 왼쪽 뒤, 2 = 왼쪽 앞, 3 = 오른쪽.
+  `PortIndex − 1` = `FedDetails` 칸 번호 = USB 버스(`locationID` 최상위 바이트). `PortControllerInfo` 순서는 이와 달라 쓰지 않는다.
+- `FedDetails[PortIndex−1].FedStateOfCharge` = 연결 기기 배터리 % (아이폰 84%일 때 83 — 1%p 이내). `FedVendorID` 1452 = Apple. 완충된 에어팟처럼 전력을 받지 않는 기기는 `PowerOutDetails`에 없다.
+- 데이터 연결되는 기기는 `IOUSBHostDevice`의 `USB Product Name`(예: "iPhone")으로 이름을 붙인다.
+- 새로 꽂은 포트의 출력은 길게는 약 50초 뒤에 나타난다 (9 W 협상 시).
 - 충전 전용 연결은 USB 기기 목록에 잡히지 않아 기기 이름은 알 수 없음. `FedDetails`(연결 기기 배터리 잔량 등)는 일부 Apple 기기만 채움.
 - 색: USB 강조 앰버 `#CC8026` (연보라·에메랄드와 3색 검증 통과, 배지 글자 `#F5C27A`).
 

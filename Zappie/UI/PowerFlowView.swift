@@ -82,7 +82,7 @@ struct PowerFlowView: View {
                 if let usb = flow.usbText {
                     VStack(spacing: 2) {
                         VerticalConnector(direction: .down, length: connector, color: Theme.usb)
-                        FlowNode(symbol: "cable.connector", label: "USB 기기", value: usb, tint: Theme.usb,
+                        FlowNode(symbol: "cable.connector", label: flow.usbLabel, value: usb, tint: Theme.usb,
                                  size: size)
                     }
                 } else {
@@ -129,6 +129,9 @@ struct FlowNode: View {
             Text(label)
                 .font(.system(size: size.label))
                 .foregroundStyle(Theme.secondaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .padding(.horizontal, 4)
             if let value {
                 Text(value)
                     .font(.system(size: size == .compact ? 12 : 18, weight: .semibold))
