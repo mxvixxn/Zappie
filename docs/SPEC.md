@@ -230,7 +230,7 @@ Views            MenuBarLabel / DropdownView / MainWindow(Overview, History, Ada
 
 ### 8-2. 그 밖의 후보
 - ✅ 포트 구성 자동 파악 (2026-10-03): 장치 트리의 `port-usb-c-N`·`port-magsafe…` 노드로 포트 개수를 정하고, 직접 검증한 모델(`PortLayout.verifiedNames`, 현재 Mac17,9)만 위치 이름("왼쪽 뒤")을 쓴다. 그 밖의 모델은 "USB-C N". 검증한 모델이라도 장치 트리 포트가 표와 다르면 표를 쓰지 않는다.
-- 다른 MacBook 검증: 위치 이름 추가(기기를 포트마다 옮겨 꽂아 확인), SMC 키(`PDTR`, `PSTR`, `B0AV`, `B0AC`)의 의미를 M1~M4에서 확인
+- 다른 MacBook 검증: 위치 이름 추가(기기를 포트마다 옮겨 꽂아 확인). SMC 키(`PSTR`, `B0AV`, `B0AC`)는 앱이 드라이버 값과 자동 교차 검증하므로 직접 검증은 선택 사항
 - 실제 macOS 14에서 실행 확인 (컴파일은 통과. SF Symbols 이름은 컴파일러가 검사하지 않음 — 특히 `apple.logo`, `cable.connector`, `powerplug`)
 - 정식 서명 빌드를 /Applications에 설치하고 "로그인 시 실행" 확인 (Xcode에서 팀 선택 필요)
 - README에 스크린샷·기능 설명
