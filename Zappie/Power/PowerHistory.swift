@@ -41,6 +41,7 @@ struct PowerHistory: Sendable {
 
     /// Adapter input is recorded as 0 while on battery, so the chart shows the drop.
     mutating func record(_ snapshot: PowerSnapshot, at date: Date) {
+        guard snapshot.telemetryValid else { return }
         let sample = PowerSample(
             date: date,
             inputW: snapshot.isExternalConnected ? snapshot.adapterInW ?? 0 : 0,

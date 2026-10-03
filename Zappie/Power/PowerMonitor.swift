@@ -38,7 +38,7 @@ final class PowerMonitor {
     }
 
     func refresh() {
-        guard let reading = read() else {
+        guard var reading = read() else {
             isSupported = false
             snapshot = nil
             state = nil
@@ -49,6 +49,10 @@ final class PowerMonitor {
         let time = now()
         if let previous = snapshot, previous.isExternalConnected != reading.isExternalConnected {
             connectionChangedAt = time
+        }
+        // The driver's first publication after a plug change mixes in the old power source.
+        if let changed = connectionChangedAt, let updated = reading.updateTime, updated < changed {
+            reading = reading.withHiddenWatts()
         }
         snapshot = reading
         state = debouncer.update(PowerState.classify(reading, connectionChangedAt: connectionChangedAt), at: time)

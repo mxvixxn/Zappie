@@ -47,6 +47,11 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 | 남은 시간 | `AvgTimeToFull` / `AvgTimeToEmpty` | 분 | 65535 = 계산 중/없음 처리 |
 | 충전 중 여부 | `IsCharging`, `ChargerData.NotChargingReason` | Bool / 비트마스크 | 한도 유지 중 `NotChargingReason`=16777216 (0이 아님) |
 
+**값 검증** (2026-10-03): 어댑터를 뽑는 순간 드라이버가 `SystemLoad` −48.6 W, `BatteryPower` +48.6 W를 내놓고 다음 갱신(~60초)까지 유지했다.
+- 불가능한 값(시스템 소비 < 0, 입력 < 0, 배터리 모드인데 충전 방향)은 W를 감추고 "갱신 대기 중" 표시.
+- 연결 상태가 바뀐 뒤 `UpdateTime`이 그보다 이른 값도 감춘다 (뽑을 때·꽂을 때 모두 이전 전원 값이 섞여 나옴).
+- 감춘 값은 기록(차트)에 남기지 않는다. 상태(배지·선 방향)는 `ExternalConnected`로 즉시 바꾼다.
+
 **충전 이유 값** (2026-10-03): 바이패스 상태의 아래 줄에 이유를 붙인다.
 - `ChargerData.NotChargingReason` = `0x1000000` → "N% 한도에서 유지 중" (80% 한도에서 확인)
 - `NotChargingReason` = `0x80` → 외부 전원 없음 (배터리 사용 중 79%에서 확인, 배터리 상태라 화면 영향 없음)

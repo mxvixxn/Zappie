@@ -33,7 +33,7 @@ enum PowerReader {
         let packData = pack?["BatteryData"] as? [String: Any]
         let charger = battery["ChargerData"] as? [String: Any]
 
-        return PowerSnapshot(
+        let snapshot = PowerSnapshot(
             isExternalConnected: battery["ExternalConnected"] as? Bool ?? false,
             adapterInW: signed(telemetry["SystemPowerIn"]).map(milli),
             systemLoadW: signed(telemetry["SystemLoad"]).map(milli),
@@ -58,6 +58,7 @@ enum PowerReader {
             usbDevices: usbDeviceNames,
             updateTime: signed(battery["UpdateTime"]).map { Date(timeIntervalSince1970: TimeInterval($0)) }
         )
+        return snapshot.hasImpossibleWatts ? snapshot.withHiddenWatts() : snapshot
     }
 
     // MARK: - Parsing helpers

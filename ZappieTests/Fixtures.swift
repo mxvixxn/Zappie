@@ -77,3 +77,16 @@ enum Fixtures {
         ["BatteryData": ["Temperature": 2829] as [String: Any]]
     }
 }
+
+extension Fixtures {
+    /// Published by the driver at the moment the adapter was unplugged (2026-10-03):
+    /// SystemLoad −48.582 W and BatteryPower +48.582 W on battery. Physically impossible.
+    static var unplugGlitch: [String: Any] {
+        var battery = discharging
+        var telemetry = battery["PowerTelemetryData"] as! [String: Any]
+        telemetry["SystemLoad"] = NSNumber(value: UInt64(18446744073709503034))
+        telemetry["BatteryPower"] = 48582
+        battery["PowerTelemetryData"] = telemetry
+        return battery
+    }
+}

@@ -52,7 +52,8 @@ struct PowerTree: Equatable {
 
         let usb = s.usbOutW
         usbActive = usb > 0
-        macText = usbActive ? s.systemLoadW.map { "Mac 본체 \(Format.watts(max($0 - usb, 0)))" } : nil
+        macText = !s.telemetryValid ? "갱신 대기 중"
+            : usbActive ? s.systemLoadW.map { "Mac 본체 \(Format.watts(max($0 - usb, 0)))" } : nil
 
         let outputs = Dictionary(s.portOutputs.map { ($0.port, $0) }, uniquingKeysWith: { a, _ in a })
         let indices = Set(PortName.known.keys).union(outputs.keys).union(s.usbDevices.keys).sorted()

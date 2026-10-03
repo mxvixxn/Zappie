@@ -23,6 +23,7 @@ struct RenderSnapshots {
                               ])),
         ("pending", PowerSnapshot(isExternalConnected: true, adapterInW: 44.1, systemLoadW: 44.4, batteryW: -0.3,
                                   percent: 80, usbDevices: [2: "iPhone"])),
+        ("waiting", PowerSnapshot(isExternalConnected: false, percent: 78, telemetryValid: false)),
         ("assisted", PowerSnapshot(isExternalConnected: true, adapterInW: 30, systemLoadW: 38, batteryW: -8,
                                    percent: 55, timeToEmptyMin: 400)),
     ]

@@ -31,10 +31,32 @@ struct PowerSnapshot: Sendable, Equatable {
     var usbDevices: [Int: String] = [:]
     /// When the battery driver last refreshed these values (`UpdateTime`).
     var updateTime: Date? = nil
+    /// False when the watts were withheld as impossible or stale (see `withHiddenWatts()`).
+    var telemetryValid = true
 }
 
 extension PowerSnapshot {
     var usbOutW: Double { portOutputs.reduce(0) { $0 + $1.watts } }
+
+    /// Watts the driver could not have measured: negative system load, or charging on battery.
+    /// Seen right at an unplug: SystemLoad −48.6 W with BatteryPower +48.6 W.
+    var hasImpossibleWatts: Bool {
+        if let load = systemLoadW, load < 0 { return true }
+        if let input = adapterInW, input < 0 { return true }
+        if !isExternalConnected, let battery = batteryW, battery > PowerState.idleThresholdW { return true }
+        return false
+    }
+
+    /// Same snapshot with the power-flow watts removed, for "갱신 대기 중".
+    func withHiddenWatts() -> PowerSnapshot {
+        var copy = self
+        copy.adapterInW = nil
+        copy.systemLoadW = nil
+        copy.batteryW = nil
+        copy.adapterLossW = nil
+        copy.telemetryValid = false
+        return copy
+    }
 }
 
 struct PortOutput: Sendable, Equatable {

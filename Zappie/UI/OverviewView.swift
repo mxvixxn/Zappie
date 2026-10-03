@@ -39,7 +39,7 @@ struct OverviewView: View {
                                                   connectedSince: monitor.usbConnectedSince))
                 }
                 .frame(width: wide)
-                compositionCard(o.composition, p)
+                compositionCard(o.composition, p, waiting: !s.telemetryValid)
                     .frame(width: column)
             }
             .fixedSize(horizontal: false, vertical: true)
@@ -73,7 +73,8 @@ struct OverviewView: View {
         }
     }
 
-    private func compositionCard(_ c: OverviewPresentation.Composition?, _ p: PowerPresentation) -> some View {
+    private func compositionCard(_ c: OverviewPresentation.Composition?, _ p: PowerPresentation,
+                                 waiting: Bool) -> some View {
         Card("입력 전력 구성", trailing: c?.totalText) {
             VStack(alignment: .leading, spacing: 14) {
                 if let c {
@@ -108,7 +109,7 @@ struct OverviewView: View {
                     }
                     .font(.system(size: 13))
                 } else {
-                    Text("어댑터가 연결되어 있지 않습니다.")
+                    Text(waiting ? "갱신 대기 중" : "어댑터가 연결되어 있지 않습니다.")
                         .font(.system(size: 13))
                         .foregroundStyle(Theme.secondaryText)
                 }
