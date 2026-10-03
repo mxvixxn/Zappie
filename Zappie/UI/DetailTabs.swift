@@ -68,6 +68,7 @@ struct BatteryTab: View {
 struct SettingsTab: View {
     @AppStorage(AppSettings.pollIntervalKey) private var pollInterval = 1
     @AppStorage(AppSettings.labelStyleKey) private var labelStyle = MenuBarLabelStyle.watts
+    @AppStorage(AppSettings.liveWattsKey) private var liveWatts = true
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
     @State private var loginError: String?
 
@@ -75,7 +76,13 @@ struct SettingsTab: View {
         TabPage(title: "설정") {
             Card("일반") {
                 VStack(alignment: .leading, spacing: 16) {
-                    setting("갱신 주기", note: "배터리 드라이버 자체의 갱신 간격(1~60초)보다 빨라지지는 않습니다.") {
+                    setting("실시간 전력", note: "SMC 센서에서 와트를 약 1.5초마다 읽습니다. 끄면 배터리 드라이버 값(1~60초 간격)을 씁니다.") {
+                        Toggle("실시간 전력", isOn: $liveWatts)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
+                    }
+                    Divider().overlay(Theme.border)
+                    setting("갱신 주기", note: liveWatts ? nil : "배터리 드라이버 자체의 갱신 간격(1~60초)보다 빨라지지는 않습니다.") {
                         Picker("갱신 주기", selection: $pollInterval) {
                             ForEach(AppSettings.pollIntervals, id: \.self) { Text("\($0)초").tag($0) }
                         }

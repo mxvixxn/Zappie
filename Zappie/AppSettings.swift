@@ -22,6 +22,8 @@ enum AppSettings {
     static let pollIntervalKey = "pollIntervalSeconds"
     static let labelStyleKey = "menuBarLabelStyle"
     static let sectionKey = "mainSection"
+    /// Read live watts from the SMC instead of waiting for the battery driver (default on).
+    static let liveWattsKey = "liveWattsFromSMC"
 
     static let pollIntervals = [1, 2, 5]
 }

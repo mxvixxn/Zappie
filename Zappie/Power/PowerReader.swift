@@ -10,8 +10,14 @@ enum PowerReader {
         guard service != IO_OBJECT_NULL else { return nil }
         defer { IOObjectRelease(service) }
 
-        guard let battery = properties(of: service) else { return nil }
-        return parse(battery: battery, pack: packProperties(of: service), usbDeviceNames: usbDeviceNames())
+        guard let battery = properties(of: service),
+              let snapshot = parse(battery: battery, pack: packProperties(of: service),
+                                   usbDeviceNames: usbDeviceNames()) else { return nil }
+        let useSMC = UserDefaults.standard.object(forKey: AppSettings.liveWattsKey) as? Bool ?? true
+        if useSMC, let live = SMCConnection.shared?.livePower() {
+            return live.applied(to: snapshot, at: .now)
+        }
+        return snapshot
     }
 
     /// - Parameter usbDeviceNames: Port → USB product name, from `usbDeviceNames()`.

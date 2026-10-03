@@ -24,6 +24,8 @@
 		6130852D68249B8E9A3AD106 /* USBOutputTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EED5C85B9893B2F56CFB185 /* USBOutputTests.swift */; };
 		6137AB04F882DC845B66F75A /* DetailPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C8265EFB803AA04E32E648 /* DetailPresentationTests.swift */; };
 		621E3B3144A8E404CA81922C /* PowerSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F08A0289524457FEC729F3D /* PowerSnapshot.swift */; };
+		746BE44DEF7430355DFC1197 /* SMCTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799E6411509EC3011CE393DD /* SMCTests.swift */; };
+		74A39F86A1EB6F5C603D6F4D /* SMC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D821FE982C863BEE458776 /* SMC.swift */; };
 		7F0983B292E396396E4E4405 /* PowerReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57096C1A0A7D2E47186B3D6 /* PowerReaderTests.swift */; };
 		8A2DC301ADAEFCF0AFCCFCEE /* MenuBarLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D37628C3B4896787F5DCD27 /* MenuBarLabel.swift */; };
 		95D0A28CAF7F0A3C2E181D30 /* PowerTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38330E5FDEB27A99AEEF7E9F /* PowerTree.swift */; };
@@ -57,6 +59,7 @@
 /* Begin PBXFileReference section */
 		05E15D9C9E43622193B7CC57 /* PowerMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerMonitorTests.swift; sourceTree = "<group>"; };
 		08413A2A677AB6BE452D0F9A /* Zappie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zappie.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		09D821FE982C863BEE458776 /* SMC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMC.swift; sourceTree = "<group>"; };
 		0DC19B214AD3BEAE48CF4F51 /* PowerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerState.swift; sourceTree = "<group>"; };
 		0F08A0289524457FEC729F3D /* PowerSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerSnapshot.swift; sourceTree = "<group>"; };
 		13BE3D6743EDAE837C213FA1 /* PowerReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerReader.swift; sourceTree = "<group>"; };
@@ -78,6 +81,7 @@
 		631C5C8CC927B0417091EA74 /* Zappie.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = Zappie.icon; sourceTree = "<group>"; };
 		66C8265EFB803AA04E32E648 /* DetailPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPresentationTests.swift; sourceTree = "<group>"; };
 		77CD2EB31B8F5CF61E42478B /* PowerTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerTreeTests.swift; sourceTree = "<group>"; };
+		799E6411509EC3011CE393DD /* SMCTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMCTests.swift; sourceTree = "<group>"; };
 		8C5B24B5F80DB26CD5793678 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		8FA44B4EDBDE6FE62D45A336 /* PowerPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerPresentation.swift; sourceTree = "<group>"; };
 		9D37628C3B4896787F5DCD27 /* MenuBarLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLabel.swift; sourceTree = "<group>"; };
@@ -105,6 +109,7 @@
 				13BE3D6743EDAE837C213FA1 /* PowerReader.swift */,
 				0F08A0289524457FEC729F3D /* PowerSnapshot.swift */,
 				0DC19B214AD3BEAE48CF4F51 /* PowerState.swift */,
+				09D821FE982C863BEE458776 /* SMC.swift */,
 			);
 			path = Power;
 			sourceTree = "<group>";
@@ -172,6 +177,7 @@
 				E3EB8A7FE005B79EFD947AF9 /* PowerStateTests.swift */,
 				77CD2EB31B8F5CF61E42478B /* PowerTreeTests.swift */,
 				ECF335F87073EB7F647303B3 /* RenderSnapshots.swift */,
+				799E6411509EC3011CE393DD /* SMCTests.swift */,
 				595227BE92B81A5D5040AC90 /* TelemetryValidityTests.swift */,
 				4EED5C85B9893B2F56CFB185 /* USBOutputTests.swift */,
 			);
@@ -283,6 +289,7 @@
 				9BADC53928C66DEBBFBA09E6 /* PowerStateTests.swift in Sources */,
 				17A0B3D282C3C7668DBD4F21 /* PowerTreeTests.swift in Sources */,
 				F1E721D1E71CDED586746C3E /* RenderSnapshots.swift in Sources */,
+				746BE44DEF7430355DFC1197 /* SMCTests.swift in Sources */,
 				B97205B817EEB4D27558E562 /* TelemetryValidityTests.swift in Sources */,
 				6130852D68249B8E9A3AD106 /* USBOutputTests.swift in Sources */,
 			);
@@ -311,6 +318,7 @@
 				4E1E93E82EB7D6A230204255 /* PowerState.swift in Sources */,
 				95D0A28CAF7F0A3C2E181D30 /* PowerTree.swift in Sources */,
 				299A207C4CEEBA0B565BDCB1 /* PowerTreeView.swift in Sources */,
+				74A39F86A1EB6F5C603D6F4D /* SMC.swift in Sources */,
 				00D2DC6429BE19C77FE92463 /* Theme.swift in Sources */,
 				E7951F9C0DA3BBC42B358B0D /* ZappieApp.swift in Sources */,
 			);

@@ -33,6 +33,8 @@ struct PowerSnapshot: Sendable, Equatable {
     var updateTime: Date? = nil
     /// False when the watts were withheld as impossible or stale (see `withHiddenWatts()`).
     var telemetryValid = true
+    /// True when the watts came from the SMC (live, ~1.5 s) rather than the battery driver.
+    var wattsAreLive = false
 }
 
 extension PowerSnapshot {

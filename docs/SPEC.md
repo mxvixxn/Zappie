@@ -47,6 +47,22 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 | 남은 시간 | `AvgTimeToFull` / `AvgTimeToEmpty` | 분 | 65535 = 계산 중/없음 처리 |
 | 충전 중 여부 | `IsCharging`, `ChargerData.NotChargingReason` | Bool / 비트마스크 | 한도 유지 중 `NotChargingReason`=16777216 (0이 아님) |
 
+**실시간 와트: SMC** (2026-10-03, 읽기 전용 · 비공개 인터페이스)
+배터리 드라이버 값은 1~60초마다만 바뀌고 갱신을 앞당길 방법이 없다(`pmset`, `system_profiler` 등 시험). SMC 센서는 약 1.5초마다 바뀐다.
+
+| 의미 | SMC 키 | 형식 | 확인 |
+|---|---|---|---|
+| 어댑터 입력 W | `PDTR` | `flt ` | 충전 중 66.9 (어댑터 최대 67.8), 배터리 모드 0 |
+| 시스템 전체 W | `PSTR` | `flt ` | 배터리 모드 ~15 (드라이버 15.7), 충전 중 ~25 |
+| 배터리 전압 mV | `B0AV` | `ui16` LE | 12632 |
+| 배터리 전류 mA | `B0AC` | `si16` LE | 충전 +3430, 방전 −1370 → 배터리 W = V × I (충전 중 +43 W ≈ 66.9 − 25) |
+| (불채택) `PPBR` | | | 배터리에서 꺼내 쓰는 전력만 (충전 중 0.7) |
+
+- Apple Silicon의 SMC 정수·실수는 **little-endian**. `SMCKeyData_t`는 80바이트(keyInfo 뒤 3바이트 패딩), 선택자 2, 명령 9 = keyInfo, 5 = readKey.
+- 와트 3개만 SMC로 대체하고 나머지(잔량·온도·용량·포트·이유 값)는 드라이버. 연결 여부는 드라이버 `ExternalConnected`를 따른다.
+- SMC 실패 시 드라이버 값으로 자동 전환. 설정 "실시간 전력"으로 끌 수 있다.
+- 미확인: `PSTR`에 USB 출력이 포함되는지 (드라이버 `SystemLoad`는 포함).
+
 **값 검증** (2026-10-03): 어댑터를 뽑는 순간 드라이버가 `SystemLoad` −48.6 W, `BatteryPower` +48.6 W를 내놓고 다음 갱신(~60초)까지 유지했다.
 - 불가능한 값(시스템 소비 < 0, 입력 < 0, 배터리 모드인데 충전 방향)은 W를 감추고 "갱신 대기 중" 표시.
 - 연결 상태가 바뀐 뒤 `UpdateTime`이 그보다 이른 값도 감춘다 (뽑을 때·꽂을 때 모두 이전 전원 값이 섞여 나옴).
