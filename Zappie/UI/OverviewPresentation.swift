@@ -54,7 +54,6 @@ struct OverviewPresentation: Equatable {
     var composition: Composition?
     var adapter: Adapter?
     var batteryTiles: [Tile]
-    var batteryCaption: String
     var ports: [Port]
 
     init(snapshot s: PowerSnapshot, state: PowerState) {
@@ -69,25 +68,9 @@ struct OverviewPresentation: Equatable {
                 "—"
             }
             return Port(name: PortName.name(for: p.port), watts: Format.watts(p.watts), detail: detail,
-                        device: Self.device(p))
+                        device: PortOutput.describeDevice(p))
         }
 
-        let w = Format.signedWatts(s.batteryW)
-        batteryCaption = switch state {
-        case .charging: "\(w) 충전"
-        case .battery, .assisted: "\(w) 방전"
-        case .hold: w
-        }
-    }
-
-    private static func device(_ p: PortOutput) -> String? {
-        let name = p.deviceName ?? (p.deviceIsApple ? "Apple 기기" : nil)
-        switch (name, p.deviceBatteryPercent) {
-        case let (name?, percent?): return "\(name) · \(percent)%"
-        case let (name?, nil): return name
-        case let (nil, percent?): return "기기 · \(percent)%"
-        case (nil, nil): return nil
-        }
     }
 
     /// Input = system + battery charge + other. Other is the remainder, clamped at zero.

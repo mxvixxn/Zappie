@@ -67,13 +67,6 @@ struct OverviewPresentationTests {
         #expect(discharging[2].value == "—")
     }
 
-    @Test func batteryCaptionNamesTheDirection() {
-        #expect(OverviewPresentation(snapshot: charging, state: .charging).batteryCaption == "+31.4 W 충전")
-        #expect(OverviewPresentation(snapshot: battery, state: .battery).batteryCaption == "−11.8 W 방전")
-        let hold = PowerSnapshot(isExternalConnected: true, adapterInW: 12, systemLoadW: 12, batteryW: 0)
-        #expect(OverviewPresentation(snapshot: hold, state: .hold).batteryCaption == "0.0 W")
-    }
-
     @Test func updatedAgo() {
         let t = Date(timeIntervalSince1970: 1_790_950_000)
         #expect(Format.updatedAgo(t, now: t.addingTimeInterval(1)) == "방금 갱신")

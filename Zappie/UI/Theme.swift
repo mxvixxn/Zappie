@@ -9,7 +9,7 @@ enum Theme {
     static let secondaryText = Color(hex: 0xA8A8AE)
     static let adapter = Color(hex: 0x967CEC)   // lavender
     static let battery = Color(hex: 0x0FAA7B)   // emerald
-    static let usb = Color(hex: 0xCC8026)       // amber: power sent to other devices over USB-C
+    static let usb = Color(hex: 0x2563C9)       // cobalt: power sent to other devices over USB-C
     static let inactive = Color(hex: 0x48484A)
     static let loss = Color(hex: 0x8E8E93)
 
@@ -33,7 +33,7 @@ enum Theme {
         switch tint {
         case .adapter: Color(hex: 0xC4B5FD)
         case .battery: Color(hex: 0x6EE7B7)
-        case .usb: Color(hex: 0xF5C27A)
+        case .usb: Color(hex: 0x93C5FD)
         case .inactive: secondaryText
         }
     }

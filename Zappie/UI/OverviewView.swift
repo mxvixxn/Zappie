@@ -35,7 +35,7 @@ struct OverviewView: View {
 
             HStack(alignment: .top, spacing: gap) {
                 Card("전력 흐름") {
-                    PowerFlowView(flow: p.flow, style: .large(batteryValue: p.percent, batteryCaption: o.batteryCaption))
+                    PowerTreeView(tree: PowerTree(snapshot: s, state: state))
                 }
                 .frame(width: wide)
                 compositionCard(o.composition, p)

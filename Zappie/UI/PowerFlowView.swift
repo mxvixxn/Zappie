@@ -1,26 +1,15 @@
 import SwiftUI
 
 /// `[Adapter] —W→ ● —W→ [System]`, with the battery hanging off the junction.
-/// `.compact` is the dropdown card (watts on the lines); `.large` is the main window (watts in the nodes).
+/// Dropdown card: watts on the lines. The main window uses `PowerTreeView`.
 struct PowerFlowView: View {
-    enum Style {
-        case compact
-        case large(batteryValue: String, batteryCaption: String)
-    }
-
     let flow: PowerPresentation.Flow
-    var style: Style = .compact
 
     var body: some View {
-        switch style {
-        case .compact:
-            compact
-                .padding(12)
-                .background(Theme.card, in: RoundedRectangle(cornerRadius: 12))
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.border))
-        case let .large(batteryValue, batteryCaption):
-            large(batteryValue: batteryValue, caption: batteryCaption)
-        }
+        compact
+            .padding(12)
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.border))
     }
 
     private var adapterColor: Color { flow.adapterActive ? Theme.adapter : Theme.inactive }
@@ -38,25 +27,6 @@ struct PowerFlowView: View {
             }
             branches(size: .compact, connector: 26, caption: flow.batteryText, captionSize: 12,
                      batteryValue: nil)
-        }
-    }
-
-    private func large(batteryValue: String, caption: String) -> some View {
-        VStack(spacing: 4) {
-            HStack(spacing: 0) {
-                FlowNode(symbol: "powerplug", label: "어댑터 입력", value: flow.adapterText,
-                         tint: Theme.adapter, size: .large)
-                    .opacity(flow.adapterActive ? 1 : 0.45)
-                FlowSegment(text: nil, color: adapterColor, dashed: !flow.adapterActive)
-                    .padding(.horizontal, 2)
-                junction(12)
-                FlowSegment(text: nil, color: Theme.color(flow.systemLineTint), dashed: false)
-                    .padding(.horizontal, 2)
-                FlowNode(symbol: "laptopcomputer",
-                         label: flow.usbText == nil ? "시스템 소비" : flow.systemNodeLabel,
-                         value: flow.systemNodeText, tint: Theme.text, size: .large)
-            }
-            branches(size: .large, connector: 30, caption: caption, captionSize: 13, batteryValue: batteryValue)
         }
     }
 
