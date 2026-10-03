@@ -18,6 +18,9 @@ enum Theme {
     static let sidebarText = Color(hex: 0xD1D1D6)
     static let divider = Color(hex: 0x2E2E31)
     static let systemLine = Color(hex: 0xD1D1D6)
+    /// Semantic status colors, kept apart from the brand accents.
+    static let warning = Color(hex: 0xF2B544)
+    static let critical = Color(hex: 0xFF7A6B)
 
     static func color(_ tint: Tint) -> Color {
         switch tint {

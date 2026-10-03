@@ -51,8 +51,9 @@ struct PowerTreeView: View {
                     .frame(width: sourceWidth, height: nodeHeight)
                     .position(x: l.adapterX, y: nodeHeight / 2)
 
-                node(symbol: "battery.100", title: "배터리 \(tree.batteryPercent)", value: tree.batteryText,
-                     tint: Theme.battery)
+                node(symbol: tree.heat == .normal ? "battery.100" : "thermometer.high",
+                     title: "배터리 \(tree.batteryPercent)", value: tree.batteryText, detail: tree.batteryHeat,
+                     tint: Theme.battery, alert: heatColor)
                     .frame(width: sourceWidth, height: nodeHeight)
                     .position(x: l.batteryX, y: nodeHeight / 2)
 
@@ -168,8 +169,17 @@ struct PowerTreeView: View {
 
     // MARK: - Nodes
 
+    private var heatColor: Color? {
+        switch tree.heat {
+        case .normal: nil
+        case .warm: Theme.warning
+        case .hot: Theme.critical
+        }
+    }
+
+    /// `alert` recolors the detail line and border, for battery heat.
     private func node(symbol: String, title: String, value: String, detail: String? = nil,
-                      tint: Color) -> some View {
+                      tint: Color, alert: Color? = nil) -> some View {
         VStack(spacing: metrics.spacing) {
             Image(systemName: symbol)
                 .font(.system(size: metrics.symbol, weight: .semibold))
@@ -187,8 +197,8 @@ struct PowerTreeView: View {
                 .minimumScaleFactor(0.8)
             if let detail {
                 Text(detail)
-                    .font(.system(size: metrics.detail))
-                    .foregroundStyle(Theme.secondaryText)
+                    .font(.system(size: metrics.detail, weight: alert == nil ? .regular : .semibold))
+                    .foregroundStyle(alert ?? Theme.secondaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
             }
@@ -196,6 +206,6 @@ struct PowerTreeView: View {
         .padding(.horizontal, 6)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.background, in: RoundedRectangle(cornerRadius: metrics.radius))
-        .overlay(RoundedRectangle(cornerRadius: metrics.radius).stroke(Theme.border))
+        .overlay(RoundedRectangle(cornerRadius: metrics.radius).stroke(alert ?? Theme.border, lineWidth: alert == nil ? 1 : 1.5))
     }
 }

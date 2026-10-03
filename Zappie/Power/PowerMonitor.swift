@@ -39,6 +39,11 @@ final class PowerMonitor {
     private(set) var liveWattsCheck: LiveWattsCheck
     @ObservationIgnored private var validator = SMCValidator()
     private let disableLiveWatts: () -> Void
+
+    /// Battery heat level (see `TemperatureWatch`).
+    private(set) var heat: TemperatureWatch.Level = .normal
+    @ObservationIgnored private var temperatureWatch = TemperatureWatch()
+    private let notify: (TemperatureWatch.Message) -> Void
     private var debouncer = StateDebouncer(delay: 2)
     private var connectionChangedAt: Date?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
@@ -50,12 +55,14 @@ final class PowerMonitor {
          logReason: @escaping (ChargeReasonSighting) -> Void = ChargeReasonLog.append,
          alreadyLogged: Set<String> = [],
          disableLiveWatts: @escaping () -> Void = LiveWattsGuard.disable,
-         liveWattsDisabled: Bool = false) {
+         liveWattsDisabled: Bool = false,
+         notify: @escaping (TemperatureWatch.Message) -> Void = HeatNotifier.send) {
         self.read = read
         self.now = now
         self.logReason = logReason
         reasonTracker = ChargeReasonTracker(alreadyLogged: alreadyLogged)
         self.disableLiveWatts = disableLiveWatts
+        self.notify = notify
         liveWattsCheck = LiveWattsCheck(matches: 0, disabled: liveWattsDisabled)
     }
 
@@ -106,6 +113,12 @@ final class PowerMonitor {
             updateMenuBar(PowerPresentation(snapshot: reading, state: state).menuBar, reading, at: time)
         }
         reasonTracker.newSightings(in: reading, at: time).forEach(logReason)
+        if let level = temperatureWatch.update(reading.temperatureC, at: time), let t = reading.temperatureC {
+            notify(TemperatureWatch.message(for: level, temperatureC: t, charging: state == .charging))
+        }
+        if temperatureWatch.level != heat {
+            heat = temperatureWatch.level
+        }
 
         var since = usbConnectedSince.filter { reading.usbDevices[$0.key] != nil }
         for port in reading.usbDevices.keys where since[port] == nil {

@@ -32,6 +32,8 @@ struct RenderSnapshots {
                                      powerInput: PowerInput(port: .usbC(1), source: "USB-PD", negotiatedW: 30),
                                      portLayout: .make(model: "MacBookAir10,1",
                                                        deviceTreeNodes: ["port-usb-c-1", "port-usb-c-2"]))),
+        ("hot", PowerSnapshot(isExternalConnected: true, adapterInW: 61.4, systemLoadW: 18.2, batteryW: 43.2,
+                              temperatureC: 41.2, percent: 54, timeToFullMin: 38)),
         ("assisted", PowerSnapshot(isExternalConnected: true, adapterInW: 30, systemLoadW: 38, batteryW: -8,
                                    percent: 55, timeToEmptyMin: 400)),
     ]
@@ -39,7 +41,7 @@ struct RenderSnapshots {
     @Test(.enabled(if: outputDir != nil)) func renderDropdowns() throws {
         let dir = URL(fileURLWithPath: try #require(Self.outputDir))
         for (name, snapshot) in Self.cases {
-            let monitor = PowerMonitor(read: { snapshot })
+            let monitor = PowerMonitor(read: { snapshot }, logReason: { _ in }, notify: { _ in })
             monitor.refresh()
             let renderer = ImageRenderer(content: DropdownView(monitor: monitor))
             renderer.scale = 2

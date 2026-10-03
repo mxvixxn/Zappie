@@ -70,6 +70,7 @@ struct SettingsTab: View {
     @AppStorage(AppSettings.pollIntervalKey) private var pollInterval = 1
     @AppStorage(AppSettings.labelStyleKey) private var labelStyle = MenuBarLabelStyle.watts
     @AppStorage(AppSettings.liveWattsKey) private var liveWatts = true
+    @AppStorage(AppSettings.heatAlertsKey) private var heatAlerts = true
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
     @State private var loginError: String?
 
@@ -103,6 +104,12 @@ struct SettingsTab: View {
                         .pickerStyle(.segmented)
                         .labelsHidden()
                         .frame(width: 220)
+                    }
+                    Divider().overlay(Theme.border)
+                    setting("온도 경고 알림", note: "배터리가 40 °C를 넘으면 알립니다(45 °C 이상은 높은 경고). 같은 경고는 30분에 한 번만 보냅니다. Zappie는 충전을 직접 멈추지 않습니다.") {
+                        Toggle("온도 경고 알림", isOn: $heatAlerts)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
                     }
                     Divider().overlay(Theme.border)
                     setting("로그인 시 실행", note: loginError) {

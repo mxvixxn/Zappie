@@ -36,7 +36,8 @@ struct OverviewView: View {
             HStack(alignment: .top, spacing: gap) {
                 Card("전력 흐름") {
                     PowerTreeView(tree: PowerTree(snapshot: s, state: state,
-                                                  connectedSince: monitor.usbConnectedSince))
+                                                  connectedSince: monitor.usbConnectedSince,
+                                                  heat: monitor.heat))
                 }
                 .frame(width: wide)
                 compositionCard(o.composition, p, waiting: !s.telemetryValid)

@@ -29,6 +29,9 @@ struct PowerTree: Equatable {
     var batteryLink: BatteryLink
     var batteryText: String
     var batteryPercent: String
+    /// "41.2 °C · 뜨거움" while the battery runs hot; nil otherwise.
+    var batteryHeat: String?
+    var heat: TemperatureWatch.Level
     var systemText: String
     /// "Mac 본체 12.2 W" when some of the system load goes out over USB.
     var macText: String?
@@ -41,7 +44,12 @@ struct PowerTree: Equatable {
     static let pendingWindow: TimeInterval = 75
 
     /// - Parameter connectedSince: When each port's USB device first appeared (`PowerMonitor`).
-    init(snapshot s: PowerSnapshot, state: PowerState, connectedSince: [Int: Date] = [:], now: Date = .now) {
+    init(snapshot s: PowerSnapshot, state: PowerState, connectedSince: [Int: Date] = [:], now: Date = .now,
+         heat: TemperatureWatch.Level = .normal) {
+        self.heat = heat
+        batteryHeat = heat == .normal ? nil : s.temperatureC.map {
+            String(format: "%.1f °C · ", $0) + (heat == .hot ? "매우 뜨거움" : "뜨거움")
+        }
         adapterActive = state != .battery
         adapterText = adapterActive ? Format.watts(s.adapterInW) : "—"
         adapterTitle = s.powerInput.map { "어댑터 · \($0.portName(in: s.portLayout))" } ?? "어댑터"

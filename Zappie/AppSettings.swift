@@ -24,6 +24,8 @@ enum AppSettings {
     static let sectionKey = "mainSection"
     /// Read live watts from the SMC instead of waiting for the battery driver (default on).
     static let liveWattsKey = "liveWattsFromSMC"
+    /// macOS notification when the battery runs hot (default on).
+    static let heatAlertsKey = "heatAlerts"
 
     static let pollIntervals = [1, 2, 5]
 }

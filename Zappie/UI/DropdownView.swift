@@ -9,7 +9,8 @@ struct DropdownView: View {
         VStack(spacing: 12) {
             if let snapshot = monitor.snapshot, let state = monitor.state {
                 content(PowerPresentation(snapshot: snapshot, state: state), PowerTree(snapshot: snapshot, state: state,
-                                                                                    connectedSince: monitor.usbConnectedSince))
+                                                                                    connectedSince: monitor.usbConnectedSince,
+                                                                                    heat: monitor.heat))
             } else {
                 unsupported
             }
