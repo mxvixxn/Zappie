@@ -2,7 +2,8 @@ import SwiftUI
 
 @main
 struct ZappieApp: App {
-    @State private var monitor = PowerMonitor(alreadyLogged: ChargeReasonLog.loggedKeys())
+    @State private var monitor = PowerMonitor(alreadyLogged: ChargeReasonLog.loggedKeys(),
+                                              liveWattsDisabled: LiveWattsGuard.isDisabled)
 
     /// Unit tests run inside this app; keep the live monitor (and its log file) out of them.
     private static let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil

@@ -8,8 +8,10 @@ private final class Rig {
     var reading: PowerSnapshot?
     var now = Date(timeIntervalSince1970: 1_790_950_000)
     var logged: [ChargeReasonSighting] = []
+    var liveDisabled = 0
     lazy var monitor = PowerMonitor(read: { [unowned self] in reading }, now: { [unowned self] in now },
-                                    logReason: { [unowned self] in logged.append($0) })
+                                    logReason: { [unowned self] in logged.append($0) },
+                                    disableLiveWatts: { [unowned self] in liveDisabled += 1 })
 
     func step(_ seconds: TimeInterval, _ reading: PowerSnapshot?) {
         now += seconds
@@ -106,6 +108,30 @@ struct PowerMonitorTests {
         rig.step(1, PowerSnapshot(isExternalConnected: false, adapterInW: 0, systemLoadW: 22.3, batteryW: -22.3))
         #expect(rig.monitor.menuBarItem?.icon == .battery)
         #expect(rig.monitor.menuBarItem?.text == "−22.3W")
+    }
+
+    /// A Mac whose SMC keys mean something else: live watts keep disagreeing with the driver.
+    @Test func disagreeingSMCTurnsLiveWattsOff() {
+        let rig = Rig()
+        for _ in 0..<10 {
+            var s = PowerSnapshot(isExternalConnected: false, adapterInW: 0, systemLoadW: 2, batteryW: 40)
+            s.liveSample = LivePower(adapterInW: 0, systemLoadW: 2, batteryW: 40)
+            s.driverWatts = DriverWatts(adapterInW: 0, systemLoadW: 15, batteryW: -15,
+                                        updateTime: rig.now + 59, valid: true)
+            rig.step(60, s)
+        }
+        #expect(rig.liveDisabled == 1)
+        #expect(rig.monitor.liveWattsCheck == .init(matches: 0, disabled: true))
+    }
+
+    @Test func agreeingSMCCountsMatches() {
+        let rig = Rig()
+        var s = PowerSnapshot(isExternalConnected: false, adapterInW: 0, systemLoadW: 15.1, batteryW: -14.8)
+        s.liveSample = LivePower(adapterInW: 0, systemLoadW: 15.1, batteryW: -14.8)
+        s.driverWatts = DriverWatts(adapterInW: 0, systemLoadW: 15.7, batteryW: -15.7, updateTime: rig.now, valid: true)
+        rig.step(1, s)
+        #expect(rig.monitor.liveWattsCheck == .init(matches: 1, disabled: false))
+        #expect(rig.liveDisabled == 0)
     }
 
     @Test func holdToChargingWaitsForHysteresis() {

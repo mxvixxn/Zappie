@@ -14,7 +14,8 @@ enum PowerReader {
               var snapshot = parse(battery: battery, pack: packProperties(of: service),
                                    usbDeviceNames: usbDeviceNames(), powerSources: powerSourceNodes()) else { return nil }
         snapshot.portLayout = thisMacPorts
-        let useSMC = UserDefaults.standard.object(forKey: AppSettings.liveWattsKey) as? Bool ?? true
+        let useSMC = (UserDefaults.standard.object(forKey: AppSettings.liveWattsKey) as? Bool ?? true)
+            && !LiveWattsGuard.isDisabled
         if useSMC, let live = SMCConnection.shared?.livePower() {
             return live.applied(to: snapshot, at: .now)
         }

@@ -57,6 +57,10 @@ struct LivePower: Equatable, Sendable {
         s.updateTime = now
         s.telemetryValid = true
         s.wattsAreLive = true
+        s.liveSample = self
+        s.driverWatts = DriverWatts(adapterInW: driver.adapterInW, systemLoadW: driver.systemLoadW,
+                                    batteryW: driver.batteryW, updateTime: driver.updateTime,
+                                    valid: driver.telemetryValid)
         return s.hasImpossibleWatts ? s.withHiddenWatts() : s
     }
 }

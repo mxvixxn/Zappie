@@ -29,6 +29,16 @@ final class PowerMonitor {
     private let now: () -> Date
     private let logReason: (ChargeReasonSighting) -> Void
     private var reasonTracker: ChargeReasonTracker
+
+    struct LiveWattsCheck: Equatable {
+        var matches: Int
+        var disabled: Bool
+    }
+
+    /// How SMC watts compare with the battery driver on this Mac (see `SMCValidator`).
+    private(set) var liveWattsCheck: LiveWattsCheck
+    @ObservationIgnored private var validator = SMCValidator()
+    private let disableLiveWatts: () -> Void
     private var debouncer = StateDebouncer(delay: 2)
     private var connectionChangedAt: Date?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
@@ -38,11 +48,22 @@ final class PowerMonitor {
 
     init(read: @escaping () -> PowerSnapshot? = PowerReader.read, now: @escaping () -> Date = Date.init,
          logReason: @escaping (ChargeReasonSighting) -> Void = ChargeReasonLog.append,
-         alreadyLogged: Set<String> = []) {
+         alreadyLogged: Set<String> = [],
+         disableLiveWatts: @escaping () -> Void = LiveWattsGuard.disable,
+         liveWattsDisabled: Bool = false) {
         self.read = read
         self.now = now
         self.logReason = logReason
         reasonTracker = ChargeReasonTracker(alreadyLogged: alreadyLogged)
+        self.disableLiveWatts = disableLiveWatts
+        liveWattsCheck = LiveWattsCheck(matches: 0, disabled: liveWattsDisabled)
+    }
+
+    /// Settings "다시 켜기": forget the verdict and start checking again.
+    func resetLiveWattsCheck() {
+        LiveWattsGuard.reset()
+        validator = SMCValidator()
+        liveWattsCheck = LiveWattsCheck(matches: 0, disabled: false)
     }
 
     func refresh() {
@@ -59,6 +80,21 @@ final class PowerMonitor {
         if let previous = snapshot, previous.isExternalConnected != reading.isExternalConnected {
             connectionChangedAt = time
         }
+        if let live = reading.liveSample {
+            validator.record(live, at: time)
+        }
+        if !liveWattsCheck.disabled, let driver = reading.driverWatts {
+            switch validator.check(driver: driver, now: time, connectionChangedAt: connectionChangedAt) {
+            case .match:
+                liveWattsCheck.matches = validator.matches
+            case .disable:
+                liveWattsCheck.disabled = true
+                disableLiveWatts()
+            case .mismatch, .skipped:
+                break
+            }
+        }
+
         // The driver's first publication after a plug change mixes in the old power source.
         if let changed = connectionChangedAt, let updated = reading.updateTime, updated < changed {
             reading = reading.withHiddenWatts()

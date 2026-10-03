@@ -25,7 +25,7 @@ struct MainWindow: View {
                 case .history: HistoryTab(monitor: monitor)
                 case .adapter: AdapterTab(monitor: monitor)
                 case .battery: BatteryTab(monitor: monitor)
-                case .settings: SettingsTab()
+                case .settings: SettingsTab(monitor: monitor)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

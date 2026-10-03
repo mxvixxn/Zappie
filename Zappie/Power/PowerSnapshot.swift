@@ -39,6 +39,9 @@ struct PowerSnapshot: Sendable, Equatable {
     var telemetryValid = true
     /// True when the watts came from the SMC (live, ~1.5 s) rather than the battery driver.
     var wattsAreLive = false
+    /// The SMC reading behind live watts, and the driver's own watts, kept for cross-checking.
+    var liveSample: LivePower? = nil
+    var driverWatts: DriverWatts? = nil
 }
 
 extension PowerSnapshot {

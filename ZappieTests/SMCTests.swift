@@ -57,6 +57,9 @@ struct LivePowerTests {
         #expect(merged.percent == 78)
         #expect(merged.updateTime == now)
         #expect(merged.wattsAreLive)
+        #expect(merged.liveSample == live)
+        #expect(merged.driverWatts == DriverWatts(adapterInW: 60.36, systemLoadW: 11.68, batteryW: 48.68,
+                                                  updateTime: Date(timeIntervalSince1970: 1_791_005_191), valid: true))
     }
 
     @Test func noAdapterMeansNoInput() {
