@@ -60,7 +60,7 @@ struct PowerTree: Equatable {
 /// Icon for what is plugged into a port. The name comes from USB (data-connected devices only),
 /// so AirPods cases usually show up as an unnamed Apple device.
 enum DeviceIcon: Equatable {
-    case iphone, ipad, airpods, watch, apple, generic
+    case iphone, ipad, airpods, watch, macbook, desktopMac, apple, generic
 
     init(_ p: PortOutput) {
         let name = p.deviceName?.lowercased() ?? ""
@@ -68,6 +68,8 @@ enum DeviceIcon: Equatable {
         else if name.contains("ipad") { self = .ipad }
         else if name.contains("airpods") { self = .airpods }
         else if name.contains("watch") { self = .watch }
+        else if name.contains("macbook") { self = .macbook }
+        else if name.contains("imac") || name.hasPrefix("mac ") { self = .desktopMac }
         else if p.deviceIsApple { self = .apple }
         else { self = .generic }
     }
@@ -78,6 +80,8 @@ enum DeviceIcon: Equatable {
         case .ipad: "ipad"
         case .airpods: "airpods"
         case .watch: "applewatch"
+        case .macbook: "laptopcomputer"
+        case .desktopMac: "desktopcomputer"
         case .apple: "apple.logo"
         case .generic: "cable.connector"
         }

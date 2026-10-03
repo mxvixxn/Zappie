@@ -97,8 +97,11 @@ struct OverviewView: View {
                                     .fill(row.tint.map(Theme.color) ?? Theme.loss)
                                     .frame(width: 8, height: 8)
                                 Text(row.label)
-                                Spacer()
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.75)
+                                Spacer(minLength: 8)
                                 Text(row.valueText).fontWeight(.semibold)
+                                    .fixedSize()
                             }
                         }
                     }
@@ -125,13 +128,13 @@ struct OverviewView: View {
         Card("어댑터") {
             if let a {
                 VStack(alignment: .leading, spacing: 12) {
-                    HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(a.ratedText).font(.system(size: 24, weight: .bold))
-                        Spacer()
                         Text(a.subtitle)
                             .font(.system(size: 12))
                             .foregroundStyle(Theme.secondaryText)
                             .lineLimit(1)
+                            .truncationMode(.middle)
                     }
                     VStack(spacing: 6) {
                         keyValue("정격 대비 사용", a.usageText)

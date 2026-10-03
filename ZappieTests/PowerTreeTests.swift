@@ -83,6 +83,13 @@ struct DeviceIconTests {
         #expect(icon(PortOutput(port: 2, watts: 2, deviceName: "Apple Watch")) == .watch)
     }
 
+    @Test func macs() {
+        #expect(icon(PortOutput(port: 3, watts: 15, deviceName: "MacBook Air", deviceIsApple: true)) == .macbook)
+        #expect(icon(PortOutput(port: 3, watts: 15, deviceName: "MacBook Pro")) == .macbook)
+        #expect(icon(PortOutput(port: 3, watts: 15, deviceName: "iMac")) == .desktopMac)
+        #expect(icon(PortOutput(port: 3, watts: 15, deviceName: "Mac mini")) == .desktopMac)
+    }
+
     @Test func unnamedAppleDeviceGetsAppleLogo() {
         #expect(icon(PortOutput(port: 1, watts: 2.9, deviceBatteryPercent: 100, deviceIsApple: true)) == .apple)
     }

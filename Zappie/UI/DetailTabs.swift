@@ -154,23 +154,38 @@ struct DetailList: View {
     }
 }
 
+/// Six tiles in one row when they fit untruncated, otherwise two rows of three.
 struct BatteryTiles: View {
     let tiles: [OverviewPresentation.Tile]
 
     var body: some View {
-        HStack(spacing: 10) {
-            ForEach(tiles, id: \.label) { tile in
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(tile.label).font(.system(size: 11)).foregroundStyle(Theme.secondaryText)
-                    Text(tile.value).font(.system(size: 15, weight: .semibold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 10) {
+                ForEach(tiles, id: \.label) { tile($0) }
+            }
+            Grid(horizontalSpacing: 10, verticalSpacing: 10) {
+                ForEach(Array(stride(from: 0, to: tiles.count, by: 3)), id: \.self) { start in
+                    GridRow {
+                        ForEach(tiles[start..<min(start + 3, tiles.count)], id: \.label) { tile($0) }
+                    }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(Theme.background, in: RoundedRectangle(cornerRadius: 8))
             }
         }
+    }
+
+    private func tile(_ tile: OverviewPresentation.Tile) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(tile.label)
+                .font(.system(size: 11))
+                .foregroundStyle(Theme.secondaryText)
+                .fixedSize()
+            Text(tile.value)
+                .font(.system(size: 15, weight: .semibold))
+                .fixedSize()
+        }
+        .frame(minWidth: 72, maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(Theme.background, in: RoundedRectangle(cornerRadius: 8))
     }
 }

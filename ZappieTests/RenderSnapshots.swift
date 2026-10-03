@@ -68,12 +68,16 @@ struct RenderSnapshots {
             clock = end.addingTimeInterval(-3_000 + t)
             monitor.refresh()
         }
-        let renderer = ImageRenderer(content: MainWindow(monitor: monitor, scrolls: false).frame(width: 1200, height: 908))
-        renderer.scale = 1
-        let image = try #require(renderer.nsImage)
-        let tiff = try #require(image.tiffRepresentation)
-        let rep = try #require(NSBitmapImageRep(data: tiff))
-        let png = try #require(rep.representation(using: .png, properties: [:]))
-        try png.write(to: dir.appendingPathComponent("main-overview.png"))
+        // Default window size, and the minimum width where cards are tightest.
+        for (name, width, height) in [("main-overview", 1200.0, 908.0), ("main-overview-narrow", 960.0, 1300.0)] {
+            let renderer = ImageRenderer(content: MainWindow(monitor: monitor, scrolls: false)
+                .frame(width: width, height: height))
+            renderer.scale = 1
+            let image = try #require(renderer.nsImage)
+            let tiff = try #require(image.tiffRepresentation)
+            let rep = try #require(NSBitmapImageRep(data: tiff))
+            let png = try #require(rep.representation(using: .png, properties: [:]))
+            try png.write(to: dir.appendingPathComponent("\(name).png"))
+        }
     }
 }
