@@ -68,8 +68,8 @@ struct PowerPresentation: Equatable {
             detailValue = Format.duration(minutes: s.timeToFullMin)
             menuBar = MenuBar(icon: .bolt, tint: .battery, text: Format.compactSignedWatts(s.batteryW))
         case .hold:
-            source = "전원 어댑터 · 배터리 대기"
-            badge = "한도 유지"
+            source = "전원 어댑터 · 바이패스"
+            badge = "바이패스"
             badgeTint = .adapter
             detailLabel = "상태"
             detailValue = "\(percent)에서 유지 중"

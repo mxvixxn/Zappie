@@ -52,8 +52,8 @@ struct PowerPresentationTests {
         #expect(c.percent == "62%")
 
         let h = present(.hold, hold)
-        #expect(h.source == "전원 어댑터 · 배터리 대기")
-        #expect(h.badge == "한도 유지")
+        #expect(h.source == "전원 어댑터 · 바이패스")
+        #expect(h.badge == "바이패스")
         #expect(h.badgeTint == .adapter)
 
         let b = present(.battery, battery)
