@@ -179,3 +179,37 @@ Views            MenuBarLabel / DropdownView / MainWindow(Overview, History, Ada
 - 충전 중일 때 입력 ≈ 시스템 + 배터리 + 손실(±1 W)  ✅ 2026-10-03 확인: 입력 17.103 W = 시스템 16.895 W + 배터리 0.208 W (mW 단위 일치)
 - 앱 자체 CPU 사용률이 평상시 1% 미만 (활성 상태 보기로 확인)
 - 키가 없는 기기(데스크톱 Mac 등)에서 크래시 없이 "지원하지 않는 기기" 표시
+
+---
+
+## 8. 백로그 (미뤄 둔 작업)
+
+### 8-1. USB-C 포트로 충전할 때 (보류, 2026-10-03)
+
+**현재 동작**: 어댑터가 어느 포트로 들어오는지 구분하지 않는다. MagSafe가 아닌 USB-C로 충전하면 그 포트는 아래 포트 줄에 "출력 없음"으로 보인다.
+
+**찾은 데이터** (MagSafe 충전 중 확인):
+- 포트마다 `IOPortFeaturePowerIn` 노드가 있다. `Description` = `Port-USB-C@1~3/Power In`, `Port-MagSafe 3@1/Power In`, `ParentBuiltInPortNumber`, `ParentBuiltInPortTypeDescription`.
+  `Active`는 연결 여부와 무관하게 모두 `No`였다 → 판별에 쓰지 않는다.
+- 전원이 들어오는 포트 아래에만 `IOPortFeaturePowerSource` 노드가 생긴다. 지금 쓰이는 공급원은 이름에 `[*]`가 붙는다 (예: `USB-PD [*]`).
+  `WinningPowerSourceOption` = 협상 결과 (20000 mV × 3390 mA = 67.8 W), `PowerSourceOptions` = 어댑터가 제공하는 PDO 목록.
+- 장치 트리에 `port-usb-c-1~3`, `port-magsafe3-1` 노드가 있다 (정적 정보만).
+
+**검증할 것** (실험: 충전기를 MagSafe → USB-C 한 포트에 30초 → MagSafe):
+1. USB-C로 충전하면 그 포트의 `Power In` 아래에 `IOPortFeaturePowerSource [*]`가 생기는가
+2. `Port-USB-C@N`의 N이 `PowerOutDetails.PortIndex`와 같은가 (1 = 왼쪽 뒤, 2 = 왼쪽 앞, 3 = 오른쪽)
+3. 충전기 두 개(MagSafe + USB-C)일 때 `[*]`가 한쪽에만 붙는가
+
+**화면 계획**:
+- 어댑터 노드에 입력 포트 표시: "어댑터 · MagSafe" / "어댑터 · USB-C 오른쪽"
+- 입력으로 쓰이는 USB-C 포트는 "출력 없음" 대신 🔌 "전원 입력 · 67.8 W"(연보라), 시스템에서 내려가는 출력선은 그리지 않음
+- 충전기 두 개: `[*]` 쪽 "사용 중", 다른 쪽 "대기 전원"
+- 저전력 USB-C 충전기는 기존 "배터리 보조"·"느린 충전" 표시로 처리
+
+### 8-2. 그 밖의 후보
+- 정식 서명 빌드를 /Applications에 설치하고 "로그인 시 실행" 확인 (Xcode에서 팀 선택 필요)
+- README에 스크린샷·기능 설명
+- 기록을 디스크에 저장 (지금은 메모리만), 잠자기 구간에서 차트 선 끊기
+- 메인 창을 연 상태의 CPU 측정 (1시간 차트 3,600점 매초 갱신)
+- 알림 (배터리 보조 시작, 충전 완료), 데스크톱 위젯
+- 실시간 와트 (SMC 직접 읽기, 비공개 API — v2)
