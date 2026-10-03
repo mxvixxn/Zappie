@@ -2,7 +2,10 @@ import SwiftUI
 
 @main
 struct ZappieApp: App {
-    @State private var monitor = PowerMonitor()
+    @State private var monitor = PowerMonitor(alreadyLogged: ChargeReasonLog.loggedKeys())
+
+    /// Unit tests run inside this app; keep the live monitor (and its log file) out of them.
+    private static let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     @AppStorage(AppSettings.pollIntervalKey) private var pollInterval = 1
 
     var body: some Scene {
@@ -11,6 +14,7 @@ struct ZappieApp: App {
         } label: {
             MenuBarLabel(monitor: monitor)
                 .task {
+                    guard !Self.isRunningTests else { return }
                     monitor.pollInterval = .seconds(pollInterval)
                     monitor.start()
                 }

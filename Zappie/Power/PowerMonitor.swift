@@ -20,7 +20,7 @@ final class PowerMonitor {
     private let read: () -> PowerSnapshot?
     private let now: () -> Date
     private let logReason: (ChargeReasonSighting) -> Void
-    private var reasonTracker = ChargeReasonTracker()
+    private var reasonTracker: ChargeReasonTracker
     private var debouncer = StateDebouncer(delay: 2)
     private var connectionChangedAt: Date?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
@@ -29,10 +29,12 @@ final class PowerMonitor {
     @ObservationIgnored private var notifications: [io_object_t] = []
 
     init(read: @escaping () -> PowerSnapshot? = PowerReader.read, now: @escaping () -> Date = Date.init,
-         logReason: @escaping (ChargeReasonSighting) -> Void = ChargeReasonLog.append) {
+         logReason: @escaping (ChargeReasonSighting) -> Void = ChargeReasonLog.append,
+         alreadyLogged: Set<String> = []) {
         self.read = read
         self.now = now
         self.logReason = logReason
+        reasonTracker = ChargeReasonTracker(alreadyLogged: alreadyLogged)
     }
 
     func refresh() {

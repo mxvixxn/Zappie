@@ -57,3 +57,29 @@ struct ChargeReasonTrackerTests {
         #expect(tracker.newSightings(in: s, at: t0).map(\.key) == ["SlowChargingReason"])
     }
 }
+
+struct ChargeReasonPersistenceTests {
+    let t0 = Date(timeIntervalSince1970: 1_791_000_000)
+
+    @Test func noExternalPowerIsKnown() {
+        var tracker = ChargeReasonTracker()
+        let s = PowerSnapshot(isExternalConnected: false, batteryW: -13.9, notChargingReason: 0x80)
+        #expect(tracker.newSightings(in: s, at: t0).isEmpty)
+    }
+
+    /// Seen live: the same value was logged again after a relaunch.
+    @Test func valuesAlreadyInTheLogAreNotRepeated() {
+        var tracker = ChargeReasonTracker(alreadyLogged: ["NotChargingReason=4"])
+        let s = PowerSnapshot(isExternalConnected: true, notChargingReason: 0x4)
+        #expect(tracker.newSightings(in: s, at: t0).isEmpty)
+    }
+
+    @Test func logLinesBecomeKeys() {
+        let lines = """
+        {"key":"NotChargingReason","value":128,"date":"2026-10-03T05:05:52Z","connected":false}
+        {"key":"SlowChargingReason","value":2,"date":"2026-10-03T05:06:00Z","connected":true}
+        not json
+        """
+        #expect(ChargeReasonLog.keys(fromJSONLines: lines) == ["NotChargingReason=128", "SlowChargingReason=2"])
+    }
+}

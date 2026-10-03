@@ -49,9 +49,10 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 
 **충전 이유 값** (2026-10-03): 바이패스 상태의 아래 줄에 이유를 붙인다.
 - `ChargerData.NotChargingReason` = `0x1000000` → "N% 한도에서 유지 중" (80% 한도에서 확인)
+- `NotChargingReason` = `0x80` → 외부 전원 없음 (배터리 사용 중 79%에서 확인, 배터리 상태라 화면 영향 없음)
 - `FullyCharged` = Yes → "완충" / 그 밖의 0이 아닌 값 → "N%에서 충전 일시 중지"
 - `ChargerData.SlowChargingReason` ≠ 0 → 충전 중 아래 줄에 "· 느린 충전"
-- 처음 보는 값은 잔량·전력과 함께 `~/Library/Application Support/Zappie/charge-reasons.jsonl`에 한 번씩 기록 → 의미를 확인하면 `ChargeReason.known`에 추가.
+- 처음 보는 값은 잔량·전력과 함께 `~/Library/Application Support/Zappie/charge-reasons.jsonl`에 값마다 한 번만 기록(재실행해도 중복 없음, 테스트 실행 중에는 기록 안 함) → 의미를 확인하면 `ChargeReason.known`에 추가.
 
 **음수 값**: `BatteryPower`, `InstantAmperage` 등 음수는 **UInt64 비트 패턴**으로 온다(예: 18446744073709534756 = −16,860). `NSNumber.int64Value`로 재해석한다.
 
