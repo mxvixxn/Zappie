@@ -8,7 +8,7 @@
 
 <br/>
 
-![Platform](https://img.shields.io/badge/platform-macOS%2027-000000?logo=apple)
+![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-000000?logo=apple)
 ![Swift](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-0A84FF?logo=swift&logoColor=white)
 ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-only-555555?logo=apple)

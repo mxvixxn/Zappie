@@ -12,7 +12,7 @@ macOS 메뉴 막대 앱. 어댑터 입력 → 시스템 / 배터리로 흐르는
 | 항목 | 값 |
 |---|---|
 | 언어 / UI | Swift 6, SwiftUI (+ Swift Charts) |
-| 대상 | macOS 27+, **Apple Silicon 전용** (Intel은 `PowerTelemetryData` 없음) |
+| 대상 | macOS 14+, **Apple Silicon 전용** (Intel은 `PowerTelemetryData` 없음). 13 이하는 `@Observable`·`chartXSelection`·`NSApp.activate()` 등 14 전용 API 때문에 미지원 |
 | 메뉴 막대 | `MenuBarExtra` + `.menuBarExtraStyle(.window)` |
 | 메인 창 | `Window` scene, 드롭다운 버튼에서 `openWindow(id:)` |
 | App Sandbox | **끔** (개인용). 샌드박스에서 IORegistry 읽기 가능 여부는 미확인 |
@@ -231,6 +231,8 @@ Views            MenuBarLabel / DropdownView / MainWindow(Overview, History, Ada
 - 저전력 USB-C 충전기는 기존 "배터리 보조"·"느린 충전" 표시로 처리
 
 ### 8-2. 그 밖의 후보
+- 다른 MacBook 지원 검증: 포트 이름은 Mac17,9(14·16형 MacBook Pro) 기준 → 모델별 포트 표 필요(MacBook Air는 왼쪽 2개뿐). SMC 키(`PDTR`, `PSTR`, `B0AV`, `B0AC`)의 의미를 M1~M4에서 확인
+- 실제 macOS 14에서 실행 확인 (컴파일은 통과. SF Symbols 이름은 컴파일러가 검사하지 않음 — 특히 `apple.logo`, `cable.connector`, `powerplug`)
 - 정식 서명 빌드를 /Applications에 설치하고 "로그인 시 실행" 확인 (Xcode에서 팀 선택 필요)
 - README에 스크린샷·기능 설명
 - 기록을 디스크에 저장 (지금은 메모리만), 잠자기 구간에서 차트 선 끊기
