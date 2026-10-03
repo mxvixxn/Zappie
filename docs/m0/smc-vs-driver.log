@@ -3,3 +3,4 @@
 1791008078 age=1s driver[SystemLoad=36894 SystemPowerIn=36721 BatteryPower=18446744073709551443] smc[PDTR=19.08 PSTR=30.03 B0AV=33840.00 B0AC=0.00]
 1791008138 age=1s driver[SystemLoad=18314 SystemPowerIn=18314 BatteryPower=0] smc[PDTR=19.22 PSTR=18.31 B0AV=33584.00 B0AC=0.00]
 1791008198 age=1s driver[SystemLoad=35696 SystemPowerIn=35696 BatteryPower=0] smc[PDTR=49.97 PSTR=35.70 B0AV=33584.00 B0AC=-17153.00]
+1791008258 age=1s driver[SystemLoad=14171 SystemPowerIn=14171 BatteryPower=0] smc[PDTR=23.44 PSTR=15.32 B0AV=33840.00 B0AC=0.00]

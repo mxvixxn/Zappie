@@ -14,7 +14,7 @@ struct SMCValidatorTests {
 
     func feed(_ v: inout SMCValidator, _ samples: [(Double, Double, Double)], endingAt end: Date) {
         for (i, s) in samples.enumerated() {
-            v.record(LivePower(adapterInW: s.0, systemLoadW: s.1, batteryW: s.2),
+            v.record(LivePower(systemLoadW: s.1, batteryW: s.2),
                      at: end - Double(samples.count - 1 - i))
         }
     }

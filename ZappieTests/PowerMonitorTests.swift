@@ -115,7 +115,7 @@ struct PowerMonitorTests {
         let rig = Rig()
         for _ in 0..<10 {
             var s = PowerSnapshot(isExternalConnected: false, adapterInW: 0, systemLoadW: 2, batteryW: 40)
-            s.liveSample = LivePower(adapterInW: 0, systemLoadW: 2, batteryW: 40)
+            s.liveSample = LivePower(systemLoadW: 2, batteryW: 40)
             s.driverWatts = DriverWatts(adapterInW: 0, systemLoadW: 15, batteryW: -15,
                                         updateTime: rig.now + 59, valid: true)
             rig.step(60, s)
@@ -127,7 +127,7 @@ struct PowerMonitorTests {
     @Test func agreeingSMCCountsMatches() {
         let rig = Rig()
         var s = PowerSnapshot(isExternalConnected: false, adapterInW: 0, systemLoadW: 15.1, batteryW: -14.8)
-        s.liveSample = LivePower(adapterInW: 0, systemLoadW: 15.1, batteryW: -14.8)
+        s.liveSample = LivePower(systemLoadW: 15.1, batteryW: -14.8)
         s.driverWatts = DriverWatts(adapterInW: 0, systemLoadW: 15.7, batteryW: -15.7, updateTime: rig.now, valid: true)
         rig.step(1, s)
         #expect(rig.monitor.liveWattsCheck == .init(matches: 1, disabled: false))

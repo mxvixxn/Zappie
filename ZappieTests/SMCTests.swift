@@ -29,29 +29,36 @@ struct SMCDecodeTests {
 
 struct LivePowerTests {
     @Test func chargingSample() throws {
-        let live = try #require(LivePower(values: ["PDTR": 66.88, "PSTR": 25.34, "B0AV": 12632, "B0AC": 3430]))
-        #expect(live.adapterInW == 66.88)
+        let live = try #require(LivePower(values: ["PSTR": 25.34, "B0AV": 12632, "B0AC": 3430]))
         #expect(live.systemLoadW == 25.34)
         #expect(abs(live.batteryW - 43.328) < 0.001)
     }
 
+    /// PDTR runs one ~1 s sample ahead of PSTR (PSTR(t) == PDTR(t−1) while the battery idles), so
+    /// pairing them showed input ≠ system for no reason. Input is derived like the driver does:
+    /// system + battery (driver: 17.103 = 16.895 + 0.208 W).
+    @Test func inputIsSystemPlusBattery() throws {
+        let live = try #require(LivePower(values: ["PSTR": 25.34, "B0AV": 12632, "B0AC": 3430]))
+        #expect(abs(live.inputW - 68.668) < 0.001)
+        #expect(LivePower(systemLoadW: 15, batteryW: -15.2).inputW == 0)
+    }
+
     @Test func dischargingSample() throws {
-        let live = try #require(LivePower(values: ["PDTR": 0, "PSTR": 15.13, "B0AV": 12160, "B0AC": -1370]))
+        let live = try #require(LivePower(values: ["PSTR": 15.13, "B0AV": 12160, "B0AC": -1370]))
         #expect(live.batteryW < 0)
-        #expect(live.adapterInW == 0)
     }
 
     @Test func missingKeyMeansNoLiveData() {
-        #expect(LivePower(values: ["PDTR": 66.88, "PSTR": 25.34, "B0AV": 12632]) == nil)
+        #expect(LivePower(values: ["PSTR": 25.34, "B0AV": 12632]) == nil)
     }
 
     @Test func liveWattsReplaceDriverWatts() {
         let driver = PowerSnapshot(isExternalConnected: true, adapterInW: 60.36, systemLoadW: 11.68, batteryW: 48.68,
                                    percent: 78, updateTime: Date(timeIntervalSince1970: 1_791_005_191))
         let now = Date(timeIntervalSince1970: 1_791_005_216)
-        let live = LivePower(adapterInW: 66.88, systemLoadW: 25.34, batteryW: 43.33)
+        let live = LivePower(systemLoadW: 25.34, batteryW: 43.33)
         let merged = live.applied(to: driver, at: now)
-        #expect(merged.adapterInW == 66.88)
+        #expect(merged.adapterInW == 25.34 + 43.33)
         #expect(merged.systemLoadW == 25.34)
         #expect(merged.batteryW == 43.33)
         #expect(merged.percent == 78)
@@ -65,7 +72,7 @@ struct LivePowerTests {
     @Test func noAdapterMeansNoInput() {
         // SMC can lag the unplug by a moment; trust ExternalConnected for input.
         let driver = PowerSnapshot(isExternalConnected: false)
-        let merged = LivePower(adapterInW: 3.1, systemLoadW: 14, batteryW: -14).applied(to: driver, at: .now)
+        let merged = LivePower(systemLoadW: 14, batteryW: -14).applied(to: driver, at: .now)
         #expect(merged.adapterInW == 0)
     }
 }
@@ -76,7 +83,7 @@ struct SMCLiveTests {
 
     @Test(.enabled(if: available)) func readsLiveWattsOnThisMac() throws {
         let live = try #require(SMCConnection.shared?.livePower())
-        #expect((0...300).contains(live.adapterInW))
+        #expect((0...300).contains(live.inputW))
         #expect((0...300).contains(live.systemLoadW))
         #expect((-300...300).contains(live.batteryW))
     }

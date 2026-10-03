@@ -75,7 +75,7 @@ struct SMCValidator: Sendable {
             let slack = max(3, 0.15 * abs(value))
             return value >= low - slack && value <= high + slack
         }
-        if let input = d.adapterInW, !inside(input, samples.map(\.adapterInW)) { return false }
+        if let input = d.adapterInW, !inside(input, samples.map(\.inputW)) { return false }
         if let system = d.systemLoadW, !inside(system, samples.map(\.systemLoadW)) { return false }
         if let battery = d.batteryW {
             let idle = abs(battery) < 1 && samples.contains { abs($0.batteryW) < 1 }

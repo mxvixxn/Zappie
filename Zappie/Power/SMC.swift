@@ -6,9 +6,10 @@ import IOKit
 ///
 /// This is a private interface (as used by Stats / iStat Menus). Any failure returns nil and the
 /// app falls back to the battery driver's watts. Key meanings verified on Mac17,9 (docs/SPEC.md §1):
-/// `PDTR` adapter input W, `PSTR` system total W, `B0AV` battery mV, `B0AC` battery mA (signed).
+/// `PSTR` system total W, `B0AV` battery mV, `B0AC` battery mA (signed). `PDTR` (adapter input)
+/// is not used: it runs one ~1 s sample ahead of `PSTR`, so pairing them misleads.
 enum SMC {
-    static let liveKeys = ["PDTR", "PSTR", "B0AV", "B0AC"]
+    static let liveKeys = ["PSTR", "B0AV", "B0AC"]
 
     /// Apple Silicon stores SMC integers and floats little-endian.
     static func decode(_ bytes: [UInt8], type: String) -> Double? {
@@ -30,28 +31,28 @@ enum SMC {
 
 /// Live watts from the SMC.
 struct LivePower: Equatable, Sendable {
-    var adapterInW: Double
     var systemLoadW: Double
     /// Signed: charging +, discharging −.
     var batteryW: Double
 
-    init(adapterInW: Double, systemLoadW: Double, batteryW: Double) {
-        self.adapterInW = adapterInW
+    /// Adapter input as the driver defines it: what the system uses plus what goes into the battery.
+    var inputW: Double { max(systemLoadW + batteryW, 0) }
+
+    init(systemLoadW: Double, batteryW: Double) {
         self.systemLoadW = systemLoadW
         self.batteryW = batteryW
     }
 
     init?(values: [String: Double]) {
-        guard let input = values["PDTR"], let system = values["PSTR"],
-              let mV = values["B0AV"], let mA = values["B0AC"] else { return nil }
-        self.init(adapterInW: input, systemLoadW: system, batteryW: mV * mA / 1_000_000)
+        guard let system = values["PSTR"], let mV = values["B0AV"], let mA = values["B0AC"] else { return nil }
+        self.init(systemLoadW: system, batteryW: mV * mA / 1_000_000)
     }
 
     /// Replaces the driver's watts with live ones. Everything else (capacity, ports, reasons)
     /// still comes from the driver. Connection state stays the driver's `ExternalConnected`.
     func applied(to driver: PowerSnapshot, at now: Date) -> PowerSnapshot {
         var s = driver
-        s.adapterInW = driver.isExternalConnected ? adapterInW : 0
+        s.adapterInW = driver.isExternalConnected ? inputW : 0
         s.systemLoadW = systemLoadW
         s.batteryW = batteryW
         s.updateTime = now
