@@ -11,24 +11,6 @@ struct USBOutputTests {
         PowerSnapshot(isExternalConnected: true, adapterInW: 17.3, systemLoadW: 17.3, batteryW: 0, portOutputs: ports)
     }
 
-    @Test func dropdownSplitsSystemIntoMacAndUSB() {
-        let p = PowerPresentation(snapshot: hub, state: .hold)
-        #expect(p.systemLabel == "Mac 본체")
-        #expect(p.systemText == "12.0 W")
-        #expect(p.usbText == "5.3 W")
-        #expect(p.flow.systemText == "17.3 W")
-        #expect(p.flow.usbText == "5.3 W")
-    }
-
-    @Test func noUSBKeepsSystemLabel() {
-        let s = PowerSnapshot(isExternalConnected: true, adapterInW: 12, systemLoadW: 12, batteryW: 0)
-        let p = PowerPresentation(snapshot: s, state: .hold)
-        #expect(p.systemLabel == "시스템")
-        #expect(p.systemText == "12.0 W")
-        #expect(p.usbText == nil)
-        #expect(p.flow.usbText == nil)
-    }
-
     @Test func compositionListsUSBOutput() throws {
         let c = try #require(OverviewPresentation(snapshot: hub, state: .hold).composition)
         #expect(c.rows.map(\.label) == ["Mac 본체", "USB 기기 출력", "배터리 충전", "기타·손실 (계산값)"])
@@ -98,25 +80,5 @@ struct PortIdentityTests {
         let rows = OverviewPresentation(snapshot: s, state: .hold).ports
         #expect(rows.map(\.device) == ["iPhone · 83%", "Apple 기기 · 100%", nil])
         #expect(rows.map(\.name) == ["왼쪽 앞", "왼쪽 뒤", "오른쪽"])
-    }
-}
-
-struct USBNodeLabelTests {
-    func flow(_ ports: [PortOutput]) -> PowerPresentation.Flow {
-        let s = PowerSnapshot(isExternalConnected: true, adapterInW: 20, systemLoadW: 20, batteryW: 0, portOutputs: ports)
-        return PowerPresentation(snapshot: s, state: .hold).flow
-    }
-
-    @Test func singleNamedDeviceShowsItsName() {
-        #expect(flow([PortOutput(port: 2, watts: 9, deviceName: "iPhone")]).usbLabel == "iPhone")
-    }
-
-    @Test func unnamedDeviceIsGeneric() {
-        #expect(flow([PortOutput(port: 3, watts: 4)]).usbLabel == "USB 기기")
-    }
-
-    @Test func severalDevicesAreCounted() {
-        #expect(flow([PortOutput(port: 1, watts: 3), PortOutput(port: 2, watts: 9, deviceName: "iPhone")])
-            .usbLabel == "USB 기기 2대")
     }
 }

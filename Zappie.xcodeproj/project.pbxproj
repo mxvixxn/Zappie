@@ -17,7 +17,6 @@
 		3967425A1F28E5EAA886E9B4 /* PortName.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD3F43A8D096FBE359637DD /* PortName.swift */; };
 		3A7E60A1EF8C416EF89B2E01 /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCA001A87A1CEC39E01381D /* Fixtures.swift */; };
 		3A94945760F9EEB2DEDE8603 /* HistoryChartCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AF91567342D599D82F3B98 /* HistoryChartCard.swift */; };
-		484D16FA5A8F51A098B403AD /* PowerFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 709F5F17F7403E1E0FED9916 /* PowerFlowView.swift */; };
 		4E1E93E82EB7D6A230204255 /* PowerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC19B214AD3BEAE48CF4F51 /* PowerState.swift */; };
 		528C9CBCE6DF94386B6CC6F9 /* PowerPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98F50BF6B13AE1D4DD443F8 /* PowerPresentationTests.swift */; };
 		561F3DED5CC10DA79340B057 /* Zappie.icon in Resources */ = {isa = PBXBuildFile; fileRef = 631C5C8CC927B0417091EA74 /* Zappie.icon */; };
@@ -73,7 +72,6 @@
 		5D36A6E69A1963BE036FCFA6 /* PowerHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerHistoryTests.swift; sourceTree = "<group>"; };
 		631C5C8CC927B0417091EA74 /* Zappie.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = Zappie.icon; sourceTree = "<group>"; };
 		66C8265EFB803AA04E32E648 /* DetailPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPresentationTests.swift; sourceTree = "<group>"; };
-		709F5F17F7403E1E0FED9916 /* PowerFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerFlowView.swift; sourceTree = "<group>"; };
 		77CD2EB31B8F5CF61E42478B /* PowerTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerTreeTests.swift; sourceTree = "<group>"; };
 		8C5B24B5F80DB26CD5793678 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		8FA44B4EDBDE6FE62D45A336 /* PowerPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerPresentation.swift; sourceTree = "<group>"; };
@@ -124,7 +122,6 @@
 				9D37628C3B4896787F5DCD27 /* MenuBarLabel.swift */,
 				15A3A2BA8DFFA077075D2D8D /* OverviewPresentation.swift */,
 				1646210A36754EDFC85A2BD2 /* OverviewView.swift */,
-				709F5F17F7403E1E0FED9916 /* PowerFlowView.swift */,
 				8FA44B4EDBDE6FE62D45A336 /* PowerPresentation.swift */,
 				38330E5FDEB27A99AEEF7E9F /* PowerTree.swift */,
 				BA51C57C2DA3F4D6C227D074 /* PowerTreeView.swift */,
@@ -294,7 +291,6 @@
 				15E3A39E9684B99CF0B5829E /* OverviewPresentation.swift in Sources */,
 				A858C84891B5132F645219D2 /* OverviewView.swift in Sources */,
 				3967425A1F28E5EAA886E9B4 /* PortName.swift in Sources */,
-				484D16FA5A8F51A098B403AD /* PowerFlowView.swift in Sources */,
 				9FBD0BEC5E0C1C55B224FB3C /* PowerHistory.swift in Sources */,
 				E2ED9D02EFD118519212FA03 /* PowerMonitor.swift in Sources */,
 				330F72D29FDC5AD82182C20B /* PowerPresentation.swift in Sources */,

@@ -15,6 +15,7 @@ struct PowerTree: Equatable {
         var active: Bool
         var watts: String
         var detail: String
+        var icon: DeviceIcon = .generic
     }
 
     var adapterActive: Bool
@@ -51,7 +52,34 @@ struct PowerTree: Equatable {
                 return Port(name: PortName.name(for: index), active: false, watts: "—", detail: "출력 없음")
             }
             return Port(name: PortName.name(for: index), active: true, watts: Format.watts(out.watts),
-                        detail: PortOutput.describeDevice(out) ?? "충전 중")
+                        detail: PortOutput.describeDevice(out) ?? "충전 중", icon: DeviceIcon(out))
+        }
+    }
+}
+
+/// Icon for what is plugged into a port. The name comes from USB (data-connected devices only),
+/// so AirPods cases usually show up as an unnamed Apple device.
+enum DeviceIcon: Equatable {
+    case iphone, ipad, airpods, watch, apple, generic
+
+    init(_ p: PortOutput) {
+        let name = p.deviceName?.lowercased() ?? ""
+        if name.contains("iphone") { self = .iphone }
+        else if name.contains("ipad") { self = .ipad }
+        else if name.contains("airpods") { self = .airpods }
+        else if name.contains("watch") { self = .watch }
+        else if p.deviceIsApple { self = .apple }
+        else { self = .generic }
+    }
+
+    var symbol: String {
+        switch self {
+        case .iphone: "iphone"
+        case .ipad: "ipad"
+        case .airpods: "airpods"
+        case .watch: "applewatch"
+        case .apple: "apple.logo"
+        case .generic: "cable.connector"
         }
     }
 }

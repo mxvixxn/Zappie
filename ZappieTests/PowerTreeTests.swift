@@ -68,3 +68,32 @@ struct PowerTreeTests {
         #expect(tree(.hold, hub).usbActive)
     }
 }
+
+struct DeviceIconTests {
+    func icon(_ port: PortOutput) -> DeviceIcon {
+        let s = PowerSnapshot(isExternalConnected: true, adapterInW: 20, systemLoadW: 20, batteryW: 0,
+                              portOutputs: [port])
+        return PowerTree(snapshot: s, state: .hold).ports.first { $0.active }!.icon
+    }
+
+    @Test func namedAppleDevices() {
+        #expect(icon(PortOutput(port: 2, watts: 9, deviceName: "iPhone", deviceIsApple: true)) == .iphone)
+        #expect(icon(PortOutput(port: 2, watts: 9, deviceName: "iPad Pro", deviceIsApple: true)) == .ipad)
+        #expect(icon(PortOutput(port: 2, watts: 2, deviceName: "AirPods Pro")) == .airpods)
+        #expect(icon(PortOutput(port: 2, watts: 2, deviceName: "Apple Watch")) == .watch)
+    }
+
+    @Test func unnamedAppleDeviceGetsAppleLogo() {
+        #expect(icon(PortOutput(port: 1, watts: 2.9, deviceBatteryPercent: 100, deviceIsApple: true)) == .apple)
+    }
+
+    @Test func everythingElseIsGeneric() {
+        #expect(icon(PortOutput(port: 3, watts: 4.4)) == .generic)
+        #expect(icon(PortOutput(port: 3, watts: 4.4, deviceName: "Power Bank")) == .generic)
+    }
+
+    @Test func idlePortIsGeneric() {
+        let s = PowerSnapshot(isExternalConnected: true, adapterInW: 20, systemLoadW: 20, batteryW: 0)
+        #expect(PowerTree(snapshot: s, state: .hold).ports.allSatisfy { $0.icon == .generic })
+    }
+}

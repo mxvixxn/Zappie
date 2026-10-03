@@ -38,27 +38,9 @@ enum Format {
     }
 }
 
-/// Everything the dropdown and menu bar label show, derived from one snapshot.
+/// Header, badge, detail row, and menu bar item, derived from one snapshot.
+/// The flow diagram itself comes from `PowerTree`.
 struct PowerPresentation: Equatable {
-    struct Flow: Equatable {
-        enum Vertical: Equatable { case down, up, idle }
-
-        var adapterActive: Bool
-        var junctionTint: Tint
-        var systemLineTint: Tint
-        var vertical: Vertical
-        var adapterText: String
-        /// Total system load on the junction → system line (includes USB output).
-        var systemText: String
-        var batteryText: String
-        /// Power sent to other devices; nil hides the USB node.
-        var usbText: String?
-        var usbLabel: String
-        var systemNodeLabel: String
-        /// What the Mac itself uses (system load minus USB output).
-        var systemNodeText: String
-    }
-
     struct MenuBar: Equatable {
         enum Icon: Equatable { case bolt, plug, battery }
         var icon: Icon
@@ -70,28 +52,12 @@ struct PowerPresentation: Equatable {
     var badge: String
     var badgeTint: Tint
     var percent: String
-    var inputText: String
-    /// "Mac 본체" when USB output is split out, otherwise "시스템".
-    var systemLabel: String
-    /// System load minus USB output, i.e. what the Mac itself uses.
-    var systemText: String
-    var batteryText: String
-    var usbText: String?
     var detailLabel: String
     var detailValue: String
-    var flow: Flow
     var menuBar: MenuBar
 
     init(snapshot s: PowerSnapshot, state: PowerState) {
-        let onBattery = state == .battery
         percent = s.percent.map { "\($0)%" } ?? "—"
-        inputText = onBattery ? "—" : Format.watts(s.adapterInW)
-        let usb = s.usbOutW
-        let hasUSB = !s.portOutputs.isEmpty && usb > 0
-        systemLabel = hasUSB ? "Mac 본체" : "시스템"
-        systemText = Format.watts(hasUSB ? s.systemLoadW.map { max($0 - usb, 0) } : s.systemLoadW)
-        batteryText = Format.signedWatts(s.batteryW)
-        usbText = hasUSB ? Format.watts(usb) : nil
 
         switch state {
         case .charging:
@@ -123,29 +89,5 @@ struct PowerPresentation: Equatable {
             detailValue = Format.duration(minutes: s.timeToEmptyMin)
             menuBar = MenuBar(icon: .battery, tint: .battery, text: Format.compactSignedWatts(s.batteryW))
         }
-
-        let vertical: Flow.Vertical = switch state {
-        case .charging: .down
-        case .hold: .idle
-        case .battery, .assisted: .up
-        }
-        flow = Flow(
-            adapterActive: !onBattery,
-            junctionTint: onBattery ? .battery : .adapter,
-            systemLineTint: onBattery ? .battery : .adapter,
-            vertical: vertical,
-            adapterText: inputText,
-            systemText: Format.watts(s.systemLoadW),
-            batteryText: batteryText,
-            usbText: usbText,
-            usbLabel: Self.usbLabel(s.portOutputs),
-            systemNodeLabel: systemLabel,
-            systemNodeText: systemText
-        )
-    }
-
-    private static func usbLabel(_ ports: [PortOutput]) -> String {
-        if ports.count > 1 { return "USB 기기 \(ports.count)대" }
-        return ports.first?.deviceName ?? "USB 기기"
     }
 }

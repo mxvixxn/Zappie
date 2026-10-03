@@ -8,15 +8,15 @@ struct DropdownView: View {
     var body: some View {
         VStack(spacing: 12) {
             if let snapshot = monitor.snapshot, let state = monitor.state {
-                content(PowerPresentation(snapshot: snapshot, state: state))
+                content(PowerPresentation(snapshot: snapshot, state: state), PowerTree(snapshot: snapshot, state: state))
             } else {
                 unsupported
             }
-            Spacer(minLength: 0)
             footer
+                .padding(.top, 2)
         }
         .padding(14)
-        .frame(width: 340, height: 500)
+        .frame(width: 340)
         .background(Theme.background)
         .foregroundStyle(Theme.text)
         .monospacedDigit()
@@ -24,17 +24,12 @@ struct DropdownView: View {
     }
 
     @ViewBuilder
-    private func content(_ p: PowerPresentation) -> some View {
+    private func content(_ p: PowerPresentation, _ tree: PowerTree) -> some View {
         header(p)
-        PowerFlowView(flow: p.flow)
-        HStack(spacing: 8) {
-            stat("입력", p.inputText)
-            stat(p.systemLabel == "시스템" ? "시스템" : "Mac", p.systemText)
-            stat("배터리", p.batteryText)
-            if let usb = p.usbText {
-                stat("USB", usb)
-            }
-        }
+        PowerTreeView(tree: tree, metrics: .compact)
+            .padding(10)
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.border))
         HStack {
             Text(p.detailLabel).foregroundStyle(Theme.secondaryText)
             Spacer()
@@ -55,18 +50,6 @@ struct DropdownView: View {
             Text(p.percent).font(.system(size: 22, weight: .semibold))
         }
         .padding([.horizontal, .top], 2)
-    }
-
-    private func stat(_ label: String, _ value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(label).font(.system(size: 11)).foregroundStyle(Theme.secondaryText)
-            Text(value).font(.system(size: 15, weight: .semibold))
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(Theme.card, in: RoundedRectangle(cornerRadius: 10))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.border))
     }
 
     private var unsupported: some View {

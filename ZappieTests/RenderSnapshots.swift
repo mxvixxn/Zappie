@@ -15,8 +15,12 @@ struct RenderSnapshots {
         ("hold", PowerSnapshot(isExternalConnected: true, adapterInW: 12.3, systemLoadW: 12.3, batteryW: 0, percent: 80)),
         ("battery", PowerSnapshot(isExternalConnected: false, adapterInW: 0, systemLoadW: 11.8, batteryW: -11.8,
                                   percent: 80, timeToEmptyMin: 290)),
-        ("hub", PowerSnapshot(isExternalConnected: true, adapterInW: 17.3, systemLoadW: 17.3, batteryW: 0, percent: 80,
-                              portOutputs: [PortOutput(port: 3, watts: 5.3, voltageV: 5.19, currentA: 1.02)])),
+        ("hub", PowerSnapshot(isExternalConnected: true, adapterInW: 24.4, systemLoadW: 24.4, batteryW: 0, percent: 80,
+                              portOutputs: [
+                                  PortOutput(port: 1, watts: 2.9, deviceBatteryPercent: 100, deviceIsApple: true),
+                                  PortOutput(port: 2, watts: 9.0, voltageV: 9, currentA: 1, deviceName: "iPhone",
+                                             deviceBatteryPercent: 88, deviceIsApple: true),
+                              ])),
         ("assisted", PowerSnapshot(isExternalConnected: true, adapterInW: 30, systemLoadW: 38, batteryW: -8,
                                    percent: 55, timeToEmptyMin: 400)),
     ]
@@ -40,8 +44,10 @@ struct RenderSnapshots {
         let dir = URL(fileURLWithPath: try #require(Self.outputDir))
         let adapter = AdapterInfo(watts: 68, voltageV: 20, currentA: 3.39, name: "70W USB-C Power Adapter")
         var snapshot = Self.cases[0].1
-        snapshot.portOutputs = [PortOutput(port: 1, watts: 4.4, voltageV: 5.2, currentA: 0.86),
-                                PortOutput(port: 3, watts: 5.3, voltageV: 5.19, currentA: 1.02)]
+        snapshot.portOutputs = [PortOutput(port: 1, watts: 2.9, voltageV: 5.2, currentA: 0.55,
+                                           deviceBatteryPercent: 100, deviceIsApple: true),
+                                PortOutput(port: 2, watts: 9.0, voltageV: 9, currentA: 1, deviceName: "iPhone",
+                                           deviceBatteryPercent: 88, deviceIsApple: true)]
         snapshot.adapter = adapter
         snapshot.adapterLossW = 0.233
         snapshot.batteryVoltageV = 12.71

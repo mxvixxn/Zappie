@@ -46,7 +46,7 @@ struct OverviewView: View {
             HistoryChartCard(history: monitor.history)
 
             if !o.ports.isEmpty {
-                usbCard(o.ports, total: p.usbText ?? "")
+                usbCard(o.ports, total: Format.watts(s.usbOutW))
             }
 
             HStack(alignment: .top, spacing: gap) {

@@ -3,18 +3,46 @@ import SwiftUI
 /// Top: adapter and battery. Middle: system. Bottom: every USB-C port in parallel.
 /// Nodes sit at fixed rows; connectors are drawn behind them as elbow lines with chevrons.
 struct PowerTreeView: View {
-    let tree: PowerTree
+    /// `.large` for the main window, `.compact` for the menu bar dropdown.
+    struct Metrics {
+        var sourceWidth: CGFloat
+        var systemWidth: CGFloat
+        var nodeHeight: CGFloat
+        var portHeight: CGFloat
+        var gap: CGFloat
+        var maxPortWidth: CGFloat
+        var portSpacing: CGFloat
+        var circle: CGFloat
+        var symbol: CGFloat
+        var title: CGFloat
+        var value: CGFloat
+        var detail: CGFloat
+        var spacing: CGFloat
+        var radius: CGFloat
+        var chevron: CGFloat
 
-    private let sourceWidth: CGFloat = 150
-    private let nodeHeight: CGFloat = 112
-    private let portHeight: CGFloat = 116
-    private let gap: CGFloat = 48
+        static let large = Metrics(sourceWidth: 150, systemWidth: 170, nodeHeight: 112, portHeight: 116, gap: 48,
+                                   maxPortWidth: 180, portSpacing: 16, circle: 36, symbol: 16, title: 12, value: 18,
+                                   detail: 11, spacing: 5, radius: 12, chevron: 5)
+        static let compact = Metrics(sourceWidth: 104, systemWidth: 116, nodeHeight: 74, portHeight: 80, gap: 28,
+                                     maxPortWidth: 92, portSpacing: 8, circle: 26, symbol: 12, title: 10, value: 13,
+                                     detail: 9.5, spacing: 3, radius: 10, chevron: 4)
+    }
+
+    let tree: PowerTree
+    var metrics: Metrics = .large
+
+    private var sourceWidth: CGFloat { metrics.sourceWidth }
+    private var nodeHeight: CGFloat { metrics.nodeHeight }
+    private var portHeight: CGFloat { metrics.portHeight }
+    private var gap: CGFloat { metrics.gap }
 
     private var height: CGFloat { nodeHeight * 2 + portHeight + gap * 2 }
 
     var body: some View {
         GeometryReader { geo in
-            let l = Layout(width: geo.size.width, portCount: tree.ports.count, nodeHeight: nodeHeight, gap: gap)
+            let l = Layout(width: geo.size.width, portCount: tree.ports.count, nodeHeight: nodeHeight, gap: gap,
+                           maxPortWidth: metrics.maxPortWidth, portSpacing: metrics.portSpacing)
             ZStack(alignment: .topLeading) {
                 Canvas { context, _ in drawConnectors(context, l) }
 
@@ -30,11 +58,11 @@ struct PowerTreeView: View {
 
                 node(symbol: "laptopcomputer", title: "시스템", value: tree.systemText, detail: tree.macText,
                      tint: Theme.text)
-                    .frame(width: sourceWidth + 20, height: nodeHeight)
+                    .frame(width: metrics.systemWidth, height: nodeHeight)
                     .position(x: l.centerX, y: l.systemTop + nodeHeight / 2)
 
                 ForEach(Array(tree.ports.enumerated()), id: \.offset) { index, port in
-                    node(symbol: "cable.connector", title: port.name, value: port.watts, detail: port.detail,
+                    node(symbol: port.icon.symbol, title: port.name, value: port.watts, detail: port.detail,
                          tint: port.active ? Theme.usb : Theme.secondaryText)
                         .opacity(port.active ? 1 : 0.55)
                         .frame(width: l.portWidth, height: portHeight)
@@ -52,6 +80,8 @@ struct PowerTreeView: View {
         let portCount: Int
         let nodeHeight: CGFloat
         let gap: CGFloat
+        let maxPortWidth: CGFloat
+        let portSpacing: CGFloat
 
         var adapterX: CGFloat { width * 0.25 }
         var batteryX: CGFloat { width * 0.75 }
@@ -62,7 +92,7 @@ struct PowerTreeView: View {
         var systemBottom: CGFloat { systemTop + nodeHeight }
         var portsBus: CGFloat { systemBottom + gap / 2 }
         var portsTop: CGFloat { systemBottom + gap }
-        var portWidth: CGFloat { min(180, width / CGFloat(max(portCount, 1)) - 16) }
+        var portWidth: CGFloat { min(maxPortWidth, width / CGFloat(max(portCount, 1)) - portSpacing) }
 
         func portX(_ index: Int) -> CGFloat {
             width * (CGFloat(index) * 2 + 1) / (CGFloat(max(portCount, 1)) * 2)
@@ -123,11 +153,12 @@ struct PowerTreeView: View {
     }
 
     private func chevron(_ context: GraphicsContext, at tip: CGPoint, down: Bool, _ color: Color) {
-        let dy: CGFloat = down ? -5 : 5
+        let size = metrics.chevron
+        let dy = down ? -size : size
         var path = Path()
-        path.move(to: .init(x: tip.x - 5, y: tip.y + dy))
+        path.move(to: .init(x: tip.x - size, y: tip.y + dy))
         path.addLine(to: tip)
-        path.addLine(to: .init(x: tip.x + 5, y: tip.y + dy))
+        path.addLine(to: .init(x: tip.x + size, y: tip.y + dy))
         context.stroke(path, with: .color(color), style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
     }
 
@@ -135,29 +166,32 @@ struct PowerTreeView: View {
 
     private func node(symbol: String, title: String, value: String, detail: String? = nil,
                       tint: Color) -> some View {
-        VStack(spacing: 5) {
+        VStack(spacing: metrics.spacing) {
             Image(systemName: symbol)
-                .font(.system(size: 16, weight: .semibold))
+                .font(.system(size: metrics.symbol, weight: .semibold))
                 .foregroundStyle(tint)
-                .frame(width: 36, height: 36)
+                .frame(width: metrics.circle, height: metrics.circle)
                 .background(tint.opacity(tint == Theme.text ? 0.10 : 0.16), in: Circle())
             Text(title)
-                .font(.system(size: 12))
+                .font(.system(size: metrics.title))
                 .foregroundStyle(Theme.secondaryText)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
             Text(value)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.system(size: metrics.value, weight: .semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
             if let detail {
                 Text(detail)
-                    .font(.system(size: 11))
+                    .font(.system(size: metrics.detail))
                     .foregroundStyle(Theme.secondaryText)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.75)
             }
         }
-        .padding(.horizontal, 8)
+        .padding(.horizontal, 6)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Theme.background, in: RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.border))
+        .background(Theme.background, in: RoundedRectangle(cornerRadius: metrics.radius))
+        .overlay(RoundedRectangle(cornerRadius: metrics.radius).stroke(Theme.border))
     }
 }

@@ -66,14 +66,6 @@ struct PowerPresentationTests {
         #expect(a.badge == "보조 방전")
     }
 
-    @Test func numbersHideAdapterInputOnBattery() {
-        #expect(present(.charging, charging).inputText == "45.2 W")
-        #expect(present(.battery, battery).inputText == "—")
-        #expect(present(.battery, battery).systemText == "11.8 W")
-        #expect(present(.battery, battery).batteryText == "−11.8 W")
-        #expect(present(.hold, hold).batteryText == "0.0 W")
-    }
-
     @Test func detailRowPerState() {
         let c = present(.charging, charging)
         #expect(c.detailLabel == "충전 완료까지")
@@ -86,20 +78,6 @@ struct PowerPresentationTests {
         let b = present(.battery, battery)
         #expect(b.detailLabel == "남은 사용 시간")
         #expect(b.detailValue == "약 4시간 50분")
-    }
-
-    @Test func flowLinesPerState() {
-        let c = present(.charging, charging).flow
-        #expect(c.adapterActive && c.junctionTint == .adapter && c.vertical == .down)
-
-        let h = present(.hold, hold).flow
-        #expect(h.adapterActive && h.vertical == .idle)
-
-        let b = present(.battery, battery).flow
-        #expect(!b.adapterActive && b.junctionTint == .battery && b.systemLineTint == .battery && b.vertical == .up)
-
-        let a = present(.assisted, assisted).flow
-        #expect(a.adapterActive && a.vertical == .up)
     }
 
     @Test func menuBarLabelPerState() {
