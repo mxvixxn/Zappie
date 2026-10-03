@@ -63,7 +63,7 @@ struct PowerPresentationTests {
 
         let a = present(.assisted, assisted)
         #expect(a.source == "전원 어댑터 · 배터리 보조")
-        #expect(a.badge == "보조 방전")
+        #expect(a.badge == "배터리 보조")
     }
 
     @Test func detailRowPerState() {

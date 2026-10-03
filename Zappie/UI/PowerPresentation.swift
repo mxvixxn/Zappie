@@ -83,7 +83,7 @@ struct PowerPresentation: Equatable {
             menuBar = MenuBar(icon: .battery, tint: .battery, text: Format.compactSignedWatts(s.batteryW))
         case .assisted:
             source = "전원 어댑터 · 배터리 보조"
-            badge = "보조 방전"
+            badge = "배터리 보조"
             badgeTint = .battery
             detailLabel = "남은 사용 시간"
             detailValue = Format.duration(minutes: s.timeToEmptyMin)
