@@ -14,6 +14,8 @@ enum Fixtures {
             "AvgTimeToFull": 65535,
             "AvgTimeToEmpty": 65535,
             "UpdateTime": 1790950824,
+            "FullyCharged": false,
+            "ChargerData": ["NotChargingReason": 16777216, "SlowChargingReason": 0] as [String: Any],
             "PowerTelemetryData": [
                 "SystemPowerIn": 14916,
                 "SystemLoad": 14916,

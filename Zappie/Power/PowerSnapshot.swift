@@ -17,6 +17,11 @@ struct PowerSnapshot: Sendable, Equatable {
     var fullChargeCapacitymAh: Int? = nil
     var timeToFullMin: Int? = nil
     var timeToEmptyMin: Int? = nil
+    /// `ChargerData.NotChargingReason`; 0x1000000 = held at the charge limit (verified).
+    var notChargingReason: Int? = nil
+    /// `ChargerData.SlowChargingReason`; non-zero means charging is being slowed.
+    var slowChargingReason: Int? = nil
+    var fullyCharged: Bool? = nil
 
     var adapter: AdapterInfo? = nil
     /// USB-C ports currently supplying power to other devices. Already included in `systemLoadW`.

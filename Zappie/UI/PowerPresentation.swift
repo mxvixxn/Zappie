@@ -66,13 +66,14 @@ struct PowerPresentation: Equatable {
             badgeTint = .battery
             detailLabel = "충전 완료까지"
             detailValue = Format.duration(minutes: s.timeToFullMin)
+                + ((s.slowChargingReason ?? 0) != 0 ? " · 느린 충전" : "")
             menuBar = MenuBar(icon: .bolt, tint: .battery, text: Format.compactSignedWatts(s.batteryW))
         case .hold:
             source = "전원 어댑터 · 바이패스"
             badge = "바이패스"
             badgeTint = .adapter
             detailLabel = "상태"
-            detailValue = "\(percent)에서 유지 중"
+            detailValue = Self.bypassReason(s, percent: percent)
             menuBar = MenuBar(icon: .plug, tint: .adapter, text: Format.compactWatts(s.adapterInW))
         case .battery:
             source = "배터리 사용 중"
@@ -89,5 +90,14 @@ struct PowerPresentation: Equatable {
             detailValue = Format.duration(minutes: s.timeToEmptyMin)
             menuBar = MenuBar(icon: .battery, tint: .battery, text: Format.compactSignedWatts(s.batteryW))
         }
+    }
+
+    /// Why the battery sits idle. Only the charge-limit reason is verified; other non-zero
+    /// reasons are shown generically and logged by `ChargeReasonTracker`.
+    private static func bypassReason(_ s: PowerSnapshot, percent: String) -> String {
+        if s.notChargingReason == ChargeReason.chargeLimit { return "\(percent) 한도에서 유지 중" }
+        if s.fullyCharged == true { return "완충" }
+        if let reason = s.notChargingReason, reason != 0 { return "\(percent)에서 충전 일시 중지" }
+        return "\(percent)에서 유지 중"
     }
 }

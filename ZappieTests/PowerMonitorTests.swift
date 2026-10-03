@@ -7,7 +7,9 @@ import Testing
 private final class Rig {
     var reading: PowerSnapshot?
     var now = Date(timeIntervalSince1970: 1_790_950_000)
-    lazy var monitor = PowerMonitor(read: { [unowned self] in reading }, now: { [unowned self] in now })
+    var logged: [ChargeReasonSighting] = []
+    lazy var monitor = PowerMonitor(read: { [unowned self] in reading }, now: { [unowned self] in now },
+                                    logReason: { [unowned self] in logged.append($0) })
 
     func step(_ seconds: TimeInterval, _ reading: PowerSnapshot?) {
         now += seconds
@@ -70,6 +72,13 @@ struct PowerMonitorTests {
 
         rig.step(1, PowerSnapshot(isExternalConnected: true))
         #expect(rig.monitor.usbConnectedSince.isEmpty)
+    }
+
+    @Test func logsUnknownChargeReasons() {
+        let rig = Rig()
+        rig.step(0, PowerSnapshot(isExternalConnected: true, batteryW: 0, notChargingReason: 0x4))
+        rig.step(1, PowerSnapshot(isExternalConnected: true, batteryW: 0, notChargingReason: 0x4))
+        #expect(rig.logged.map(\.value) == [0x4])
     }
 
     @Test func holdToChargingWaitsForHysteresis() {

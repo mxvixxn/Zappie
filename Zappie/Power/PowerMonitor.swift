@@ -19,6 +19,8 @@ final class PowerMonitor {
 
     private let read: () -> PowerSnapshot?
     private let now: () -> Date
+    private let logReason: (ChargeReasonSighting) -> Void
+    private var reasonTracker = ChargeReasonTracker()
     private var debouncer = StateDebouncer(delay: 2)
     private var connectionChangedAt: Date?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
@@ -26,9 +28,11 @@ final class PowerMonitor {
     @ObservationIgnored private var notifyPort: IONotificationPortRef?
     @ObservationIgnored private var notifications: [io_object_t] = []
 
-    init(read: @escaping () -> PowerSnapshot? = PowerReader.read, now: @escaping () -> Date = Date.init) {
+    init(read: @escaping () -> PowerSnapshot? = PowerReader.read, now: @escaping () -> Date = Date.init,
+         logReason: @escaping (ChargeReasonSighting) -> Void = ChargeReasonLog.append) {
         self.read = read
         self.now = now
+        self.logReason = logReason
     }
 
     func refresh() {
@@ -47,6 +51,7 @@ final class PowerMonitor {
         snapshot = reading
         state = debouncer.update(PowerState.classify(reading, connectionChangedAt: connectionChangedAt), at: time)
         history.record(reading, at: time)
+        reasonTracker.newSightings(in: reading, at: time).forEach(logReason)
 
         var since = usbConnectedSince.filter { reading.usbDevices[$0.key] != nil }
         for port in reading.usbDevices.keys where since[port] == nil {

@@ -47,6 +47,12 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 | 남은 시간 | `AvgTimeToFull` / `AvgTimeToEmpty` | 분 | 65535 = 계산 중/없음 처리 |
 | 충전 중 여부 | `IsCharging`, `ChargerData.NotChargingReason` | Bool / 비트마스크 | 한도 유지 중 `NotChargingReason`=16777216 (0이 아님) |
 
+**충전 이유 값** (2026-10-03): 바이패스 상태의 아래 줄에 이유를 붙인다.
+- `ChargerData.NotChargingReason` = `0x1000000` → "N% 한도에서 유지 중" (80% 한도에서 확인)
+- `FullyCharged` = Yes → "완충" / 그 밖의 0이 아닌 값 → "N%에서 충전 일시 중지"
+- `ChargerData.SlowChargingReason` ≠ 0 → 충전 중 아래 줄에 "· 느린 충전"
+- 처음 보는 값은 잔량·전력과 함께 `~/Library/Application Support/Zappie/charge-reasons.jsonl`에 한 번씩 기록 → 의미를 확인하면 `ChargeReason.known`에 추가.
+
 **음수 값**: `BatteryPower`, `InstantAmperage` 등 음수는 **UInt64 비트 패턴**으로 온다(예: 18446744073709534756 = −16,860). `NSNumber.int64Value`로 재해석한다.
 
 **갱신 주기**: IORegistry 값은 1초마다 바뀌지 않는다. `UpdateTime` 관찰 결과 유휴 시 최대 약 60초, 부하 변화 시 1~7초 간격. 전원을 분리하면 `ExternalConnected`는 즉시 바뀌지만 전력 값은 다음 갱신까지 이전 값이 남는다. → 상태 판정은 `ExternalConnected`를 우선하고, 전력 값의 신선도는 `UpdateTime`으로 판단한다.

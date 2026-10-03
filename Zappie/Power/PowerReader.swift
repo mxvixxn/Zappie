@@ -31,6 +31,7 @@ enum PowerReader {
         }
 
         let packData = pack?["BatteryData"] as? [String: Any]
+        let charger = battery["ChargerData"] as? [String: Any]
 
         return PowerSnapshot(
             isExternalConnected: battery["ExternalConnected"] as? Bool ?? false,
@@ -47,6 +48,9 @@ enum PowerReader {
             fullChargeCapacitymAh: int(batteryData?["FullChargeCapacity"]),
             timeToFullMin: minutes(battery["AvgTimeToFull"]),
             timeToEmptyMin: minutes(battery["AvgTimeToEmpty"]),
+            notChargingReason: int(charger?["NotChargingReason"]),
+            slowChargingReason: int(charger?["SlowChargingReason"]),
+            fullyCharged: battery["FullyCharged"] as? Bool,
             adapter: adapter(battery["AdapterDetails"] as? [String: Any]),
             portOutputs: portOutputs(battery["PowerOutDetails"] as? [[String: Any]],
                                      devices: battery["FedDetails"] as? [[String: Any]],

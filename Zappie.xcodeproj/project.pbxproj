@@ -32,6 +32,7 @@
 		9BADC53928C66DEBBFBA09E6 /* PowerStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3EB8A7FE005B79EFD947AF9 /* PowerStateTests.swift */; };
 		9FBD0BEC5E0C1C55B224FB3C /* PowerHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969A9F90202742BE828E145 /* PowerHistory.swift */; };
 		A858C84891B5132F645219D2 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646210A36754EDFC85A2BD2 /* OverviewView.swift */; };
+		AACC8BEEBAD136EC3B3806AE /* ChargeReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = F25AD71C9E144F740965B92A /* ChargeReason.swift */; };
 		AEEB27E6096F64328C9C4EB3 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F25DC705E2A122CF11F2BB /* MainWindow.swift */; };
 		BC7647B8A5765AB03B8314A3 /* OverviewPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF1CCB988B78D05E5CD0F97 /* OverviewPresentationTests.swift */; };
 		D47FD7D38E6CE68507B9F237 /* DetailTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455979CEE452E0D1B6E3E37D /* DetailTabs.swift */; };
@@ -39,6 +40,7 @@
 		E2ED9D02EFD118519212FA03 /* PowerMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C3CEC65392B9A0488556A /* PowerMonitor.swift */; };
 		E7951F9C0DA3BBC42B358B0D /* ZappieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249616148354C772AB6A3241 /* ZappieApp.swift */; };
 		F1E721D1E71CDED586746C3E /* RenderSnapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF335F87073EB7F647303B3 /* RenderSnapshots.swift */; };
+		FDA229E071BB5D6806397E75 /* ChargeReasonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A7F819B5C9F8BBBB05199C9 /* ChargeReasonTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +71,7 @@
 		455979CEE452E0D1B6E3E37D /* DetailTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailTabs.swift; sourceTree = "<group>"; };
 		4EED5C85B9893B2F56CFB185 /* USBOutputTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USBOutputTests.swift; sourceTree = "<group>"; };
 		57F9520C806283AAE550071D /* DetailPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPresentation.swift; sourceTree = "<group>"; };
+		5A7F819B5C9F8BBBB05199C9 /* ChargeReasonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargeReasonTests.swift; sourceTree = "<group>"; };
 		5D36A6E69A1963BE036FCFA6 /* PowerHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerHistoryTests.swift; sourceTree = "<group>"; };
 		631C5C8CC927B0417091EA74 /* Zappie.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = Zappie.icon; sourceTree = "<group>"; };
 		66C8265EFB803AA04E32E648 /* DetailPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPresentationTests.swift; sourceTree = "<group>"; };
@@ -85,6 +88,7 @@
 		E3EB8A7FE005B79EFD947AF9 /* PowerStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerStateTests.swift; sourceTree = "<group>"; };
 		EBD3F43A8D096FBE359637DD /* PortName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortName.swift; sourceTree = "<group>"; };
 		ECF335F87073EB7F647303B3 /* RenderSnapshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderSnapshots.swift; sourceTree = "<group>"; };
+		F25AD71C9E144F740965B92A /* ChargeReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargeReason.swift; sourceTree = "<group>"; };
 		FB3C3CEC65392B9A0488556A /* PowerMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerMonitor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -92,6 +96,7 @@
 		4673A474E057B93BE5904789 /* Power */ = {
 			isa = PBXGroup;
 			children = (
+				F25AD71C9E144F740965B92A /* ChargeReason.swift */,
 				EBD3F43A8D096FBE359637DD /* PortName.swift */,
 				2969A9F90202742BE828E145 /* PowerHistory.swift */,
 				FB3C3CEC65392B9A0488556A /* PowerMonitor.swift */,
@@ -154,6 +159,7 @@
 		F7B3BF6E3BB30BA4ADF94517 /* ZappieTests */ = {
 			isa = PBXGroup;
 			children = (
+				5A7F819B5C9F8BBBB05199C9 /* ChargeReasonTests.swift */,
 				66C8265EFB803AA04E32E648 /* DetailPresentationTests.swift */,
 				BCCA001A87A1CEC39E01381D /* Fixtures.swift */,
 				3EF1CCB988B78D05E5CD0F97 /* OverviewPresentationTests.swift */,
@@ -263,6 +269,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FDA229E071BB5D6806397E75 /* ChargeReasonTests.swift in Sources */,
 				6137AB04F882DC845B66F75A /* DetailPresentationTests.swift in Sources */,
 				3A7E60A1EF8C416EF89B2E01 /* Fixtures.swift in Sources */,
 				BC7647B8A5765AB03B8314A3 /* OverviewPresentationTests.swift in Sources */,
@@ -282,6 +289,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1406D8EFF649BFDE1D196634 /* AppSettings.swift in Sources */,
+				AACC8BEEBAD136EC3B3806AE /* ChargeReason.swift in Sources */,
 				57CF806824E09917D6C76FE0 /* DetailPresentation.swift in Sources */,
 				D47FD7D38E6CE68507B9F237 /* DetailTabs.swift in Sources */,
 				9613E6C53EF77AA4DA84F8BD /* DropdownView.swift in Sources */,
