@@ -61,9 +61,11 @@ struct PowerPresentation: Equatable {
 
         switch state {
         case .charging:
-            source = "전원 어댑터 · 충전 중"
-            badge = "충전 중"
-            badgeTint = .battery
+            // Charging always means bypass too: the adapter feeds the system and the surplus
+            // goes to the battery.
+            source = "전원 어댑터 · 배터리 충전 중"
+            badge = "바이패스"
+            badgeTint = .adapter
             detailLabel = "충전 완료까지"
             detailValue = Format.duration(minutes: s.timeToFullMin)
                 + ((s.slowChargingReason ?? 0) != 0 ? " · 느린 충전" : "")

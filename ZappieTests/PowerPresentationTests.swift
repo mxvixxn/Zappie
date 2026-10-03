@@ -46,9 +46,10 @@ struct PowerPresentationTests {
 
     @Test func headerAndBadge() {
         let c = present(.charging, charging)
-        #expect(c.source == "전원 어댑터 · 충전 중")
-        #expect(c.badge == "충전 중")
-        #expect(c.badgeTint == .battery)
+        // Adapter feeds the system directly and the surplus charges the battery.
+        #expect(c.source == "전원 어댑터 · 배터리 충전 중")
+        #expect(c.badge == "바이패스")
+        #expect(c.badgeTint == .adapter)
         #expect(c.percent == "62%")
 
         let h = present(.hold, hold)
