@@ -144,7 +144,7 @@ save(background, "\(iconDir)/Assets/background.png")
 save(upper, "\(iconDir)/Assets/bolt-upper.png")
 save(lower, "\(iconDir)/Assets/bolt-lower.png")
 
-// Glass settings tuned in Icon Composer (refraction 50%, translucency 10%); keep in sync.
+// Glass settings tuned in Icon Composer (refraction 85% / depth 40%, translucency 30%, shadow 70%); keep in sync.
 let iconJSON = """
 {
   "features" : [
@@ -168,18 +168,18 @@ let iconJSON = """
         }
       ],
       "refractivity" : {
-        "depth" : 0,
+        "depth" : 0.4,
         "enabled" : true,
-        "strength" : 0.5
+        "strength" : 0.85
       },
       "shadow" : {
         "kind" : "layer-color",
-        "opacity" : 0.5
+        "opacity" : 0.7
       },
       "specular" : true,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.1
+        "value" : 0.3
       }
     },
     {
