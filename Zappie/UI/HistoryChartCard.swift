@@ -34,7 +34,9 @@ struct HistoryChartCard: View {
                     .foregroundStyle(Theme.secondaryText)
                     .frame(maxWidth: .infinity, minHeight: chartHeight)
             } else {
-                HistoryChart(points: range.chartPoints(samples), range: range, now: now, showsUSB: hasUSB)
+                HistoryChart(points: range.chartPoints(samples), range: range, tick: range.chartTick(now),
+                             showsUSB: hasUSB)
+                    .equatable()
                     .frame(height: chartHeight)
             }
             if showsSummary, let summary = HistorySummary(samples) {
@@ -97,13 +99,21 @@ struct HistoryChartCard: View {
     }
 }
 
-private struct HistoryChart: View {
+/// Redrawn only when `tick` moves (once per drawn point, see `HistoryRange.chartTick`), not on
+/// every one-second sample: rebuilding ~1,000 marks each second was most of the main window's CPU.
+private struct HistoryChart: View, Equatable {
     /// Each segment is drawn as its own line, so gaps (sleep, app not running) stay empty.
     let points: [ChartPoint]
     let range: HistoryRange
-    let now: Date
+    let tick: Date
     let showsUSB: Bool
     @State private var hovered: Date?
+
+    private var now: Date { tick }
+
+    nonisolated static func == (a: Self, b: Self) -> Bool {
+        a.range == b.range && a.tick == b.tick && a.showsUSB == b.showsUSB && a.points.isEmpty == b.points.isEmpty
+    }
 
     private enum Series: String {
         case input = "어댑터 입력"

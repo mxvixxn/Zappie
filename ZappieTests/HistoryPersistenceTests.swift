@@ -160,3 +160,22 @@ struct HistorySavingTests {
         #expect(monitor.history.samples(.hour) == [sample(0)])
     }
 }
+
+/// With the main window open, rebuilding ~1,000 chart marks every second was most of its CPU.
+/// A drawn point covers `chartStep` seconds, so the chart only needs redrawing once per step.
+struct ChartTickTests {
+    @Test func stepIsDurationOverDrawnPoints() {
+        #expect(HistoryRange.hour.chartStep == 10)
+        #expect(HistoryRange.sixHours.chartStep == 60)
+        #expect(HistoryRange.day.chartStep == 240)
+    }
+
+    @Test func tickHoldsWithinAStep() {
+        let base = Date(timeIntervalSince1970: 1_790_949_840) // divisible by 240
+        #expect(HistoryRange.hour.chartTick(base + 3) == base)
+        #expect(HistoryRange.hour.chartTick(base + 9.9) == base)
+        #expect(HistoryRange.hour.chartTick(base + 10) == base + 10)
+        #expect(HistoryRange.day.chartTick(base + 239) == base)
+        #expect(HistoryRange.day.chartTick(base + 240) == base + 240)
+    }
+}

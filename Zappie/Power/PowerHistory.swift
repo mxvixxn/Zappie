@@ -170,7 +170,7 @@ extension HistoryRange {
 extension HistoryRange {
     /// Averages consecutive samples so the chart draws at most `limit` points.
     /// Stored history keeps full resolution; this is only for drawing.
-    static func forChart(_ samples: [PowerSample], limit: Int = 360) -> [PowerSample] {
+    static func forChart(_ samples: [PowerSample], limit: Int = chartPointLimit) -> [PowerSample] {
         guard samples.count > limit, limit > 0 else { return samples }
         let chunk = (samples.count + limit - 1) / limit
         return stride(from: 0, to: samples.count, by: chunk).map { start in
@@ -227,6 +227,17 @@ struct ChartPoint: Equatable {
 }
 
 extension HistoryRange {
+    /// The chart is ~1000 pt wide; more points than this add nothing visible.
+    static let chartPointLimit = 360
+
+    /// Seconds one drawn point covers.
+    var chartStep: TimeInterval { duration / Double(Self.chartPointLimit) }
+
+    /// Changes once per `chartStep`: the chart only needs redrawing when a new point appears.
+    func chartTick(_ now: Date) -> Date {
+        Date(timeIntervalSince1970: (now.timeIntervalSince1970 / chartStep).rounded(.down) * chartStep)
+    }
+
     /// A longer pause between samples is a gap (sleep, app not running, no readings). Generous
     /// enough for the slowest poll interval (5 s).
     var gapThreshold: TimeInterval { max(30, resolution * 5) }
@@ -247,7 +258,7 @@ extension HistoryRange {
 
     /// Segments, each downsampled on its own (never averaged across a gap), sharing `limit`
     /// points in proportion to their length.
-    func chartPoints(_ samples: [PowerSample], limit: Int = 360) -> [ChartPoint] {
+    func chartPoints(_ samples: [PowerSample], limit: Int = Self.chartPointLimit) -> [ChartPoint] {
         let total = samples.count
         return segments(samples).enumerated().flatMap { index, segment in
             let share = max(1, limit * segment.count / max(total, 1))
