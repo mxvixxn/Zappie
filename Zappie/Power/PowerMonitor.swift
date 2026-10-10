@@ -11,7 +11,11 @@ final class PowerMonitor {
     private(set) var snapshot: PowerSnapshot?
     private(set) var state: PowerState?
     private(set) var isSupported = true
-    private(set) var history = PowerHistory()
+    private(set) var history: PowerHistory
+    /// Writes the history to disk (`HistoryStore`); about 9 ms when full, so it runs inline.
+    private let saveHistory: (HistoryArchive) -> Void
+    @ObservationIgnored private var historySavedAt: Date?
+    static let historySaveInterval: TimeInterval = 60
     /// What the menu bar shows. Small wobbles are held back (see `updateMenuBar`) because every
     /// menu bar redraw costs CPU, and live SMC watts change every second.
     private(set) var menuBarItem: PowerPresentation.MenuBar?
@@ -59,13 +63,17 @@ final class PowerMonitor {
          alreadyLogged: Set<String> = [],
          disableLiveWatts: @escaping () -> Void = LiveWattsGuard.disable,
          liveWattsDisabled: Bool = false,
-         notify: @escaping (TemperatureWatch.Message) -> Void = HeatNotifier.send) {
+         notify: @escaping (TemperatureWatch.Message) -> Void = HeatNotifier.send,
+         history: PowerHistory = PowerHistory(),
+         saveHistory: @escaping (HistoryArchive) -> Void = { _ in }) {
         self.read = read
         self.now = now
         self.logReason = logReason
         reasonTracker = ChargeReasonTracker(alreadyLogged: alreadyLogged)
         self.disableLiveWatts = disableLiveWatts
         self.notify = notify
+        self.history = history
+        self.saveHistory = saveHistory
         liveWattsCheck = LiveWattsCheck(matches: 0, disabled: liveWattsDisabled)
     }
 
@@ -112,6 +120,13 @@ final class PowerMonitor {
         snapshot = reading
         state = debouncer.update(PowerState.classify(reading, connectionChangedAt: connectionChangedAt), at: time)
         history.record(reading, at: time)
+        if let saved = historySavedAt {
+            if time.timeIntervalSince(saved) >= Self.historySaveInterval || time < saved {
+                saveHistoryNow()
+            }
+        } else {
+            historySavedAt = time
+        }
         if let state {
             updateMenuBar(PowerPresentation(snapshot: reading, state: state).menuBar, reading, at: time)
         }
@@ -138,6 +153,12 @@ final class PowerMonitor {
         if since != usbConnectedSince {
             usbConnectedSince = since
         }
+    }
+
+    /// Also called before sleep and quit.
+    func saveHistoryNow() {
+        saveHistory(history.archive)
+        historySavedAt = now()
     }
 
     private func updateMenuBar(_ item: PowerPresentation.MenuBar, _ s: PowerSnapshot, at time: Date) {

@@ -70,11 +70,11 @@ struct RenderSnapshots {
         snapshot.designCapacitymAh = 6249
         snapshot.fullChargeCapacitymAh = 6004
         snapshot.updateTime = .now
-        // 50 minutes of synthetic history ending now.
+        // 50 minutes of synthetic history ending now, with a 10-minute sleep in the middle.
         let end = Date.now
         var clock = end.addingTimeInterval(-3_000)
-        let monitor = PowerMonitor(read: { snapshot }, now: { clock })
-        for second in 0..<3_000 {
+        let monitor = PowerMonitor(read: { snapshot }, now: { clock }, logReason: { _ in }, notify: { _ in })
+        for second in 0..<3_000 where !(1_200..<1_800).contains(second) {
             let t = Double(second)
             snapshot.adapterInW = 44 + 2 * sin(t / 300)
             snapshot.systemLoadW = 12 + 6 * max(0, sin(t / 200))

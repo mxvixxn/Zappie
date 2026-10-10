@@ -34,7 +34,7 @@ struct HistoryChartCard: View {
                     .foregroundStyle(Theme.secondaryText)
                     .frame(maxWidth: .infinity, minHeight: chartHeight)
             } else {
-                HistoryChart(samples: HistoryRange.forChart(samples), range: range, now: now, showsUSB: hasUSB)
+                HistoryChart(points: range.chartPoints(samples), range: range, now: now, showsUSB: hasUSB)
                     .frame(height: chartHeight)
             }
             if showsSummary, let summary = HistorySummary(samples) {
@@ -98,30 +98,39 @@ struct HistoryChartCard: View {
 }
 
 private struct HistoryChart: View {
-    let samples: [PowerSample]
+    /// Each segment is drawn as its own line, so gaps (sleep, app not running) stay empty.
+    let points: [ChartPoint]
     let range: HistoryRange
     let now: Date
     let showsUSB: Bool
     @State private var hovered: Date?
 
-    private enum Series: String, Plottable {
+    private enum Series: String {
         case input = "어댑터 입력"
         case system = "시스템 소비"
         case usb = "USB 기기 출력"
+
+        func line(_ segment: Int) -> String { "\(rawValue) \(segment)" }
     }
+
+    private var samples: [PowerSample] { points.map(\.sample) }
 
     var body: some View {
         let start = now.addingTimeInterval(-range.duration)
         let axisDates = [start, now.addingTimeInterval(-range.duration / 2), now]
 
         Chart {
-            ForEach(samples, id: \.date) { s in
-                LineMark(x: .value("시간", s.date), y: .value("전력", s.inputW), series: .value("항목", Series.input))
+            ForEach(points, id: \.sample.date) { point in
+                let s = point.sample
+                LineMark(x: .value("시간", s.date), y: .value("전력", s.inputW),
+                         series: .value("항목", Series.input.line(point.segment)))
                     .foregroundStyle(Theme.adapter)
-                LineMark(x: .value("시간", s.date), y: .value("전력", s.systemW), series: .value("항목", Series.system))
+                LineMark(x: .value("시간", s.date), y: .value("전력", s.systemW),
+                         series: .value("항목", Series.system.line(point.segment)))
                     .foregroundStyle(Theme.systemLine)
                 if showsUSB {
-                    LineMark(x: .value("시간", s.date), y: .value("전력", s.usbW), series: .value("항목", Series.usb))
+                    LineMark(x: .value("시간", s.date), y: .value("전력", s.usbW),
+                             series: .value("항목", Series.usb.line(point.segment)))
                         .foregroundStyle(Theme.usb)
                 }
             }

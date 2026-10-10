@@ -1,13 +1,14 @@
 import Foundation
 
-struct PowerSample: Sendable, Equatable {
+struct PowerSample: Sendable, Equatable, Codable {
     var date: Date
     var inputW: Double
     var systemW: Double
     var usbW: Double = 0
 }
 
-/// SPEC §3: 1 hour at 1 s, 6 hours at 10 s averages, 24 hours at 60 s averages. Memory only (v1).
+/// SPEC §3: 1 hour at 1 s, 6 hours at 10 s averages, 24 hours at 60 s averages.
+/// Saved to disk by `HistoryStore` and restored at launch.
 enum HistoryRange: String, CaseIterable, Identifiable, Sendable {
     case hour = "1시간"
     case sixHours = "6시간"
@@ -39,6 +40,22 @@ struct PowerHistory: Sendable {
         uniqueKeysWithValues: HistoryRange.allCases.map { ($0, Tier(range: $0)) }
     )
 
+    init() {}
+
+    /// Keeps only samples inside each range ending `now`; anything later (the clock moved back)
+    /// is dropped so it can't sit after new samples.
+    init(restoring archive: HistoryArchive, now: Date) {
+        for range in HistoryRange.allCases {
+            let start = now.addingTimeInterval(-range.duration)
+            let kept = archive[range].filter { $0.date >= start && $0.date <= now }
+            tiers[range] = Tier(range: range, restoring: kept)
+        }
+    }
+
+    var archive: HistoryArchive {
+        HistoryArchive(hour: samples(.hour), sixHours: samples(.sixHours), day: samples(.day))
+    }
+
     /// Adapter input is recorded as 0 while on battery, so the chart shows the drop.
     mutating func record(_ snapshot: PowerSnapshot, at date: Date) {
         guard snapshot.telemetryValid else { return }
@@ -61,9 +78,9 @@ struct PowerHistory: Sendable {
         var averager: BucketAverager
         var ring: RingBuffer<PowerSample>
 
-        init(range: HistoryRange) {
+        init(range: HistoryRange, restoring samples: [PowerSample] = []) {
             averager = BucketAverager(interval: range.resolution)
-            ring = RingBuffer(capacity: range.capacity)
+            ring = RingBuffer(capacity: range.capacity, elements: samples)
         }
 
         mutating func add(_ sample: PowerSample) {
@@ -112,9 +129,10 @@ struct RingBuffer<Element: Sendable>: Sendable {
     private var storage: [Element] = []
     private var head = 0
 
-    init(capacity: Int) {
+    init(capacity: Int, elements: [Element] = []) {
         self.capacity = capacity
         storage.reserveCapacity(capacity)
+        storage.append(contentsOf: elements.suffix(capacity))
     }
 
     mutating func append(_ element: Element) {
@@ -162,6 +180,78 @@ extension HistoryRange {
                                inputW: slice.reduce(0) { $0 + $1.inputW } / n,
                                systemW: slice.reduce(0) { $0 + $1.systemW } / n,
                                usbW: slice.reduce(0) { $0 + $1.usbW } / n)
+        }
+    }
+}
+
+/// What `HistoryStore` writes: each range's samples, oldest first. The averaging bucket still
+/// open when saving (under a minute) is not kept.
+struct HistoryArchive: Codable, Equatable, Sendable {
+    var hour: [PowerSample]
+    var sixHours: [PowerSample]
+    var day: [PowerSample]
+
+    subscript(range: HistoryRange) -> [PowerSample] {
+        switch range {
+        case .hour: hour
+        case .sixHours: sixHours
+        case .day: day
+        }
+    }
+}
+
+/// ~/Library/Application Support/Zappie/history.plist (binary, about 300 KB when full).
+enum HistoryStore {
+    static var url: URL {
+        URL.applicationSupportDirectory.appending(path: "Zappie/history.plist")
+    }
+
+    static func load(from url: URL = url) -> HistoryArchive? {
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        return try? PropertyListDecoder().decode(HistoryArchive.self, from: data)
+    }
+
+    static func save(_ archive: HistoryArchive, to url: URL = url) throws {
+        let encoder = PropertyListEncoder()
+        encoder.outputFormat = .binary
+        let data = try encoder.encode(archive)
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try data.write(to: url, options: .atomic)
+    }
+}
+
+/// A sample tagged with its unbroken stretch, so the chart draws each stretch as its own line.
+struct ChartPoint: Equatable {
+    var sample: PowerSample
+    var segment: Int
+}
+
+extension HistoryRange {
+    /// A longer pause between samples is a gap (sleep, app not running, no readings). Generous
+    /// enough for the slowest poll interval (5 s).
+    var gapThreshold: TimeInterval { max(30, resolution * 5) }
+
+    func segments(_ samples: [PowerSample]) -> [[PowerSample]] {
+        var result: [[PowerSample]] = []
+        var current: [PowerSample] = []
+        for sample in samples {
+            if let last = current.last, sample.date.timeIntervalSince(last.date) > gapThreshold {
+                result.append(current)
+                current = []
+            }
+            current.append(sample)
+        }
+        if !current.isEmpty { result.append(current) }
+        return result
+    }
+
+    /// Segments, each downsampled on its own (never averaged across a gap), sharing `limit`
+    /// points in proportion to their length.
+    func chartPoints(_ samples: [PowerSample], limit: Int = 360) -> [ChartPoint] {
+        let total = samples.count
+        return segments(samples).enumerated().flatMap { index, segment in
+            let share = max(1, limit * segment.count / max(total, 1))
+            return Self.forChart(segment, limit: share).map { ChartPoint(sample: $0, segment: index) }
         }
     }
 }

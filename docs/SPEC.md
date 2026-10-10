@@ -138,11 +138,14 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 ```
 PowerReader      IOKit 읽기 → PowerSnapshot (순수 값 타입, Sendable)
 PowerMonitor     @Observable @MainActor. 1초 폴링 + 전원 이벤트 구독, 상태 판정, 히스토리 기록
-PowerHistory     링 버퍼: 1시간=1초 해상도, 6시간=10초 평균, 24시간=60초 평균 (메모리만, v1)
+PowerHistory     링 버퍼: 1시간=1초 해상도, 6시간=10초 평균, 24시간=60초 평균
+HistoryStore     ~/Library/Application Support/Zappie/history.plist (바이너리 plist)
 Views            MenuBarLabel / DropdownView / MainWindow(Overview, History, Adapter, Battery, Settings)
 ```
 
 - 전원 연결/분리 이벤트: `IOPSNotificationCreateRunLoopSource`로 즉시 갱신 (폴링과 병행).
+- 기록 저장 (2026-10-10): 1분마다, 잠자기·종료 직전에 세 범위를 통째로 저장하고 실행할 때 불러온다. 범위를 벗어난 샘플과 현재 시각보다 뒤의 샘플(시계가 뒤로 감)은 버린다. 꽉 찼을 때 245 KB, 저장 9 ms·불러오기 10 ms라 메인 스레드에서 바로 쓴다. 열려 있던 평균 구간(1분 미만)은 저장하지 않는다.
+- 차트 선 끊기: 샘플 간격이 `max(30초, 해상도×5)`(1시간 30초 / 6시간 50초 / 24시간 5분)보다 길면 구간을 나눠 각각 따로 그린다(잠자기, 앱 꺼짐, 측정값 없음). 화면용 다운샘플도 구간 안에서만 평균한다.
 - `PowerReader`는 딕셔너리 → 스냅샷 파싱을 별도 함수로 분리해서 **고정 딕셔너리로 단위 테스트** 가능하게.
 
 ---
@@ -242,7 +245,7 @@ Views            MenuBarLabel / DropdownView / MainWindow(Overview, History, Ada
 - 실제 macOS 14에서 실행 확인 (컴파일은 통과. SF Symbols 이름은 컴파일러가 검사하지 않음 — 특히 `apple.logo`, `cable.connector`, `powerplug`)
 - 정식 서명 빌드를 /Applications에 설치하고 "로그인 시 실행" 확인 (Xcode에서 팀 선택 필요)
 - README에 스크린샷·기능 설명
-- 기록을 디스크에 저장 (지금은 메모리만), 잠자기 구간에서 차트 선 끊기
+- ✅ 기록을 디스크에 저장, 잠자기 구간에서 차트 선 끊기 (2026-10-10, §3)
 - 메인 창을 연 상태의 CPU 측정 (1시간 차트 3,600점 매초 갱신)
 - 알림 (배터리 보조 시작, 충전 완료), 데스크톱 위젯
 - 실시간 와트 (SMC 직접 읽기, 비공개 API — v2)
