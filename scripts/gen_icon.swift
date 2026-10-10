@@ -144,25 +144,59 @@ save(background, "\(iconDir)/Assets/background.png")
 save(upper, "\(iconDir)/Assets/bolt-upper.png")
 save(lower, "\(iconDir)/Assets/bolt-lower.png")
 
+// Glass settings tuned in Icon Composer (refraction 50%, translucency 10%); keep in sync.
 let iconJSON = """
 {
+  "features" : [
+    "refractivity"
+  ],
   "fill" : {
     "automatic-gradient" : "extended-srgb:0.04314,0.04706,0.11765,1.00000"
   },
   "groups" : [
     {
       "layers" : [
-        { "image-name" : "bolt-upper.png", "name" : "bolt-upper", "glass" : true },
-        { "image-name" : "bolt-lower.png", "name" : "bolt-lower", "glass" : true }
+        {
+          "glass" : true,
+          "image-name" : "bolt-upper.png",
+          "name" : "bolt-upper"
+        },
+        {
+          "glass" : true,
+          "image-name" : "bolt-lower.png",
+          "name" : "bolt-lower"
+        }
       ],
-      "shadow" : { "kind" : "layer-color", "opacity" : 0.5 },
-      "translucency" : { "enabled" : true, "value" : 0.2 },
-      "specular" : true
+      "refractivity" : {
+        "depth" : 0,
+        "enabled" : true,
+        "strength" : 0.5
+      },
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 0.5
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.1
+      }
     },
     {
       "layers" : [
-        { "image-name" : "background.png", "name" : "background" }
-      ]
+        {
+          "image-name" : "background.png",
+          "name" : "background"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.3
+      }
     }
   ],
   "supported-platforms" : {
