@@ -81,10 +81,16 @@ struct RenderSnapshots {
             clock = end.addingTimeInterval(-3_000 + t)
             monitor.refresh()
         }
+        // Own defaults so the render shows the chosen tab, not the one last opened in the real app.
+        let defaults = try #require(UserDefaults(suiteName: "ZappieRenderSnapshots"))
+        defaults.removePersistentDomain(forName: "ZappieRenderSnapshots")
         // Default window size, and the minimum width where cards are tightest.
+        // Other tabs are ScrollViews, which ImageRenderer draws blank.
+        defaults.set(MainSection.overview.rawValue, forKey: AppSettings.sectionKey)
         for (name, width, height) in [("main-overview", 1200.0, 908.0), ("main-overview-narrow", 960.0, 1300.0)] {
             let renderer = ImageRenderer(content: MainWindow(monitor: monitor, scrolls: false)
-                .frame(width: width, height: height))
+                .frame(width: width, height: height)
+                .defaultAppStorage(defaults))
             renderer.scale = 1
             let image = try #require(renderer.nsImage)
             let tiff = try #require(image.tiffRepresentation)
