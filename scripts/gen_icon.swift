@@ -20,8 +20,8 @@ func rgb(_ hex: UInt32) -> CGColor {
 }
 
 // Colors sampled from the reference
-let upperTop = rgb(0xE8D6FF), upperBottom = rgb(0x6646F0)
-let lowerTop = rgb(0xB4FAEA), lowerBottom = rgb(0x00B9B8)
+let upperTop = rgb(0xEEE2FF), upperBottom = rgb(0x7656F6)
+let lowerTop = rgb(0xC4FFF1), lowerBottom = rgb(0x14CEC6)
 let backgroundBase = rgb(0x0B0C1E)
 let glow = rgb(0x6E3CFF)
 
@@ -120,10 +120,14 @@ func drawBackground(_ ctx: CGContext) {
                            endCenter: CGPoint(x: size, y: 0), endRadius: r, options: [])
 }
 
+/// Piece fill opacity: below 1 so the Liquid Glass material shows through and carries the color.
+let pieceOpacity = 0.86
+
 func drawPiece(_ ctx: CGContext, _ path: CGPath, top: CGColor, bottom: CGColor) {
     ctx.saveGState()
     ctx.addPath(path)
     ctx.clip()
+    ctx.setAlpha(pieceOpacity)
     let box = path.boundingBox
     let g = CGGradient(colorsSpace: space, colors: [top, bottom] as CFArray, locations: [0, 1])!
     // Light from the top-left, like the reference.
@@ -144,7 +148,8 @@ save(background, "\(iconDir)/Assets/background.png")
 save(upper, "\(iconDir)/Assets/bolt-upper.png")
 save(lower, "\(iconDir)/Assets/bolt-lower.png")
 
-// Glass settings tuned in Icon Composer (refraction 85% / depth 40%, translucency 30%, shadow 70%); keep in sync.
+// Glass settings tuned in Icon Composer (blur 35%, refraction 100% / depth 60%, translucency 45%, shadow 70%);
+// keep in sync.
 let iconJSON = """
 {
   "features" : [
@@ -155,6 +160,7 @@ let iconJSON = """
   },
   "groups" : [
     {
+      "blur-material" : 0.35,
       "layers" : [
         {
           "glass" : true,
@@ -168,9 +174,9 @@ let iconJSON = """
         }
       ],
       "refractivity" : {
-        "depth" : 0.4,
+        "depth" : 0.6,
         "enabled" : true,
-        "strength" : 0.85
+        "strength" : 1
       },
       "shadow" : {
         "kind" : "layer-color",
@@ -179,7 +185,7 @@ let iconJSON = """
       "specular" : true,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.3
+        "value" : 0.45
       }
     },
     {

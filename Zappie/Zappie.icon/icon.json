@@ -7,6 +7,7 @@
   },
   "groups" : [
     {
+      "blur-material" : 0.35,
       "layers" : [
         {
           "glass" : true,
@@ -20,9 +21,9 @@
         }
       ],
       "refractivity" : {
-        "depth" : 0.4,
+        "depth" : 0.6,
         "enabled" : true,
-        "strength" : 0.85
+        "strength" : 1
       },
       "shadow" : {
         "kind" : "layer-color",
@@ -31,7 +32,7 @@
       "specular" : true,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.3
+        "value" : 0.45
       }
     },
     {
