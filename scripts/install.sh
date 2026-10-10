@@ -5,8 +5,8 @@ set -e
 cd "${0:A:h}/.."
 xcodegen generate -q
 xcodebuild -project Zappie.xcodeproj -scheme Zappie -configuration Release -destination 'platform=macOS' \
-  -derivedDataPath build CODE_SIGN_IDENTITY="-" DEVELOPMENT_TEAM="" build | grep -E "error:|\*\* BUILD"
-APP=build/Build/Products/Release/Zappie.app
+  -derivedDataPath build.noindex CODE_SIGN_IDENTITY="-" DEVELOPMENT_TEAM="" build | grep -E "error:|\*\* BUILD"
+APP=build.noindex/Build/Products/Release/Zappie.app
 IDENTITY=$(security find-identity -v -p codesigning | awk -F'"' '/Apple Development/ {print $2; exit}')
 codesign --force --deep --options runtime --timestamp=none --sign "${IDENTITY:--}" "$APP"
 codesign --verify --deep --strict "$APP"
