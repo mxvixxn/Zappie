@@ -1,9 +1,11 @@
 #!/usr/bin/env swift
 // Generate the Zappie app icon layers for Icon Composer, plus a flat preview.
 //
-// Concept: a lightning bolt split along its own zigzag into two pieces —
-// adapter lavender on top, battery emerald below — the adapter → battery flow the app shows.
-// Layers stay flat (no baked gloss) so macOS can apply Liquid Glass to the `.icon`.
+// Design (v2, from docs/icon-source/chatgpt-reference.png): a lightning bolt made of two rounded
+// pieces that meet along the bolt's zigzag — lavender→violet on top (power from the charger),
+// mint→teal below (power into the battery) — on a near-black navy with violet corner glow.
+// Pieces are separate transparent layers so macOS applies Liquid Glass to each; no frame, shadow
+// or highlight is baked in.
 //
 // Run from the repo root:  swift scripts/gen_icon.swift
 import AppKit
@@ -12,31 +14,75 @@ let size = 1024
 let iconDir = "Zappie/Zappie.icon"
 let previewPath = "docs/app-icon.png"
 
-// Design tokens (docs/SPEC.md §4)
-let adapterLavender = NSColor(srgbRed: 0x96 / 255, green: 0x7C / 255, blue: 0xEC / 255, alpha: 1)
-let batteryEmerald = NSColor(srgbRed: 0x0F / 255, green: 0xAA / 255, blue: 0x7B / 255, alpha: 1)
-let backgroundTop = NSColor(srgbRed: 44 / 255, green: 44 / 255, blue: 50 / 255, alpha: 1)
-let backgroundBottom = NSColor(srgbRed: 16 / 255, green: 16 / 255, blue: 19 / 255, alpha: 1)
-
-// Bolt from the design's 24-unit glyph: M13 2 4 14h7l-1 8 9-12h-7z.
-// The line through its inner zigzag edge (11,14)–(12,10) splits it into an upper and a lower piece.
-let bolt: [CGPoint] = [.init(x: 13, y: 2), .init(x: 4, y: 14), .init(x: 11, y: 14),
-                       .init(x: 10, y: 22), .init(x: 19, y: 10), .init(x: 12, y: 10)]
-let cut = (CGPoint(x: 11, y: 14), CGPoint(x: 12, y: 10))
-let upperReference = CGPoint(x: 4, y: 14)
-let lowerReference = CGPoint(x: 19, y: 10)
-
-let glyphHeight = 0.60 * Double(size)   // bolt spans y 2…22 (20 units)
-let scale = glyphHeight / 20
-let cornerRounding = 0.9 * scale         // stroke width that rounds the bolt's corners
-let gapWidth = 0.45 * scale              // transparent gap between the two pieces
-
-/// Glyph units → canvas pixels, centered, with CoreGraphics' flipped y.
-func canvas(_ p: CGPoint) -> CGPoint {
-    let cx = 11.5, cy = 12.0
-    return CGPoint(x: Double(size) / 2 + (p.x - cx) * scale,
-                   y: Double(size) / 2 - (p.y - cy) * scale)
+func rgb(_ hex: UInt32) -> CGColor {
+    CGColor(srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
+            blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
 }
+
+// Colors sampled from the reference
+let upperTop = rgb(0xE8D6FF), upperBottom = rgb(0x6646F0)
+let lowerTop = rgb(0xB4FAEA), lowerBottom = rgb(0x00B9B8)
+let backgroundBase = rgb(0x0B0C1E)
+let glow = rgb(0x6E3CFF)
+
+// MARK: - Geometry (reference image units, 1254 px canvas; mapped onto 1024 below)
+
+struct Circle { var x: Double; var y: Double; var r: Double }
+
+// Where the two pieces meet: the bolt's middle zigzag.
+let joinTop = CGPoint(x: 787, y: 520)
+let joinBottom = CGPoint(x: 600, y: 748)
+// Rounded outer ends
+let upperRight = Circle(x: 862, y: 228, r: 112)
+let upperLeft = Circle(x: 292, y: 584, r: 112)
+let lowerRight = Circle(x: 982, y: 648, r: 104)
+let lowerTip = Circle(x: 448, y: 1058, r: 74)
+
+let glyphBounds = CGRect(x: 180, y: 105, width: 910, height: 1025)
+let glyphHeight = 0.76 * Double(size) // bold like the reference, still clear of the mask edge
+let scale = glyphHeight / glyphBounds.height
+
+/// Reference units → canvas pixels, centered, with CoreGraphics' flipped y.
+func canvas(_ p: CGPoint) -> CGPoint {
+    CGPoint(x: Double(size) / 2 + (p.x - glyphBounds.midX) * scale,
+            y: Double(size) / 2 - (p.y - glyphBounds.midY) * scale)
+}
+
+/// Convex hull of rounded ends and sharp corners: the piece's outline.
+func piece(circles: [Circle], points: [CGPoint]) -> CGPath {
+    var cloud = points
+    for c in circles {
+        for i in 0..<180 {
+            let a = Double(i) / 180 * 2 * .pi
+            cloud.append(CGPoint(x: c.x + c.r * cos(a), y: c.y + c.r * sin(a)))
+        }
+    }
+    let mapped: [CGPoint] = cloud.map(canvas).sorted { (a: CGPoint, b: CGPoint) -> Bool in
+        if a.x != b.x { return a.x < b.x }
+        return a.y < b.y
+    }
+    func cross(_ o: CGPoint, _ a: CGPoint, _ b: CGPoint) -> Double {
+        (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x)
+    }
+    var lower: [CGPoint] = [], upper: [CGPoint] = []
+    for p in mapped {
+        while lower.count >= 2, cross(lower[lower.count - 2], lower[lower.count - 1], p) <= 0 { lower.removeLast() }
+        lower.append(p)
+    }
+    for p in mapped.reversed() {
+        while upper.count >= 2, cross(upper[upper.count - 2], upper[upper.count - 1], p) <= 0 { upper.removeLast() }
+        upper.append(p)
+    }
+    let path = CGMutablePath()
+    path.addLines(between: Array(lower.dropLast() + upper.dropLast()))
+    path.closeSubpath()
+    return path
+}
+
+let upperPath = piece(circles: [upperRight, upperLeft], points: [joinTop, joinBottom])
+let lowerPath = piece(circles: [lowerRight, lowerTip], points: [joinTop, joinBottom])
+
+// MARK: - Rendering
 
 func render(_ draw: (CGContext) -> Void) -> NSBitmapImageRep {
     let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: size, pixelsHigh: size, bitsPerSample: 8,
@@ -58,74 +104,60 @@ func save(_ rep: NSBitmapImageRep, _ path: String) {
     print("wrote \(path)")
 }
 
+let space = CGColorSpace(name: CGColorSpace.sRGB)!
+
 func drawBackground(_ ctx: CGContext) {
-    let gradient = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB),
-                              colors: [backgroundTop.cgColor, backgroundBottom.cgColor] as CFArray,
-                              locations: [0, 1])!
-    ctx.drawLinearGradient(gradient, start: CGPoint(x: 0, y: size), end: CGPoint(x: 0, y: 0), options: [])
+    ctx.setFillColor(backgroundBase)
+    ctx.fill(CGRect(x: 0, y: 0, width: size, height: size))
+    // Violet glow from the top-left and bottom-right corners.
+    let clear = glow.copy(alpha: 0)!
+    let g = CGGradient(colorsSpace: space, colors: [glow.copy(alpha: 1)!, glow.copy(alpha: 0.4)!, clear] as CFArray,
+                       locations: [0, 0.35, 1])!
+    let r = Double(size) * 0.7
+    ctx.drawRadialGradient(g, startCenter: CGPoint(x: 0, y: size), startRadius: 0,
+                           endCenter: CGPoint(x: 0, y: size), endRadius: r, options: [])
+    ctx.drawRadialGradient(g, startCenter: CGPoint(x: size, y: 0), startRadius: 0,
+                           endCenter: CGPoint(x: size, y: 0), endRadius: r, options: [])
 }
 
-func drawBolt(_ ctx: CGContext, _ color: NSColor) {
-    let path = CGMutablePath()
-    path.addLines(between: bolt.map(canvas))
-    path.closeSubpath()
-    ctx.addPath(path)
-    ctx.setFillColor(color.cgColor)
-    ctx.fillPath()
-    ctx.addPath(path)
-    ctx.setStrokeColor(color.cgColor)
-    ctx.setLineWidth(cornerRounding)
-    ctx.setLineJoin(.round)
-    ctx.strokePath()
-}
-
-/// Clips to the side of the cut line that contains `reference`, shrunk by half the gap.
-func clipToSide(_ ctx: CGContext, of reference: CGPoint) {
-    let a = canvas(cut.0), b = canvas(cut.1), r = canvas(reference)
-    let dx = b.x - a.x, dy = b.y - a.y
-    let len = (dx * dx + dy * dy).squareRoot()
-    let ux = dx / len, uy = dy / len
-    var nx = -uy, ny = ux
-    if (r.x - a.x) * nx + (r.y - a.y) * ny < 0 { nx = -nx; ny = -ny }
-    let far = Double(size) * 2, half = gapWidth / 2
-    let p0 = CGPoint(x: a.x - ux * far + nx * half, y: a.y - uy * far + ny * half)
-    let p1 = CGPoint(x: a.x + ux * far + nx * half, y: a.y + uy * far + ny * half)
-    let path = CGMutablePath()
-    path.addLines(between: [p0, p1,
-                            CGPoint(x: p1.x + nx * far, y: p1.y + ny * far),
-                            CGPoint(x: p0.x + nx * far, y: p0.y + ny * far)])
-    path.closeSubpath()
+func drawPiece(_ ctx: CGContext, _ path: CGPath, top: CGColor, bottom: CGColor) {
+    ctx.saveGState()
     ctx.addPath(path)
     ctx.clip()
+    let box = path.boundingBox
+    let g = CGGradient(colorsSpace: space, colors: [top, bottom] as CFArray, locations: [0, 1])!
+    // Light from the top-left, like the reference.
+    ctx.drawLinearGradient(g, start: CGPoint(x: box.minX + box.width * 0.35, y: box.maxY),
+                           end: CGPoint(x: box.minX + box.width * 0.55, y: box.minY), options: [])
+    ctx.restoreGState()
 }
 
-func piece(_ reference: CGPoint, _ color: NSColor) -> NSBitmapImageRep {
-    render { ctx in
-        clipToSide(ctx, of: reference)
-        drawBolt(ctx, color)
-    }
-}
+let background = render(drawBackground)
+let upper = render { drawPiece($0, upperPath, top: upperTop, bottom: upperBottom) }
+let lower = render { drawPiece($0, lowerPath, top: lowerTop, bottom: lowerBottom) }
 
-// Icon Composer layers
-save(render(drawBackground), "\(iconDir)/Assets/background.png")
-let upper = piece(upperReference, adapterLavender)
-let lower = piece(lowerReference, batteryEmerald)
-save(upper, "\(iconDir)/Assets/bolt-adapter.png")
-save(lower, "\(iconDir)/Assets/bolt-battery.png")
+// Remove layers from earlier designs.
+for old in ["bolt-adapter.png", "bolt-battery.png"] {
+    try? FileManager.default.removeItem(atPath: "\(iconDir)/Assets/\(old)")
+}
+save(background, "\(iconDir)/Assets/background.png")
+save(upper, "\(iconDir)/Assets/bolt-upper.png")
+save(lower, "\(iconDir)/Assets/bolt-lower.png")
 
 let iconJSON = """
 {
   "fill" : {
-    "automatic-gradient" : "extended-srgb:0.11765,0.11765,0.12549,1.00000"
+    "automatic-gradient" : "extended-srgb:0.04314,0.04706,0.11765,1.00000"
   },
   "groups" : [
     {
       "layers" : [
-        { "image-name" : "bolt-adapter.png", "name" : "bolt-adapter" },
-        { "image-name" : "bolt-battery.png", "name" : "bolt-battery" }
+        { "image-name" : "bolt-upper.png", "name" : "bolt-upper", "glass" : true },
+        { "image-name" : "bolt-lower.png", "name" : "bolt-lower", "glass" : true }
       ],
       "shadow" : { "kind" : "layer-color", "opacity" : 0.5 },
-      "translucency" : { "enabled" : true, "value" : 0.3 }
+      "translucency" : { "enabled" : true, "value" : 0.2 },
+      "specular" : true
     },
     {
       "layers" : [
@@ -141,19 +173,17 @@ let iconJSON = """
 try! iconJSON.write(toFile: "\(iconDir)/icon.json", atomically: true, encoding: .utf8)
 print("wrote \(iconDir)/icon.json")
 
-// Flat preview for the README: layers composited inside the macOS rounded-square mask.
+// Flat preview for the README: layers inside the macOS rounded-square mask (no glass).
 let preview = render { ctx in
-    let inset = 0.098 * Double(size)          // macOS icon grid: artwork inside ~824 pt of 1024
+    let inset = 0.098 * Double(size)
     let rect = CGRect(x: inset, y: inset, width: Double(size) - inset * 2, height: Double(size) - inset * 2)
-    ctx.addPath(CGPath(roundedRect: rect, cornerWidth: rect.width * 0.225, cornerHeight: rect.width * 0.225, transform: nil))
+    ctx.addPath(CGPath(roundedRect: rect, cornerWidth: rect.width * 0.225, cornerHeight: rect.width * 0.225,
+                       transform: nil))
     ctx.clip()
-    ctx.saveGState()
     ctx.translateBy(x: rect.minX, y: rect.minY)
     ctx.scaleBy(x: rect.width / Double(size), y: rect.height / Double(size))
-    drawBackground(ctx)
-    for layer in [upper, lower] {
+    for layer in [background, lower, upper] {
         ctx.draw(layer.cgImage!, in: CGRect(x: 0, y: 0, width: size, height: size))
     }
-    ctx.restoreGState()
 }
 save(preview, previewPath)
