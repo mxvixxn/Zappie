@@ -12,6 +12,7 @@
 ![Swift](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-0A84FF?logo=swift&logoColor=white)
 ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-only-555555?logo=apple)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 </div>
 
@@ -68,3 +69,7 @@ scripts/test.sh
 ```
 
 단위 테스트를 실행합니다. `TEST_RUNNER_ZAPPIE_RENDER_DIR=<폴더> scripts/test.sh`로 실행하면 드롭다운·메인 창 화면을 PNG로 저장합니다. 데이터 소스(IOKit·SMC 키), 상태 판정 규칙, 디자인 토큰은 [docs/SPEC.md](docs/SPEC.md)에 정리되어 있습니다.
+
+## 라이선스
+
+[MIT](LICENSE)
