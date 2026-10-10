@@ -43,6 +43,9 @@ final class PowerMonitor {
     /// Battery heat level (see `TemperatureWatch`).
     private(set) var heat: TemperatureWatch.Level = .normal
     @ObservationIgnored private var temperatureWatch = TemperatureWatch()
+    /// macOS is limiting charging because of heat (see `ThermalLimitTracker`).
+    private(set) var thermalLimited = false
+    @ObservationIgnored private var thermalTracker = ThermalLimitTracker()
     private let notify: (TemperatureWatch.Message) -> Void
     private var debouncer = StateDebouncer(delay: 2)
     private var connectionChangedAt: Date?
@@ -118,6 +121,14 @@ final class PowerMonitor {
         }
         if temperatureWatch.level != heat {
             heat = temperatureWatch.level
+        }
+        if thermalTracker.update(reading.thermallyLimitedTime, at: time), let value = reading.thermallyLimitedTime {
+            logReason(ChargeReasonSighting(key: "TimeChargingThermallyLimited", value: value, date: time,
+                                           percent: reading.percent, batteryW: reading.batteryW,
+                                           adapterInW: reading.adapterInW, connected: reading.isExternalConnected))
+        }
+        if thermalTracker.isLimiting != thermalLimited {
+            thermalLimited = thermalTracker.isLimiting
         }
 
         var since = usbConnectedSince.filter { reading.usbDevices[$0.key] != nil }

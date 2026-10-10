@@ -37,7 +37,8 @@ struct OverviewView: View {
                 Card("전력 흐름") {
                     PowerTreeView(tree: PowerTree(snapshot: s, state: state,
                                                   connectedSince: monitor.usbConnectedSince,
-                                                  heat: monitor.heat))
+                                                  heat: monitor.heat,
+                                                  thermalLimited: monitor.thermalLimited))
                 }
                 .frame(width: wide)
                 compositionCard(o.composition, p, waiting: !s.telemetryValid)

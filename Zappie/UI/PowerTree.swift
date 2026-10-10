@@ -32,6 +32,7 @@ struct PowerTree: Equatable {
     /// "41.2 °C · 뜨거움" while the battery runs hot; nil otherwise.
     var batteryHeat: String?
     var heat: TemperatureWatch.Level
+    var thermalLimited: Bool
     var systemText: String
     /// "Mac 본체 12.2 W" when some of the system load goes out over USB.
     var macText: String?
@@ -45,10 +46,16 @@ struct PowerTree: Equatable {
 
     /// - Parameter connectedSince: When each port's USB device first appeared (`PowerMonitor`).
     init(snapshot s: PowerSnapshot, state: PowerState, connectedSince: [Int: Date] = [:], now: Date = .now,
-         heat: TemperatureWatch.Level = .normal) {
+         heat: TemperatureWatch.Level = .normal, thermalLimited: Bool = false) {
         self.heat = heat
-        batteryHeat = heat == .normal ? nil : s.temperatureC.map {
-            String(format: "%.1f °C · ", $0) + (heat == .hot ? "매우 뜨거움" : "뜨거움")
+        self.thermalLimited = thermalLimited
+        let temperature = s.temperatureC.map { String(format: "%.1f °C", $0) }
+        batteryHeat = switch (heat, thermalLimited) {
+        case (.normal, false): nil
+        case (.normal, true): "온도로 충전 조절 중"
+        case (_, true): temperature.map { "\($0) · 충전 조절 중" } ?? "온도로 충전 조절 중"
+        case (.hot, false): temperature.map { "\($0) · 매우 뜨거움" }
+        case (_, false): temperature.map { "\($0) · 뜨거움" }
         }
         adapterActive = state != .battery
         adapterText = adapterActive ? Format.watts(s.adapterInW) : "—"

@@ -46,6 +46,9 @@ struct TemperatureWatch: Sendable {
         return next
     }
 
+    /// Zappie never stops charging itself; macOS does slow or pause it when the battery is too hot.
+    private static let macOSNote = " 온도가 너무 높으면 macOS가 충전을 늦추거나 잠시 멈출 수 있습니다."
+
     static func message(for level: Level, temperatureC: Double, charging: Bool) -> Message {
         let t = String(format: "%.1f °C", temperatureC)
         switch level {
@@ -54,6 +57,7 @@ struct TemperatureWatch: Sendable {
                 title: "배터리 온도가 매우 높습니다 (\(t))",
                 body: charging
                     ? "충전 중 배터리가 매우 뜨겁습니다. 충전기를 잠시 분리하거나 Mac을 서늘한 곳으로 옮겨 주세요."
+                        + macOSNote
                     : "배터리가 매우 뜨겁습니다. Mac을 서늘한 곳으로 옮기고 무거운 작업을 멈춰 주세요."
             )
         case .warm, .normal:
@@ -61,8 +65,37 @@ struct TemperatureWatch: Sendable {
                 title: "배터리 온도가 높습니다 (\(t))",
                 body: (charging ? "충전 중 배터리가 뜨거워졌습니다." : "배터리가 뜨거워졌습니다.")
                     + " 통풍이 잘되는 곳에 두거나 무거운 작업을 잠시 줄여 주세요."
+                    + (charging ? macOSNote : "")
             )
         }
+    }
+}
+
+/// Detects macOS limiting charging for heat from `TimeChargingThermallyLimited`. Its exact meaning
+/// (live flag or running total) is unverified, so growth within the last 3 minutes counts.
+struct ThermalLimitTracker: Sendable {
+    static let quietAfter: TimeInterval = 180
+
+    private(set) var isLimiting = false
+    private var last: Int?
+    private var lastGrowth: Date?
+
+    /// Returns true when limiting starts.
+    mutating func update(_ value: Int?, at now: Date) -> Bool {
+        guard let value else { return false }
+        defer { last = value }
+        if let last, value > last {
+            lastGrowth = now
+            if !isLimiting {
+                isLimiting = true
+                return true
+            }
+            return false
+        }
+        if let growth = lastGrowth, now.timeIntervalSince(growth) > Self.quietAfter {
+            isLimiting = false
+        }
+        return false
     }
 }
 

@@ -22,6 +22,8 @@ struct PowerSnapshot: Sendable, Equatable {
     /// `ChargerData.SlowChargingReason`; non-zero means charging is being slowed.
     var slowChargingReason: Int? = nil
     var fullyCharged: Bool? = nil
+    /// `ChargerData.TimeChargingThermallyLimited`; growth means macOS is limiting charging for heat.
+    var thermallyLimitedTime: Int? = nil
 
     var adapter: AdapterInfo? = nil
     /// USB-C ports currently supplying power to other devices. Already included in `systemLoadW`.

@@ -72,7 +72,8 @@ struct TemperatureDisplayTests {
     @Test func notificationText() {
         #expect(TemperatureWatch.message(for: .warm, temperatureC: 40.6, charging: true)
                 == .init(title: "배터리 온도가 높습니다 (40.6 °C)",
-                         body: "충전 중 배터리가 뜨거워졌습니다. 통풍이 잘되는 곳에 두거나 무거운 작업을 잠시 줄여 주세요."))
+                         body: "충전 중 배터리가 뜨거워졌습니다. 통풍이 잘되는 곳에 두거나 무거운 작업을 잠시 줄여 주세요."
+                             + " 온도가 너무 높으면 macOS가 충전을 늦추거나 잠시 멈출 수 있습니다."))
         #expect(TemperatureWatch.message(for: .hot, temperatureC: 45.2, charging: false).title
                 == "배터리 온도가 매우 높습니다 (45.2 °C)")
     }

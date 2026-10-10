@@ -51,7 +51,7 @@ struct PowerTreeView: View {
                     .frame(width: sourceWidth, height: nodeHeight)
                     .position(x: l.adapterX, y: nodeHeight / 2)
 
-                node(symbol: tree.heat == .normal ? "battery.100" : "thermometer.high",
+                node(symbol: tree.heat == .normal && !tree.thermalLimited ? "battery.100" : "thermometer.high",
                      title: "배터리 \(tree.batteryPercent)", value: tree.batteryText, detail: tree.batteryHeat,
                      tint: Theme.battery, alert: heatColor)
                     .frame(width: sourceWidth, height: nodeHeight)
@@ -171,7 +171,7 @@ struct PowerTreeView: View {
 
     private var heatColor: Color? {
         switch tree.heat {
-        case .normal: nil
+        case .normal: tree.thermalLimited ? Theme.warning : nil
         case .warm: Theme.warning
         case .hot: Theme.critical
         }

@@ -59,6 +59,7 @@ enum PowerReader {
             notChargingReason: int(charger?["NotChargingReason"]),
             slowChargingReason: int(charger?["SlowChargingReason"]),
             fullyCharged: battery["FullyCharged"] as? Bool,
+            thermallyLimitedTime: int(charger?["TimeChargingThermallyLimited"]),
             adapter: adapter(battery["AdapterDetails"] as? [String: Any]),
             portOutputs: portOutputs(battery["PowerOutDetails"] as? [[String: Any]],
                                      devices: battery["FedDetails"] as? [[String: Any]],
