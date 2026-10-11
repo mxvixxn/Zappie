@@ -82,3 +82,20 @@ struct PortIdentityTests {
         #expect(rows.map(\.name) == ["왼쪽 앞", "왼쪽 뒤", "오른쪽"])
     }
 }
+
+/// Android devices report raw product strings like "SAMSUNG_Android" (Galaxy Tab, 2026-10-11).
+struct USBDeviceNameTests {
+    @Test func androidBecomesVendorAndroidDevice() {
+        #expect(PowerReader.displayName(product: "SAMSUNG_Android") == "Samsung Android 기기")
+        #expect(PowerReader.displayName(product: "Pixel_Android") == "Pixel Android 기기")
+    }
+
+    @Test func appleAndOrdinaryNamesUnchanged() {
+        #expect(PowerReader.displayName(product: "iPhone") == "iPhone")
+        #expect(PowerReader.displayName(product: "iPad Pro") == "iPad Pro")
+    }
+
+    @Test func underscoresBecomeSpaces() {
+        #expect(PowerReader.displayName(product: "USB_Light_Bar") == "USB Light Bar")
+    }
+}

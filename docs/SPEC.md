@@ -102,6 +102,7 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 - 포트 매핑 (아이폰을 옮겨 꽂아 확인, `docs/m0/port-mapping.log`): `PortIndex` 1 = 왼쪽 뒤, 2 = 왼쪽 앞, 3 = 오른쪽.
   `PortIndex − 1` = `FedDetails` 칸 번호 = USB 버스(`locationID` 최상위 바이트). `PortControllerInfo` 순서는 이와 달라 쓰지 않는다.
 - `FedDetails[PortIndex−1].FedStateOfCharge` = 연결 기기 배터리 % (아이폰 84%일 때 83 — 1%p 이내). `FedVendorID` 1452 = Apple. 완충된 에어팟처럼 전력을 받지 않는 기기는 `PowerOutDetails`에 없다.
+- 안드로이드 (2026-10-11, 갤럭시탭, 오른쪽 포트): PD 협상 없이 5 V 2.2 W(0.42 A)만 받고 `FedVendorID`·`FedStateOfCharge` 모두 0 → 잔량 표시 없음. USB 데이터 이름은 "SAMSUNG_Android"(제조사 SAMSUNG, idVendor 1256)로 나와 `PowerReader.displayName`이 "Samsung Android 기기"로 다듬는다. 배터리 없는 USB-C 조명도 5 V 4.0 W, 기기 정보 없음.
 - 데이터 연결되는 기기는 `IOUSBHostDevice`의 `USB Product Name`(예: "iPhone")으로 이름을 붙인다.
 - 새로 꽂은 포트의 출력은 길게는 약 60초 뒤에 나타난다. `PowerOutDetails`·`FedDetails`는 배터리 드라이버 갱신(`UpdateTime`) 때만 바뀌기 때문.
   `pmset -g batt/ps/rawbatt/accps`, `system_profiler SPPowerDataType`로는 갱신을 앞당길 수 없음을 확인 (수동 새로고침 버튼 불채택).

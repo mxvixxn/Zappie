@@ -174,6 +174,15 @@ enum PowerReader {
         (locationID >> 24) + 1
     }
 
+    /// Tidies raw USB product strings: "SAMSUNG_Android" → "Samsung Android 기기".
+    static func displayName(product: String) -> String {
+        let words = product.split(separator: "_").map(String.init)
+        if words.count == 2, words[1].lowercased() == "android" {
+            return "\(words[0].capitalized) Android 기기"
+        }
+        return words.joined(separator: " ")
+    }
+
     /// Product names of USB devices attached directly to the Mac, keyed by port.
     private static func usbDeviceNames() -> [Int: String] {
         var iterator: io_iterator_t = 0
@@ -189,7 +198,7 @@ enum PowerReader {
                   let name = props["USB Product Name"] as? String else { continue }
             // Only devices plugged straight into a port (no hub tier) sit at 0xBB100000.
             if location & 0x00FF_FFFF == 0x0010_0000 {
-                names[port(forUSBLocationID: location)] = name
+                names[port(forUSBLocationID: location)] = displayName(product: name)
             }
         }
         return names
