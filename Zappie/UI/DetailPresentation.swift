@@ -11,9 +11,8 @@ extension Format {
     }
 
     /// Full-charge capacity as a share of design capacity.
-    static func capacityHealth(_ s: PowerSnapshot) -> String {
-        guard let full = s.fullChargeCapacitymAh, let design = s.designCapacitymAh, design > 0 else { return "—" }
-        return percent(Double(full) / Double(design))
+    static func maxCapacity(_ s: PowerSnapshot) -> String {
+        s.maxCapacityPercent.map { "\($0)%" } ?? "—"
     }
 }
 
@@ -40,8 +39,7 @@ enum DetailRows {
         return [
             DetailRow(label: "잔량", value: s.percent.map { "\($0)%" } ?? "—"),
             DetailRow(label: "설계 용량", value: Format.milliampHours(s.designCapacitymAh)),
-            DetailRow(label: "최대 충전 용량", value: Format.milliampHours(s.fullChargeCapacitymAh)),
-            DetailRow(label: "최대 용량", value: Format.capacityHealth(s)),
+            DetailRow(label: "성능 최대치", value: Format.maxCapacity(s)),
             DetailRow(label: "배터리 전력", value: Format.signedWatts(s.batteryW)),
             time,
         ]

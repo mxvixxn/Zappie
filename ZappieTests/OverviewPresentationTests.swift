@@ -9,7 +9,7 @@ struct OverviewPresentationTests {
     var charging: PowerSnapshot {
         PowerSnapshot(isExternalConnected: true, adapterInW: 45.2, systemLoadW: 12.3, batteryW: 31.4, adapterLossW: 0.233,
                       batteryVoltageV: 12.71, batteryCurrentA: 2.47, temperatureC: 33.42, percent: 62, cycleCount: 66,
-                      designCapacitymAh: 6249, fullChargeCapacitymAh: 6004, timeToFullMin: 24, adapter: adapter)
+                      designCapacitymAh: 6249, maxCapacityPercent: 100, timeToFullMin: 24, adapter: adapter)
     }
 
     var battery: PowerSnapshot {
@@ -66,8 +66,8 @@ struct OverviewPresentationTests {
 
     @Test func batteryTiles() {
         let tiles = OverviewPresentation(snapshot: charging, state: .charging).batteryTiles
-        #expect(tiles.map(\.label) == ["전압", "전류", "온도", "사이클", "최대 용량", "충전 한도"])
-        #expect(tiles.map(\.value) == ["12.71 V", "+2.47 A", "33.4 °C", "66", "96%", "—"])
+        #expect(tiles.map(\.label) == ["전압", "전류", "온도", "사이클", "성능 최대치", "충전 한도"])
+        #expect(tiles.map(\.value) == ["12.71 V", "+2.47 A", "33.4 °C", "66", "100%", "—"])
 
         let discharging = OverviewPresentation(snapshot: battery, state: .battery).batteryTiles
         #expect(discharging[1].value == "−1.12 A")

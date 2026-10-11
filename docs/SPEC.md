@@ -48,7 +48,7 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 | 온도 | **Pack** `BatteryData.Temperature` | 0.01 °C | ⚠️ 최상위 `Temperature` 없음. Pack 노드에만 있음 (`VirtualTemperature`도 동일 값) |
 | 사이클 | `CycleCount` | 회 | ✅ 확인 |
 | 설계 용량 | `BatteryData.DesignCapacity` | mAh | ✅ 확인 |
-| 최대 충전 용량 | `BatteryData.FullChargeCapacity` | mAh | ✅ 확인. `AppleRawMaxCapacity`는 최상위에 없고 Pack에만 있음 |
+| 성능 최대치 | `MaxCapacity` (최상위) | % | ✅ 2026-10-11: macOS 설정 → 배터리 "성능 최대치"·`system_profiler` Maximum Capacity와 같은 100. `BatteryData.FullChargeCapacity`(mAh)는 배터리 칩 추정치라 하루 사이 6,004 → 6,060처럼 오르내려 표시하지 않는다 |
 | 전원 연결 | `ExternalConnected` | Bool | ✅ 확인 |
 | 어댑터 정보 | `AdapterDetails` (`Watts`, `AdapterVoltage`, `Current`, `Manufacturer`, `Name`, `Description`) | W / mV / mA | ✅ 70W 어댑터인데 `Watts`=68. 프로토콜은 `Description`("pd charger") |
 | 배터리 % | `CurrentCapacity` | % | ✅ 확인. raw mAh는 `BatteryData.RemainingCapacity` (Pack에는 `AppleRawCurrentCapacity`) |
@@ -113,7 +113,7 @@ Deprecated 주의: `kIOMasterPortDefault`는 macOS 12부터 deprecated → `kIOM
 - 배터리 순전력(대체값) = `Voltage × InstantAmperage / 1_000_000` (W). `BatteryPower` 키가 **없을 때만** 사용. (0일 때도 대체하던 초안은 부하 급증 순간 `InstantAmperage`가 −65 mA쯤 흔들려 입력 = 시스템인데도 −0.8 W "보조 방전"으로 오표시됨. 2026-10-03)
 - 기타·손실 = 입력 − 시스템 − 배터리(충전 시). 음수면 0으로 클램프, 배터리 모드에선 "—". (`AdapterEfficiencyLoss`와 비교해 어느 쪽을 쓸지 M1에서 결정)
 - 정격 대비 사용률 = 입력 W / `AdapterDetails.Watts`.
-- 최대 용량 % = 최대 충전 용량 / 설계 용량.
+- 성능 최대치는 `MaxCapacity`를 그대로 쓴다. FullChargeCapacity / 설계 용량(96~97%)으로 계산하면 macOS(100%)와 달라 사용자가 헷갈린다 (2026-10-11 결정).
 
 **충전 한도(80%)**: 공개 API로 macOS 충전 한도 설정값을 읽는 방법은 확인하지 못했다. v1에서는 표시하지 않거나 "—"로 둔다.
 
@@ -197,7 +197,7 @@ Views            MenuBarLabel / DropdownView / MainWindow(Overview, History, Ada
 - 개요(3열 그리드, 간격 18):
   - 전력 흐름(2열) | 입력 전력 구성(1열: 스택 막대 + 3행 W·% + 남은 시간)
   - 전력 기록(3열): Swift Charts 라인 2개(어댑터 입력 연보라, 시스템 흰회색), 1시간/6시간/24시간 세그먼트
-  - 어댑터(1열): 정격 W, 프로토콜, 사용률 막대, 협상 전압×전류 | 배터리(2열): 전압·전류·온도·사이클·최대 용량·충전 한도 6타일
+  - 어댑터(1열): 정격 W, 프로토콜, 사용률 막대, 협상 전압×전류 | 배터리(2열): 전압·전류·온도·사이클·성능 최대치·충전 한도 6타일
 - 기록/어댑터/배터리/설정 탭은 v1에서 간단 버전(설정: 갱신 주기, 메뉴 막대 라벨 형식, 로그인 시 실행)
 
 ---

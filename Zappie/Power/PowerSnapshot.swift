@@ -14,7 +14,9 @@ struct PowerSnapshot: Sendable, Equatable {
     var percent: Int? = nil
     var cycleCount: Int? = nil
     var designCapacitymAh: Int? = nil
-    var fullChargeCapacitymAh: Int? = nil
+    /// macOS "성능 최대치" (Settings → Battery). Apple smooths this; the raw
+    /// FullChargeCapacity / DesignCapacity ratio wanders a point or two day to day.
+    var maxCapacityPercent: Int? = nil
     var timeToFullMin: Int? = nil
     var timeToEmptyMin: Int? = nil
     /// `ChargerData.NotChargingReason`; 0x1000000 = held at the charge limit (verified).

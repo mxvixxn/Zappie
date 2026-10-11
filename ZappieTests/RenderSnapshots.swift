@@ -68,7 +68,7 @@ struct RenderSnapshots {
         snapshot.temperatureC = 33.4
         snapshot.cycleCount = 66
         snapshot.designCapacitymAh = 6249
-        snapshot.fullChargeCapacitymAh = 6004
+        snapshot.maxCapacityPercent = 100
         snapshot.updateTime = .now
         // 50 minutes of synthetic history ending now, with a 10-minute sleep in the middle.
         let end = Date.now

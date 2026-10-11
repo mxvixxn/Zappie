@@ -35,7 +35,7 @@ struct ZappieApp: App {
         .menuBarExtraStyle(.window)
 
         Window("Zappie", id: "main") {
-            MainWindow(monitor: monitor)
+            MainWindowScene(monitor: monitor)
         }
         .defaultSize(width: 1200, height: 960)
     }

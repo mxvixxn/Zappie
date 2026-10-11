@@ -128,7 +128,7 @@ struct OverviewPresentation: Equatable {
             Tile(label: "전류", value: current),
             Tile(label: "온도", value: s.temperatureC.map { String(format: "%.1f °C", $0) } ?? "—"),
             Tile(label: "사이클", value: s.cycleCount.map(String.init) ?? "—"),
-            Tile(label: "최대 용량", value: Format.capacityHealth(s)),
+            Tile(label: "성능 최대치", value: Format.maxCapacity(s)),
             // The macOS charge limit setting is not readable through public API (SPEC §1).
             Tile(label: "충전 한도", value: "—"),
         ]

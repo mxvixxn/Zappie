@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 enum MainSection: String, CaseIterable, Identifiable {
@@ -60,5 +61,78 @@ struct MainWindow: View {
         .padding(.vertical, 16)
         .frame(width: 200)
         .background(Theme.sidebar)
+    }
+}
+
+/// The main window's scene content. SwiftUI keeps a closed `Window`'s views alive, and they kept
+/// following the monitor's one-second updates: after opening and closing the window once, the
+/// app idled at ~3% CPU instead of ~1%. Draw nothing while the window is closed.
+struct MainWindowScene: View {
+    let monitor: PowerMonitor
+    @State private var isOpen = true
+
+    var body: some View {
+        Group {
+            if isOpen {
+                MainWindow(monitor: monitor)
+            } else {
+                Theme.background.frame(minWidth: 960, minHeight: 760)
+            }
+        }
+        .background(WindowLifecycle(isOpen: $isOpen))
+    }
+}
+
+/// Reports the hosting window closing (`willClose`) and becoming visible again (occlusion),
+/// which also covers SwiftUI reusing the closed window when it is reopened.
+private struct WindowLifecycle: NSViewRepresentable {
+    @Binding var isOpen: Bool
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async { context.coordinator.attach(to: view.window) }
+        return view
+    }
+
+    func updateNSView(_ view: NSView, context: Context) {
+        context.coordinator.isOpen = $isOpen
+        if context.coordinator.window == nil {
+            DispatchQueue.main.async { context.coordinator.attach(to: view.window) }
+        }
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(isOpen: $isOpen) }
+
+    @MainActor
+    final class Coordinator {
+        var isOpen: Binding<Bool>
+        private(set) weak var window: NSWindow?
+        nonisolated(unsafe) private var observers: [NSObjectProtocol] = []
+
+        init(isOpen: Binding<Bool>) { self.isOpen = isOpen }
+
+        func attach(to window: NSWindow?) {
+            guard let window, self.window == nil else { return }
+            self.window = window
+            let center = NotificationCenter.default
+            observers.append(center.addObserver(forName: NSWindow.willCloseNotification, object: window,
+                                                queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.set(false) }
+            })
+            observers.append(center.addObserver(forName: NSWindow.didChangeOcclusionStateNotification,
+                                                object: window, queue: .main) { [weak self, weak window] _ in
+                MainActor.assumeIsolated {
+                    if window?.occlusionState.contains(.visible) == true { self?.set(true) }
+                }
+            })
+        }
+
+        private func set(_ open: Bool) {
+            if isOpen.wrappedValue != open { isOpen.wrappedValue = open }
+        }
+
+        deinit {
+            observers.forEach(NotificationCenter.default.removeObserver)
+        }
     }
 }

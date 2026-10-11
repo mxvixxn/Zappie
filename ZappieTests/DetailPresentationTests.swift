@@ -8,7 +8,7 @@ struct DetailPresentationTests {
 
     var charging: PowerSnapshot {
         PowerSnapshot(isExternalConnected: true, adapterInW: 45.2, systemLoadW: 12.3, batteryW: 31.4, adapterLossW: 0.233,
-                      percent: 62, designCapacitymAh: 6249, fullChargeCapacitymAh: 6004, timeToFullMin: 24,
+                      percent: 62, designCapacitymAh: 6249, maxCapacityPercent: 100, timeToFullMin: 24,
                       adapter: adapter)
     }
 
@@ -26,8 +26,8 @@ struct DetailPresentationTests {
 
     @Test func batteryRows() {
         let rows = DetailRows.battery(charging, state: .charging)
-        #expect(rows.map(\.label) == ["잔량", "설계 용량", "최대 충전 용량", "최대 용량", "배터리 전력", "충전 완료까지"])
-        #expect(rows.map(\.value) == ["62%", "6,249 mAh", "6,004 mAh", "96%", "+31.4 W", "약 24분"])
+        #expect(rows.map(\.label) == ["잔량", "설계 용량", "성능 최대치", "배터리 전력", "충전 완료까지"])
+        #expect(rows.map(\.value) == ["62%", "6,249 mAh", "100%", "+31.4 W", "약 24분"])
     }
 
     @Test func batteryRowsShowTimeToEmptyWhenDischarging() {

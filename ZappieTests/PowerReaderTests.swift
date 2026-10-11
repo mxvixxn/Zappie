@@ -53,7 +53,7 @@ struct PowerReaderTests {
         #expect(s.percent == 80)
         #expect(s.cycleCount == 66)
         #expect(s.designCapacitymAh == 6249)
-        #expect(s.fullChargeCapacitymAh == 6004)
+        #expect(s.maxCapacityPercent == 100)
         #expect(s.batteryVoltageV == 12.416)
     }
 

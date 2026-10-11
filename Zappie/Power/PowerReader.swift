@@ -53,7 +53,7 @@ enum PowerReader {
             percent: int(battery["CurrentCapacity"]),
             cycleCount: int(battery["CycleCount"]),
             designCapacitymAh: int(batteryData?["DesignCapacity"]),
-            fullChargeCapacitymAh: int(batteryData?["FullChargeCapacity"]),
+            maxCapacityPercent: int(battery["MaxCapacity"]),
             timeToFullMin: minutes(battery["AvgTimeToFull"]),
             timeToEmptyMin: minutes(battery["AvgTimeToEmpty"]),
             notChargingReason: int(charger?["NotChargingReason"]),

@@ -11,6 +11,7 @@ enum Fixtures {
             "InstantAmperage": 0,
             "CurrentCapacity": 80,
             "CycleCount": 66,
+            "MaxCapacity": 100,
             "AvgTimeToFull": 65535,
             "AvgTimeToEmpty": 65535,
             "UpdateTime": 1790950824,
