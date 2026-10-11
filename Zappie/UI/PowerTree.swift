@@ -86,7 +86,7 @@ struct PowerTree: Equatable {
             }
             if let out = outputs[index], out.watts > 0 {
                 return Port(name: name, connected: true, active: true, watts: Format.watts(out.watts),
-                            detail: PortOutput.describeDevice(out) ?? "충전 중", icon: DeviceIcon(out))
+                            detail: PortOutput.describeDevice(out), icon: DeviceIcon(out))
             }
             if let device = s.usbDevices[index] {
                 let waiting = connectedSince[index].map { now.timeIntervalSince($0) < Self.pendingWindow } ?? true
@@ -132,14 +132,15 @@ enum DeviceIcon: Equatable {
 }
 
 extension PortOutput {
-    /// e.g. "iPhone · 88%", "Apple 기기 · 100%"; nil when nothing is known about the device.
-    static func describeDevice(_ p: PortOutput) -> String? {
+    /// e.g. "iPhone · 88%", "Apple 기기 · 100%". With no name or battery level (a USB-C lamp, an
+    /// earbuds case) it may have no battery at all, so it is "전원만 받는 기기", not "충전 중".
+    static func describeDevice(_ p: PortOutput) -> String {
         let name = p.deviceName ?? (p.deviceIsApple ? "Apple 기기" : nil)
         switch (name, p.deviceBatteryPercent) {
         case let (name?, percent?): return "\(name) · \(percent)%"
         case let (name?, nil): return name
         case let (nil, percent?): return "기기 · \(percent)%"
-        case (nil, nil): return nil
+        case (nil, nil): return "전원만 받는 기기"
         }
     }
 }

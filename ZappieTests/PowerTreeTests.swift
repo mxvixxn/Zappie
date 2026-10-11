@@ -46,10 +46,13 @@ struct PowerTreeTests {
         #expect(ports.map(\.detail) == ["출력 없음", "iPhone · 88%", "출력 없음"])
     }
 
-    @Test func activePortWithoutDeviceInfoSaysCharging() {
+    /// No name or battery level (a USB-C lamp, Galaxy Buds case): it may have no battery at all,
+    /// so not "충전 중".
+    @Test func activePortWithoutDeviceInfoSaysPowerOnly() {
         let s = PowerSnapshot(isExternalConnected: true, adapterInW: 20, systemLoadW: 20, batteryW: 0,
                               portOutputs: [PortOutput(port: 3, watts: 4.4)])
-        #expect(tree(.hold, s).ports[2].detail == "충전 중")
+        #expect(tree(.hold, s).ports[2].detail == "전원만 받는 기기")
+        #expect(PortOutput.describeDevice(PortOutput(port: 3, watts: 4.4)) == "전원만 받는 기기")
     }
 
     @Test func unknownPortIsAppended() {

@@ -26,7 +26,7 @@ struct USBOutputTests {
 
     @Test func portRowsUseNames() {
         let rows = OverviewPresentation(snapshot: hub, state: .hold).ports
-        #expect(rows == [.init(name: "오른쪽", watts: "5.3 W", detail: "5.19 V × 1.02 A")])
+        #expect(rows == [.init(name: "오른쪽", watts: "5.3 W", detail: "5.19 V × 1.02 A", device: "전원만 받는 기기")])
     }
 
     @Test func unknownPortFallsBackToNumber() {
@@ -78,7 +78,7 @@ struct PortIdentityTests {
         ]
         let s = PowerSnapshot(isExternalConnected: true, adapterInW: 30, systemLoadW: 30, batteryW: 0, portOutputs: ports)
         let rows = OverviewPresentation(snapshot: s, state: .hold).ports
-        #expect(rows.map(\.device) == ["iPhone · 83%", "Apple 기기 · 100%", nil])
+        #expect(rows.map(\.device) == ["iPhone · 83%", "Apple 기기 · 100%", "전원만 받는 기기"])
         #expect(rows.map(\.name) == ["왼쪽 앞", "왼쪽 뒤", "오른쪽"])
     }
 }
